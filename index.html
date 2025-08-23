@@ -6,6 +6,8 @@
     <title>Project Monarch 2.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/15.2.11/Tone.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body {
@@ -66,6 +68,14 @@
         .achievement-unlocked {
             animation: fadeInOut 5s forwards;
         }
+        .pr-animation {
+            animation: pr-pop-in-out 4s ease-in-out forwards;
+        }
+        @keyframes pr-pop-in-out {
+            0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            10% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            20%, 80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
         @keyframes fadeInOut {
             0%, 100% { opacity: 0; transform: translateY(20px); }
             10%, 90% { opacity: 1; transform: translateY(0); }
@@ -98,6 +108,14 @@
         }
 
         /* --- Components: Achievements --- */
+        .chart-toggle-btn {
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            color: #9ca3af; /* gray-400 */
+        }
+        .chart-toggle-btn.active {
+            background-color: #374151; /* gray-700 */
+            color: #fff;
+        }
         .achievement-unlocked-glow {
             box-shadow: 0 0 15px rgba(129, 140, 248, 0.5), 0 0 5px rgba(199, 210, 254, 0.7);
             border-color: rgba(129, 140, 248, 0.8);
@@ -119,6 +137,44 @@
             background-color: rgba(0,0,0,0.7);
         }
 
+        /* --- Level Up Animation --- */
+        .level-up-active {
+            display: flex;
+            animation: level-up-fade-in 0.2s ease-out forwards;
+        }
+        .level-up-active #level-up-content {
+            animation: level-up-zoom-in 0.4s 0.1s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+                       level-up-stay 2s 0.5s forwards,
+                       level-up-zoom-out 0.5s 2.5s ease-in forwards;
+        }
+        .level-up-active .bg-black\/80 {
+            animation: level-up-fade-in 0.2s ease-out forwards,
+                       level-up-fade-out 0.5s 2.5s ease-in forwards;
+        }
+
+        @keyframes level-up-fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes level-up-fade-out { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes level-up-zoom-in {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes level-up-stay {
+            from { transform: scale(1); opacity: 1; }
+            to { transform: scale(1.05); opacity: 1; text-shadow: 0 0 30px rgba(253, 224, 71, 0.9); }
+        }
+        @keyframes level-up-zoom-out {
+            from { transform: scale(1.05); opacity: 1; }
+            to { transform: scale(1.5); opacity: 0; }
+        }
+
+        /* --- XP Bar Pulse --- */
+        .xp-bar-pulse {
+            animation: xp-pulse 0.6s 2 ease-in-out;
+        }
+        @keyframes xp-pulse {
+            50% { filter: brightness(1.5); box-shadow: 0 0 10px #a78bfa; }
+        }
+
         /* --- Misc --- */
         .header-bg {
             background-image: url('http://googleusercontent.com/file_content/34');
@@ -138,7 +194,7 @@
         </header>
 
         <!-- Navigation -->
-        <nav class="flex justify-center gap-2 mb-6">
+        <nav class="flex justify-center gap-1 sm:gap-2 mb-6 flex-wrap">
             <button data-page="workout" class="nav-btn active inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/></svg>
                 <span class="hidden sm:inline">Quest</span>
@@ -147,6 +203,14 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg>
                 <span class="hidden sm:inline">Dashboard</span>
             </button>
+            <button data-page="architect" class="nav-btn inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/></svg>
+                <span class="hidden sm:inline">Architect</span>
+            </button>
+            <button data-page="nutrition" class="nav-btn inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg>
+                <span class="hidden sm:inline">Nutrition</span>
+            </button>
             <button data-page="calendar" class="nav-btn inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"/></svg>
                 <span class="hidden sm:inline">Calendar</span>
@@ -154,6 +218,10 @@
             <button data-page="log" class="nav-btn inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 6.75v10.5a2.25 2.25 0 0 0 2.25 2.25Zm.75-12h9v9h-9v-9Z"/></svg>
                 <span class="hidden sm:inline">System Log</span>
+            </button>
+            <button data-page="settings" class="nav-btn inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                <span class="hidden sm:inline">Settings</span>
             </button>
         </nav>
 
@@ -179,7 +247,19 @@
                         <p class="text-xs sm:text-sm text-gray-400 uppercase font-bold">Phase</p>
                         <p id="workout-phase" class="text-xl sm:text-2xl font-semibold text-indigo-300">I</p>
                     </div>
+                        <div class="card-bg p-3 sm:p-4 rounded-lg text-center">
+                        <p class="text-xs sm:text-sm text-gray-400 uppercase font-bold">Mana</p>
+                        <p id="player-mana" class="text-xl sm:text-2xl font-semibold text-cyan-300">0</p>
+                    </div>
                 </div>
+
+                    <!-- Inventory Section -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-white mb-3">Inventory</h3>
+                        <div id="inventory-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                            <!-- Inventory items will be injected here -->
+                        </div>
+                    </div>
 
                 <!-- XP Bar -->
                 <div class="mb-6 card-bg p-4 rounded-lg">
@@ -191,6 +271,9 @@
                         <div id="xp-bar" class="bg-indigo-500 h-4 rounded-full progress-bar-fill" style="width: 0%"></div>
                     </div>
                 </div>
+
+                <!-- Gate Challenge -->
+                <div id="gate-challenge-container" class="mb-6 hidden"></div>
 
                 <!-- Daily Quest / Workout -->
                 <div id="workout-container" class="card-bg p-4 sm:p-6 rounded-lg">
@@ -207,6 +290,26 @@
 
             <!-- Dashboard Page -->
             <div id="dashboard-page" class="page">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-4">Hunter Status</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="card-bg p-3 sm:p-4 rounded-lg text-center">
+                        <p class="text-xs sm:text-sm text-gray-400 uppercase font-bold">Level</p>
+                        <p id="dashboard-level" class="text-xl sm:text-2xl font-semibold text-green-400">1</p>
+                    </div>
+                    <div class="card-bg p-3 sm:p-4 rounded-lg text-center">
+                        <p class="text-xs sm:text-sm text-gray-400 uppercase font-bold">Days Trained</p>
+                        <p id="dashboard-days-trained" class="text-xl sm:text-2xl font-semibold text-green-400">0</p>
+                    </div>
+                    <div class="card-bg p-3 sm:p-4 rounded-lg text-center">
+                        <p class="text-xs sm:text-sm text-gray-400 uppercase font-bold">Phase</p>
+                        <p id="dashboard-phase" class="text-xl sm:text-2xl font-semibold text-indigo-300">I</p>
+                    </div>
+                    <div class="card-bg p-3 sm:p-4 rounded-lg text-center">
+                        <p class="text-xs sm:text-sm text-gray-400 uppercase font-bold">Mana</p>
+                        <p id="dashboard-mana" class="text-xl sm:text-2xl font-semibold text-cyan-300">0</p>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-1 card-bg p-6 rounded-lg text-center">
                         <img src="http://googleusercontent.com/file_content/38" alt="Player Avatar" class="w-32 h-32 sm:w-40 sm:h-40 rounded-full mx-auto mb-4 border-4 border-indigo-500">
@@ -219,11 +322,17 @@
                     </div>
                     <div class="lg:col-span-2 space-y-6">
                         <div class="card-bg p-4 sm:p-6 rounded-lg">
-                            <div class="flex justify-between items-center mb-4">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                                 <h3 class="text-lg sm:text-xl font-bold text-glow text-indigo-400">Progress Chart</h3>
-                                <select id="lift-select" class="bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
-                                    <!-- Options will be populated by JS -->
-                                </select>
+                                <div class="flex items-center gap-2">
+                                    <div id="chart-metric-toggle" class="flex rounded-lg bg-gray-800 p-1">
+                                        <button data-metric="weight" class="chart-toggle-btn active px-3 py-1 text-sm font-semibold rounded-md">Weight</button>
+                                        <button data-metric="volume" class="chart-toggle-btn px-3 py-1 text-sm font-semibold rounded-md">Volume</button>
+                                    </div>
+                                    <select id="lift-select" class="bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
+                                        <!-- Options will be populated by JS -->
+                                    </select>
+                                </div>
                             </div>
                             <div class="h-64">
                                 <canvas id="progress-chart"></canvas>
@@ -254,8 +363,110 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Architect Page -->
+            <div id="architect-page" class="page">
+                <div class="card-bg p-4 sm:p-6 rounded-lg">
+                    <h2 class="text-xl sm:text-2xl font-bold mb-4 text-glow text-indigo-400">The Architect</h2>
+                    <p class="text-gray-400 mb-6">Design and save your own custom workout routines.</p>
+
+                    <div class="space-y-6">
+                        <!-- Create New Routine Form -->
+                        <div class="card-bg border border-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3">Create New Routine</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="routine-name" class="block text-sm font-medium text-gray-300 mb-1">Routine Name</label>
+                                    <input type="text" id="routine-name" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 'Hypertrophy Focus'">
+                                </div>
+                            </div>
+
+                            <div id="new-routine-exercises" class="mt-4 space-y-2">
+                                <!-- Dynamically added exercises will appear here -->
+                            </div>
+
+                            <div class="border-t border-gray-700 mt-4 pt-4">
+                                <h4 class="text-md font-semibold mb-2">Add Exercise</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                    <select id="architect-exercise-select" class="md:col-span-2 bg-gray-800 border border-gray-600 rounded-lg p-2 text-white focus:ring-indigo-500 focus:border-indigo-500"></select>
+                                    <input type="number" id="architect-sets" class="bg-gray-800 border border-gray-600 rounded-lg p-2 text-white" placeholder="Sets">
+                                    <input type="text" id="architect-reps" class="bg-gray-800 border border-gray-600 rounded-lg p-2 text-white" placeholder="Reps">
+                                </div>
+                                <button id="architect-add-exercise-btn" class="btn-secondary w-full mt-3 py-2">Add Exercise to Routine</button>
+                            </div>
+
+                            <button id="architect-save-routine-btn" class="btn-primary w-full mt-6 py-3 font-bold uppercase">Save Routine</button>
+                        </div>
+
+                        <!-- Saved Routines List -->
+                        <div class="card-bg border border-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3">Saved Routines</h3>
+                            <div id="saved-routines-list" class="space-y-3">
+                                <p class="text-gray-500">No custom routines saved yet.</p>
+                                <!-- Saved routines will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nutrition Page -->
+            <div id="nutrition-page" class="page">
+                <div class="card-bg p-4 sm:p-6 rounded-lg">
+                    <h2 class="text-xl sm:text-2xl font-bold mb-4 text-glow text-indigo-400">Nutrition Analysis</h2>
+                    <p class="text-gray-400 mb-6">
+                        Enter the meal you've consumed today. The System will analyze the contents and provide a nutritional breakdown and recommendations to optimize your performance.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label for="nutrition-input" class="block text-sm font-medium text-gray-300 mb-1">Log your meal</label>
+                            <textarea id="nutrition-input" rows="6" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., '300g chicken breast, 150g brown rice, 1 cup broccoli'"></textarea>
+                        </div>
+
+                        <button id="analyze-nutrition-btn" class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg text-base sm:text-lg uppercase tracking-wider">Analyze Meal</button>
+                    </div>
+
+                    <div id="nutrition-results-container" class="mt-6">
+                        <!-- Analysis results will be displayed here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings-page" class="page">
+                <div class="space-y-8">
+                    <!-- Deload Protocol -->
+                    <div class="card-bg p-4 sm:p-6 rounded-lg">
+                        <h2 class="text-xl sm:text-2xl font-bold mb-2 text-glow text-indigo-400">Deload Protocol</h2>
+                        <p class="text-gray-400 mb-4">
+                            Activating the Deload Protocol will reduce the working weight of your four main lifts (Squat, Bench Press, Deadlift, Overhead Press) by 10%. This is useful for starting a new training cycle or when feeling fatigued.
+                        </p>
+                        <button id="trigger-deload-btn" class="btn-secondary text-white font-bold py-2 px-4 rounded-lg">Trigger Deload</button>
+                    </div>
+
+                    <!-- Data Management -->
+                    <div class="card-bg p-4 sm:p-6 rounded-lg">
+                        <h2 class="text-xl sm:text-2xl font-bold mb-2 text-glow text-yellow-400">Data Management</h2>
+                        <p class="text-gray-400 mb-4">
+                            Export your progress to a file or import a previous save.
+                        </p>
+                        <div class="flex gap-4 mb-6">
+                            <button id="export-data-btn" class="btn-secondary text-white font-bold py-2 px-4 rounded-lg flex-1">Export Data</button>
+                            <button id="import-data-btn" class="btn-secondary text-white font-bold py-2 px-4 rounded-lg flex-1">Import Data</button>
+                        </div>
+
+                        <h3 class="text-lg font-semibold text-red-500">Danger Zone</h3>
+                        <p class="text-gray-400 mb-4">
+                            Reset all your progress. This action is irreversible and will delete all your levels, stats, and achievements.
+                        </p>
+                        <button id="reset-progress-btn" class="w-full bg-red-800 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg uppercase">Reset All Progress</button>
+                    </div>
+                </div>
+            </div>
         </main>
 
+        <input type="file" id="import-file-input" class="hidden" accept=".json">
     </div>
 
     <!-- Modal -->
@@ -274,9 +485,74 @@
         <p id="achievement-toast-text" class="text-gray-300 text-sm"></p>
     </div>
 
+    <!-- PR Toast -->
+    <div id="pr-toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 card-bg p-6 rounded-lg shadow-2xl hidden pr-animation border-2 border-yellow-400 w-11/12 max-w-sm text-center">
+        <p class="text-2xl font-black text-yellow-300 text-glow uppercase tracking-wider">Personal Record!</p>
+        <p id="pr-toast-text" class="text-gray-200 text-lg mt-2"></p>
+    </div>
+
+    <!-- Level Up Animation Overlay -->
+    <div id="level-up-overlay" class="fixed inset-0 z-50 items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/80"></div>
+        <div id="level-up-content" class="relative text-center">
+            <p class="text-2xl font-bold text-gray-400 uppercase tracking-widest">Level Up</p>
+            <p id="level-up-number" class="text-9xl font-black text-yellow-300 text-glow" style="line-height: 1;">10</p>
+        </div>
+    </div>
+
     <script>
+        // --- ITEM DEFINITIONS ---
+        const itemDefs = {
+            'stamina-potion': {
+                name: 'Stamina Potion',
+                description: 'A bubbling, effervescent liquid. Grants 50 XP upon use.',
+                icon: '🧪',
+                use: () => {
+                    app.addXp(50);
+                    app.showToast('Used Stamina Potion and gained 50 XP!', 'success');
+                    return true; // Consume item
+                }
+            },
+            'key-dungeon': {
+                name: 'Key to a Hidden Dungeon',
+                description: 'An ornate, glowing key. Guarantees a high-rank gate for tomorrow.',
+                icon: '🔑',
+                use: () => {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    const dateString = tomorrow.toISOString().split('T')[0];
+
+                    // Overwrite any existing gate for tomorrow
+                    app.state.gates = app.state.gates.filter(g => g.date !== dateString);
+
+                    const highRankGate = app.generateGate(true); // `true` forces high rank
+                    if (highRankGate) {
+                        highRankGate.date = dateString;
+                        app.state.gates.push(highRankGate);
+                        app.showToast('A high-rank gate has been scheduled for tomorrow!', 'special');
+                        return true; // Consume item
+                    }
+                    app.showToast('Could not generate a high-rank gate.', 'error');
+                    return false; // Do not consume
+                }
+            },
+            'mana-crystal': {
+                name: 'Mana Crystal',
+                description: 'A crystal humming with raw power. Grants 100 Mana.',
+                icon: '💎',
+                use: () => {
+                    app.updateMana(100);
+                    app.showToast('Used Mana Crystal and gained 100 Mana!', 'success');
+                    return true;
+                }
+            }
+        };
+
         const app = {
             progressChart: null,
+            chartMetric: 'weight',
+            newRoutine: { name: '', exercises: [] },
+            sounds: null,
             // --- STATE ---
             state: {
                 currentPage: 'workout',
@@ -289,12 +565,20 @@
                 week: 1,
                 streak: 0,
                 lastWorkoutDate: null,
+                mana: 0,
+                inventory: {}, // e.g., { 'stamina-potion': 2 }
+                gate: null, // e.g., { id: 'e_rank_squats', rank: 'E', description: 'Perform 20 bodyweight squats.', xp: 10 }
+                gates: [],
+                personalRecords: {}, // e.g., { 'Squat': { reps: 5, weight: 100 } }
+                customWorkouts: [],
+                activeCustomWorkout: null,
+                lastGateGenerationDate: null,
                 lifts: {
-                    'Squat': { weight: 20, lastCompletedSets: 0 },
-                    'Bench Press': { weight: 20, lastCompletedSets: 0 },
-                    'Barbell Row': { weight: 20, lastCompletedSets: 0 },
-                    'Overhead Press': { weight: 20, lastCompletedSets: 0 },
-                    'Deadlift': { weight: 30, lastCompletedSets: 0 },
+                    'Squat': { weight: 20, lastCompletedSets: 0, e1rm: 0 },
+                    'Bench Press': { weight: 20, lastCompletedSets: 0, e1rm: 0 },
+                    'Barbell Row': { weight: 20, lastCompletedSets: 0, e1rm: 0 },
+                    'Overhead Press': { weight: 20, lastCompletedSets: 0, e1rm: 0 },
+                    'Deadlift': { weight: 30, lastCompletedSets: 0, e1rm: 0 },
                     'Incline DB Press': { weight: 10, lastCompletedSets: 0 },
                     'Tricep Pushdown': { weight: 15, lastCompletedSets: 0 },
                     'Lateral Raise': { weight: 5, lastCompletedSets: 0 },
@@ -303,6 +587,12 @@
                     'Romanian Deadlift': { weight: 40, lastCompletedSets: 0 },
                     'Leg Press': { weight: 50, lastCompletedSets: 0 },
                     'Calf Raise': { weight: 40, lastCompletedSets: 0 },
+                    'Power Clean': { weight: 30, lastCompletedSets: 0 },
+                    'Kettlebell Swing': { weight: 16, lastCompletedSets: 0 },
+                    'Box Jump': { height: 24, lastCompletedSets: 0 }, // Using height in inches
+                    'Dips': { weight: 0, lastCompletedSets: 0 }, // Bodyweight, can add weight
+                    'Face Pull': { weight: 10, lastCompletedSets: 0 },
+                    'Leg Curls': { weight: 20, lastCompletedSets: 0 },
                 },
                 achievements: [],
                 systemLog: [],
@@ -367,6 +657,56 @@
                             { name: 'Calf Raise', sets: 5, reps: '10-15', xp: 10, videoId: 'Jifcyb0p_gU' },
                         ]
                     }
+                },
+                3: {
+                    name: "Power & Athleticism",
+                    exercises: {
+                        'Push': [
+                            { name: 'Overhead Press', sets: 5, reps: '3-5', xp: 30, videoId: '2yjwXTZQDDI' },
+                            { name: 'Power Clean', sets: 5, reps: '3-5', xp: 35, videoId: 'H-h9Lsl_gB0' },
+                            { name: 'Incline DB Press', sets: 3, reps: '6-8', xp: 20, videoId: '8iPEnn-ltC8' },
+                            { name: 'Dips', sets: 3, reps: '8-12', xp: 15 },
+                            { name: 'Lateral Raise', sets: 4, reps: '10-15', xp: 10, videoId: '3VcKaXpzqRo' },
+                        ],
+                        'Pull': [
+                            { name: 'Barbell Row', sets: 5, reps: '3-5', xp: 30, videoId: 'T3N-tLpso_E' },
+                            { name: 'Kettlebell Swing', sets: 4, reps: '8-12', xp: 25, videoId: 'YSxH57_d-wM' },
+                            { name: 'Lat Pulldown', sets: 3, reps: '8-10', xp: 15, videoId: 'eGo4IYlbE5g' },
+                            { name: 'Face Pull', sets: 3, reps: '12-15', xp: 10 },
+                        ],
+                        'Legs': [
+                            { name: 'Squat', sets: 5, reps: '3-5', xp: 35, videoId: 'bEv6CCg2BC8' },
+                            { name: 'Box Jump', sets: 5, reps: '5-8', xp: 30, videoId: 'hJq1tr_TRy8' },
+                            { name: 'Romanian Deadlift', sets: 3, reps: '6-8', xp: 20, videoId: 'JCXUYuzwNrM' },
+                            { name: 'Leg Press', sets: 3, reps: '10-12', xp: 15, videoId: 'GvRgijoJ2xY' },
+                        ]
+                    }
+                },
+                4: {
+                    name: "Peak Strength & Specialization",
+                    exercises: {
+                        'Push': [
+                            { name: 'Bench Press', sets: 3, reps: '5/3/1', xp: 40, scheme: '5/3/1', videoId: 'gRVjAtPip0Y' },
+                            { name: 'Overhead Press', sets: 3, reps: '8-12', xp: 20, videoId: '2yjwXTZQDDI' },
+                            { name: 'Incline DB Press', sets: 3, reps: '8-12', xp: 15, videoId: '8iPEnn-ltC8' },
+                            { name: 'Tricep Pushdown', sets: 3, reps: '10-15', xp: 10, videoId: '2-LAMcpzODU', accessory: true },
+                            { name: 'Lateral Raise', sets: 3, reps: '10-15', xp: 10, videoId: '3VcKaXpzqRo', accessory: true },
+                        ],
+                        'Pull': [
+                            { name: 'Deadlift', sets: 3, reps: '5/3/1', xp: 50, scheme: '5/3/1', videoId: 'wYREQk5P_zI' },
+                            { name: 'Barbell Row', sets: 3, reps: '8-12', xp: 20, videoId: 'T3N-tLpso_E' },
+                            { name: 'Lat Pulldown', sets: 3, reps: '8-12', xp: 15, videoId: 'eGo4IYlbE5g' },
+                            { name: 'Bicep Curl', sets: 3, reps: '10-15', xp: 10, accessory: true },
+                            { name: 'Face Pull', sets: 3, reps: '12-15', xp: 10, accessory: true },
+                        ],
+                        'Legs': [
+                            { name: 'Squat', sets: 3, reps: '5/3/1', xp: 45, scheme: '5/3/1', videoId: 'bEv6CCg2BC8' },
+                            { name: 'Leg Press', sets: 3, reps: '8-12', xp: 20, videoId: 'GvRgijoJ2xY' },
+                            { name: 'Romanian Deadlift', sets: 3, reps: '8-12', xp: 20, videoId: 'JCXUYuzwNrM' },
+                            { name: 'Leg Curls', sets: 3, reps: '10-15', xp: 10, accessory: true },
+                            { name: 'Calf Raise', sets: 4, reps: '15-20', xp: 10, accessory: true },
+                        ]
+                    }
                 }
             },
             titlesData: [
@@ -392,11 +732,62 @@
                 { id: 'level_50', name: 'Monarch of Strength', description: 'Reach Level 50.', condition: (s) => s.level >= 50, icon: 'fa-crown' },
             ],
 
+            gatesData: {
+                'E': [ { id: 'e_squats', description: 'Perform 20 bodyweight squats.', xp: 10, mana: 5 } ],
+                'D': [ { id: 'd_lunges', description: 'Perform 40 walking lunges.', xp: 20, mana: 10 } ],
+                'C': [ { id: 'c_plank', description: 'Hold a plank for a total of 3 minutes.', xp: 30, mana: 15 } ],
+                'B': [ { id: 'b_amrap', description: 'On your last set of the main lift, perform As Many Reps As Possible (AMRAP).', xp: 50, mana: 25, requiresWorkout: true } ],
+                'A': [ { id: 'a_slow_negative', description: 'Complete your final set of your main lift with a 10-second slow negative.', xp: 75, mana: 50, requiresWorkout: true } ],
+                'S': [ { id: 's_100_pushups', description: 'Complete your entire workout, then perform 100 push-ups.', xp: 200, mana: 100, requiresWorkout: true, canDropKey: true } ]
+            },
+
+            generateGate(forceHighRank = false) {
+                this.state.lastGateGenerationDate = new Date().toISOString().split('T')[0];
+
+                if (!forceHighRank && Math.random() > 0.5) { // 50% chance of no gate
+                    this.state.gate = null;
+                    this.saveState();
+                    if (forceHighRank) return null; // for key
+                    return;
+                }
+
+                const rand = Math.random() * 100;
+                let rank;
+                if (forceHighRank) {
+                    rank = Math.random() < 0.8 ? 'A' : 'S'; // 80% A, 20% S for key
+                } else {
+                    if (rand < 60) rank = 'E';      // 60% chance
+                    else if (rand < 80) rank = 'D'; // 20% chance
+                    else if (rand < 90) rank = 'C'; // 10% chance
+                    else if (rand < 95) rank = 'B'; // 5% chance
+                    else if (rand < 98) rank = 'A'; // 3% chance
+                    else rank = 'S';                // 2% chance
+                }
+
+                let selectedGate = null;
+                if (this.gatesData[rank] && this.gatesData[rank].length > 0) {
+                    const gatePool = this.gatesData[rank];
+                    selectedGate = { ...gatePool[Math.floor(Math.random() * gatePool.length)] };
+                    selectedGate.rank = rank;
+                }
+
+                if (forceHighRank) {
+                    return selectedGate; // Return the gate object for the key to use
+                }
+
+                this.state.gate = selectedGate;
+                this.saveState();
+            },
+
             // --- JAVASCRIPT LOGIC ---
             init() {
                 this.loadState();
-                const today = new Date();
-                const dayOfWeek = today.getDay();
+                this.initSounds();
+                const today = new Date().toISOString().split('T')[0];
+                if (this.state.lastGateGenerationDate !== today) {
+                    this.generateGate();
+                }
+                const dayOfWeek = new Date().getDay();
                 this.state.currentDayIndex = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
 
                 document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -405,18 +796,97 @@
                 document.getElementById('complete-workout-btn').addEventListener('click', () => this.confirmCompleteWorkout());
                 document.getElementById('analyze-workout-btn').addEventListener('click', () => this.analyzeWorkout());
                 document.getElementById('edit-name-btn').addEventListener('click', () => this.editPlayerName());
+                document.getElementById('architect-add-exercise-btn').addEventListener('click', () => this.architectAddExercise());
+                document.getElementById('architect-save-routine-btn').addEventListener('click', () => this.architectSaveRoutine());
+                document.getElementById('analyze-nutrition-btn').addEventListener('click', () => this.analyzeNutrition());
+                document.getElementById('trigger-deload-btn').addEventListener('click', () => this.confirmDeload());
+                document.getElementById('reset-progress-btn').addEventListener('click', () => this.confirmReset());
+                document.getElementById('export-data-btn').addEventListener('click', () => this.exportData());
+                document.getElementById('import-data-btn').addEventListener('click', () => document.getElementById('import-file-input').click());
+                document.getElementById('import-file-input').addEventListener('change', (e) => this.importData(e));
+
+                // Event delegation for dynamic buttons
+                document.getElementById('app').addEventListener('click', (e) => {
+                    if (e.target && e.target.id === 'gate-complete-btn') {
+                        this.completeGateChallenge();
+                    }
+                });
 
                 this.getMotivationalQuote();
                 this.render();
             },
+
+            initSounds() {
+                this.sounds = {
+                    setComplete: new Tone.Synth({
+                        oscillator: { type: 'sine' },
+                        envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.1 }
+                    }).toDestination(),
+                    workoutComplete: new Tone.PolySynth(Tone.Synth).toDestination(),
+                    levelUp: new Tone.PolySynth(Tone.Synth).toDestination(),
+                    achievement: new Tone.Synth({
+                        oscillator: { type: 'triangle' },
+                        envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.2 }
+                    }).toDestination(),
+                    itemUse: new Tone.NoiseSynth({
+                        noise: { type: 'pink' },
+                        envelope: { attack: 0.005, decay: 0.1, sustain: 0 }
+                    }).toDestination()
+                };
+            },
+
+            playSound(soundName, note, duration = '8n') {
+                if (!this.sounds || !this.sounds[soundName]) return;
+
+                // Ensure audio context is started
+                Tone.start();
+
+                try {
+                    if (soundName === 'workoutComplete') {
+                        this.sounds.workoutComplete.triggerAttackRelease(["C4", "E4", "G4"], "0.5");
+                    } else if (soundName === 'levelUp') {
+                        const now = Tone.now();
+                        this.sounds.levelUp.triggerAttackRelease("C4", "8n", now);
+                        this.sounds.levelUp.triggerAttackRelease("E4", "8n", now + 0.1);
+                        this.sounds.levelUp.triggerAttackRelease("G4", "8n", now + 0.2);
+                        this.sounds.levelUp.triggerAttackRelease("C5", "8n", now + 0.3);
+                    } else {
+                         this.sounds[soundName].triggerAttackRelease(note, duration);
+                    }
+                } catch (e) {
+                    console.error(`Error playing sound ${soundName}:`, e);
+                }
+            },
+
             saveState() { localStorage.setItem('projectMonarchState', JSON.stringify(this.state)); },
             loadState() {
                 const savedState = localStorage.getItem('projectMonarchState');
                 if (savedState) {
                     const parsedState = JSON.parse(savedState);
+
+                    // --- Migration for inventory from array to object ---
+                    if (Array.isArray(parsedState.inventory)) {
+                        const newInventory = {};
+                        parsedState.inventory.forEach(item => {
+                            if (item.id && item.quantity) {
+                                newInventory[item.id] = (newInventory[item.id] || 0) + item.quantity;
+                            }
+                        });
+                        parsedState.inventory = newInventory;
+                    }
+
                     this.state = { ...this.state, ...parsedState };
+                    // --- Safely initialize new properties for users with old save data ---
                     this.state.systemLog = this.state.systemLog || [];
                     this.state.history = this.state.history || [];
+                    this.state.mana = this.state.mana || 0;
+                    this.state.inventory = this.state.inventory || {}; // Ensure it's an object
+                    this.state.gate = this.state.gate || null;
+                    this.state.gates = this.state.gates || [];
+                    this.state.personalRecords = this.state.personalRecords || {};
+                    this.state.customWorkouts = this.state.customWorkouts || [];
+                    this.state.activeCustomWorkout = this.state.activeCustomWorkout || null;
+                    this.state.lastGateGenerationDate = this.state.lastGateGenerationDate || null;
                 }
             },
             showPage(pageId) {
@@ -425,22 +895,223 @@
                 document.getElementById(`${pageId}-page`).classList.add('active');
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                 document.querySelector(`.nav-btn[data-page="${pageId}"]`).classList.add('active');
+                this.saveState();
                 this.render();
             },
             render() {
                 this.renderPlayerStats();
+                this.renderInventory();
                 if (this.state.currentPage === 'workout') this.renderWorkout();
                 if (this.state.currentPage === 'dashboard') this.renderDashboard();
                 if (this.state.currentPage === 'calendar') this.renderCalendar();
                 if (this.state.currentPage === 'log') this.renderSystemLog();
+                if (this.state.currentPage === 'architect') this.renderArchitect();
             },
+
+            renderInventory() {
+                const container = document.getElementById('inventory-container');
+                container.innerHTML = '';
+                if (Object.keys(this.state.inventory).length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 col-span-full text-center text-sm">Your inventory is empty.</p>';
+                    return;
+                }
+
+                for (const itemId in this.state.inventory) {
+                    const quantity = this.state.inventory[itemId];
+                    if (quantity <= 0) continue;
+
+                    const itemDef = itemDefs[itemId];
+                    if (!itemDef) continue;
+
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'card-bg p-3 rounded-lg text-center cursor-pointer transition-transform transform hover:scale-105';
+                    itemEl.dataset.itemId = itemId;
+                    itemEl.innerHTML = `
+                        <div class="text-3xl">${itemDef.icon}</div>
+                        <p class="font-semibold text-sm mt-1">${itemDef.name}</p>
+                        <p class="text-xs text-gray-400">x${quantity}</p>
+                    `;
+                    itemEl.onclick = () => this.confirmUseItem(itemId);
+                    container.appendChild(itemEl);
+                }
+            },
+
+            renderArchitect() {
+                // Populate exercise dropdown
+                const exerciseSelect = document.getElementById('architect-exercise-select');
+                if (exerciseSelect.options.length <= 1) { // Populate only once
+                    exerciseSelect.innerHTML = '<option value="">-- Select Exercise --</option>';
+                    Object.keys(this.state.lifts).forEach(liftName => {
+                        const option = document.createElement('option');
+                        option.value = liftName;
+                        option.textContent = liftName;
+                        exerciseSelect.appendChild(option);
+                    });
+                }
+
+                // Render exercises currently in the new routine
+                const exercisesContainer = document.getElementById('new-routine-exercises');
+                exercisesContainer.innerHTML = '';
+                this.newRoutine.exercises.forEach((ex, index) => {
+                    const exEl = document.createElement('div');
+                    exEl.className = 'flex justify-between items-center bg-gray-900 p-2 rounded-md';
+                    exEl.innerHTML = `
+                        <span>${ex.name} - ${ex.sets} sets x ${ex.reps} reps</span>
+                        <button data-index="${index}" class="remove-exercise-btn text-red-500 hover:text-red-400">&times;</button>
+                    `;
+                    exercisesContainer.appendChild(exEl);
+                });
+
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-exercise-btn').forEach(btn => {
+                    btn.onclick = (e) => {
+                        this.newRoutine.exercises.splice(e.target.dataset.index, 1);
+                        this.renderArchitect();
+                    };
+                });
+
+                // Render saved routines
+                const savedList = document.getElementById('saved-routines-list');
+                savedList.innerHTML = '';
+                if (this.state.customWorkouts.length === 0) {
+                    savedList.innerHTML = '<p class="text-gray-500">No custom routines saved yet.</p>';
+                } else {
+                    this.state.customWorkouts.forEach(routine => {
+                        const routineEl = document.createElement('div');
+                        routineEl.className = 'flex justify-between items-center bg-gray-900 p-3 rounded-lg';
+                        routineEl.innerHTML = `
+                            <div>
+                                <p class="font-semibold">${routine.name}</p>
+                                <p class="text-xs text-gray-400">${routine.exercises.length} exercises</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button data-id="${routine.id}" class="start-custom-btn btn-primary px-3 py-1 text-sm">Start</button>
+                                <button data-id="${routine.id}" class="delete-custom-btn btn-secondary px-3 py-1 text-sm">&times;</button>
+                            </div>
+                        `;
+                        savedList.appendChild(routineEl);
+                    });
+                }
+
+                // Add event listeners for saved routines
+                document.querySelectorAll('.start-custom-btn').forEach(btn => {
+                    btn.onclick = (e) => this.startCustomWorkout(e.target.dataset.id);
+                });
+                document.querySelectorAll('.delete-custom-btn').forEach(btn => {
+                    btn.onclick = (e) => this.deleteCustomWorkout(e.target.dataset.id);
+                });
+            },
+
+            architectAddExercise() {
+                const exerciseSelect = document.getElementById('architect-exercise-select');
+                const setsInput = document.getElementById('architect-sets');
+                const repsInput = document.getElementById('architect-reps');
+
+                const exercise = {
+                    name: exerciseSelect.value,
+                    sets: parseInt(setsInput.value) || 3,
+                    reps: repsInput.value || '8-12',
+                    xp: 10 // Standard XP for custom exercises
+                };
+
+                if (!exercise.name) {
+                    alert('Please select an exercise.');
+                    return;
+                }
+
+                this.newRoutine.exercises.push(exercise);
+                this.renderArchitect(); // Re-render to show the new exercise
+
+                // Clear inputs
+                exerciseSelect.value = '';
+                setsInput.value = '';
+                repsInput.value = '';
+            },
+
+            architectSaveRoutine() {
+                const routineNameInput = document.getElementById('routine-name');
+                const routineName = routineNameInput.value.trim();
+
+                if (!routineName) {
+                    alert('Please enter a name for your routine.');
+                    return;
+                }
+                if (this.newRoutine.exercises.length === 0) {
+                    alert('Please add at least one exercise to the routine.');
+                    return;
+                }
+
+                const newWorkout = {
+                    id: `custom_${Date.now()}`,
+                    name: routineName,
+                    exercises: this.newRoutine.exercises
+                };
+
+                this.state.customWorkouts.push(newWorkout);
+                this.saveState();
+
+                // Clear the builder
+                this.newRoutine = { name: '', exercises: [] };
+                routineNameInput.value = '';
+                this.renderArchitect();
+            },
+
+            startCustomWorkout(routineId) {
+                const routine = this.state.customWorkouts.find(r => r.id === routineId);
+                if (routine) {
+                    this.state.activeCustomWorkout = routine;
+                    this.saveState();
+                    this.showPage('workout');
+                }
+            },
+
+            deleteCustomWorkout(routineId) {
+                this.state.customWorkouts = this.state.customWorkouts.filter(r => r.id !== routineId);
+                this.saveState();
+                this.renderArchitect();
+            },
+
             renderWorkout() {
-                const workoutDay = this.workoutPlan[this.state.currentDayIndex];
+                const isCustom = !!this.state.activeCustomWorkout;
+                let workoutDay, exercisesForDay;
+
+                // --- Gate Display ---
+                const gateContainer = document.getElementById('gate-challenge-container');
+                if (this.state.gate && !this.state.gate.claimed) {
+                    const gate = this.state.gate;
+                    const gateRankColor = { E: 'gray', D: 'green', C: 'blue', B: 'indigo', A: 'purple', S: 'yellow' }[gate.rank];
+                    const gateIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 0 1-.657.643 48.39 48.39 0 0 1-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 0 1-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 0 0-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 0 1-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 0 0 .657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 0 1-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 0 0 5.427-.63 48.05 48.05 0 0 0 .582-4.717.532.532 0 0 0-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84 2.25 1.875 2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 0 0 .658-.663 48.422 48.422 0 0 0-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 0 1-.61-.58v0Z"/></svg>`;
+                    gateContainer.innerHTML = `
+                        <div class="card-bg border-2 border-${gateRankColor}-500 p-4 rounded-lg shadow-lg">
+                            <h3 class="text-lg font-bold text-${gateRankColor}-300 text-glow flex items-center">
+                                ${gateIcon}
+                                <span class="ml-2">${gate.rank}-Rank Gate Detected!</span>
+                            </h3>
+                            <p class="text-gray-300 mt-2"><b>Challenge:</b> ${gate.description}</p>
+                            <p class="text-gray-400 text-sm mt-2"><b>Rewards:</b> ${gate.xp} XP, ${gate.mana} Mana</p>
+                            <button id="gate-complete-btn" class="btn-secondary w-full mt-4 py-2 text-sm">Challenge Complete</button>
+                        </div>
+                    `;
+                    gateContainer.classList.remove('hidden');
+                } else {
+                    gateContainer.classList.add('hidden');
+                    gateContainer.innerHTML = '';
+                }
+
+                if (isCustom) {
+                    workoutDay = { name: this.state.activeCustomWorkout.name, type: 'Custom' };
+                    exercisesForDay = this.state.activeCustomWorkout.exercises;
+                } else {
+                    workoutDay = this.workoutPlan[this.state.currentDayIndex];
+                    const phase = this.getPhaseForWeek(this.state.week);
+                    exercisesForDay = this.workoutPhases[phase].exercises[workoutDay.type];
+                }
+
                 const exerciseListEl = document.getElementById('exercise-list');
                 const completeBtn = document.getElementById('complete-workout-btn');
                 const analyzeBtn = document.getElementById('analyze-workout-btn');
 
-                document.getElementById('workout-day-title').textContent = `${workoutDay.day}: ${workoutDay.name}`;
+                document.getElementById('workout-day-title').textContent = `${isCustom ? 'Custom:' : workoutDay.day + ':'} ${workoutDay.name}`;
                 exerciseListEl.innerHTML = '';
 
                 if (this.state.lastWorkoutSummary) {
@@ -451,7 +1122,7 @@
                     analyzeBtn.classList.add('hidden');
                 }
 
-                if (workoutDay.type === 'Rest') {
+                if (workoutDay.type === 'Rest' && !isCustom) {
                     exerciseListEl.innerHTML = `<div class="text-center py-8">
                         <img src="http://googleusercontent.com/file_content/37" class="mx-auto h-32 w-32 opacity-50 mb-4">
                         <p class="text-gray-400">Your body grows stronger during rest. Recover well, Hunter.</p>
@@ -459,14 +1130,31 @@
                     completeBtn.classList.add('hidden');
                     analyzeBtn.classList.add('hidden');
                 } else {
-                    const phase = this.state.week < 13 ? 1 : 2;
-                    const exercisesForDay = this.workoutPhases[phase].exercises[workoutDay.type];
                     exercisesForDay.forEach(ex => {
                         const lift = this.state.lifts[ex.name];
                         const exerciseEl = this.createExerciseElement(ex, lift);
                         exerciseListEl.appendChild(exerciseEl);
                     });
                 }
+            },
+
+            completeGateChallenge() {
+                if (!this.state.gate) return;
+
+                const gate = this.state.gate;
+                this.addXp(gate.xp);
+                this.updateMana(gate.mana || 0);
+
+                if (gate.canDropKey && Math.random() < 0.1) { // 10% chance for key drop on S-Rank
+                    this.addItemToInventory('key-dungeon', 1);
+                    this.showToast('Found: Key to a Hidden Dungeon!', 'special');
+                }
+
+                this.showToast(`Gate Cleared! +${gate.xp} XP, +${gate.mana || 0} Mana`, 'success');
+
+                this.state.gate.claimed = true; // Mark as claimed instead of deleting
+                this.saveState();
+                this.render();
             },
             renderSystemLog() {
                 const logContent = document.getElementById('system-log-content');
@@ -490,8 +1178,9 @@
                 document.getElementById('player-level').textContent = this.state.level;
                 document.getElementById('player-title').textContent = this.state.title;
                 document.getElementById('player-streak').innerHTML = `<i class="fas fa-fire"></i> ${this.state.streak}`;
-                const phase = this.state.week < 13 ? 1 : 2;
+                const phase = this.getPhaseForWeek(this.state.week);
                 document.getElementById('workout-phase').textContent = phase;
+                document.getElementById('player-mana').textContent = this.state.mana;
                 const xpPercentage = (this.state.xp / this.state.xpToNextLevel) * 100;
                 document.getElementById('xp-bar').style.width = `${xpPercentage}%`;
                 document.getElementById('xp-text').textContent = `${this.state.xp} / ${this.state.xpToNextLevel}`;
@@ -502,22 +1191,65 @@
                 el.dataset.exerciseName = exercise.name;
 
                 let setsHtml = '';
-                for (let i = 1; i <= exercise.sets; i++) {
-                    setsHtml += `<div class="flex items-center justify-between p-2 bg-gray-800 rounded-md mb-2 transition-colors duration-300">
-                        <span class="font-semibold text-sm sm:text-base transition-colors duration-300">Set ${i}</span>
-                        <span class="text-gray-400 text-sm sm:text-base transition-colors duration-300">${exercise.reps} Reps</span>
-                        <input type="checkbox" class="set-checkbox w-5 h-5 sm:w-6 sm:h-6 bg-gray-700 rounded text-indigo-500 focus:ring-indigo-600 cursor-pointer">
-                    </div>`;
+                let setsRepsDisplay = '';
+
+                if (exercise.scheme === '5/3/1') {
+                    const cycleWeek = (this.state.week - 37) % 4;
+                    const reps = ['5', '3', '1+ (AMRAP)'];
+                    const sets = [
+                        { reps: '5' }, { reps: '5' }, { reps: '5' },
+                        { reps: '3' }, { reps: '3' }, { reps: '3' },
+                        { reps: '5' }, { reps: '3' }, { reps: '1+' }
+                    ];
+
+                    let weekSets = [];
+                    if (cycleWeek === 0) { // Week 1
+                        setsRepsDisplay = '3 sets of 5 reps';
+                        weekSets = [{reps: 5}, {reps: 5}, {reps: 5}];
+                    } else if (cycleWeek === 1) { // Week 2
+                        setsRepsDisplay = '3 sets of 3 reps';
+                        weekSets = [{reps: 3}, {reps: 3}, {reps: 3}];
+                    } else if (cycleWeek === 2) { // Week 3
+                        setsRepsDisplay = '1x5, 1x3, 1x1+ AMRAP';
+                        weekSets = [{reps: 5}, {reps: 3}, {reps: '1+'}];
+                    } else { // Week 4 (Deload)
+                        setsRepsDisplay = '3 sets of 5 reps (Deload)';
+                        weekSets = [{reps: 5}, {reps: 5}, {reps: 5}];
+                    }
+
+                    weekSets.forEach((set, i) => {
+                         setsHtml += `<div class="flex items-center justify-between p-2 bg-gray-800 rounded-md mb-2 transition-colors duration-300">
+                            <span class="font-semibold text-sm sm:text-base transition-colors duration-300">Set ${i + 1}</span>
+                            <span class="text-gray-400 text-sm sm:text-base transition-colors duration-300">${set.reps} Reps</span>
+                            <input type="checkbox" class="set-checkbox w-5 h-5 sm:w-6 sm:h-6 bg-gray-700 rounded text-indigo-500 focus:ring-indigo-600 cursor-pointer">
+                        </div>`;
+                    });
+                } else {
+                    setsRepsDisplay = `${exercise.sets} x ${exercise.reps}`;
+                    for (let i = 1; i <= exercise.sets; i++) {
+                        setsHtml += `<div class="flex items-center justify-between p-2 bg-gray-800 rounded-md mb-2 transition-colors duration-300">
+                            <span class="font-semibold text-sm sm:text-base transition-colors duration-300">Set ${i}</span>
+                            <span class="text-gray-400 text-sm sm:text-base transition-colors duration-300">${exercise.reps} Reps</span>
+                            <input type="checkbox" class="set-checkbox w-5 h-5 sm:w-6 sm:h-6 bg-gray-700 rounded text-indigo-500 focus:ring-indigo-600 cursor-pointer">
+                        </div>`;
+                    }
                 }
 
-                const weightDisplay = `${liftData.weight} kg`;
+                let unitDisplay = '';
+                if (liftData.height) {
+                    unitDisplay = `${liftData.height} in`;
+                } else if (liftData.weight > 0) {
+                    unitDisplay = `${liftData.weight} kg`;
+                } else {
+                    unitDisplay = 'Bodyweight';
+                }
 
                 el.innerHTML = `
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg sm:text-xl font-bold">${exercise.name}</h3>
-                        <a href="https://www.youtube.com/watch?v=${exercise.videoId}" target="_blank" class="text-indigo-400 hover:text-indigo-300 text-sm">How-to Video</a>
+                        ${exercise.videoId ? `<a href="https://www.youtube.com/watch?v=${exercise.videoId}" target="_blank" class="text-indigo-400 hover:text-indigo-300 text-sm">How-to Video</a>` : ''}
                     </div>
-                    <p class="text-base sm:text-lg font-semibold text-indigo-300 mb-3">${exercise.sets} x ${exercise.reps} @ ${weightDisplay}</p>
+                    <p class="text-base sm:text-lg font-semibold text-indigo-300 mb-3">${setsRepsDisplay} @ ${unitDisplay}</p>
                     <div class="sets-container space-y-2">${setsHtml}</div>`;
 
                 el.querySelectorAll('.set-checkbox').forEach(checkbox => {
@@ -525,6 +1257,7 @@
                         const setContainer = e.target.parentElement;
                         if (e.target.checked) {
                             setContainer.classList.add('set-completed');
+                            this.playSound('setComplete', 'C5', '16n');
                         } else {
                             setContainer.classList.remove('set-completed');
                         }
@@ -534,28 +1267,39 @@
                 return el;
             },
             renderDashboard() {
-                // Render player info
+                // Populate new stats bar
+                document.getElementById('dashboard-level').textContent = this.state.level;
+                document.getElementById('dashboard-days-trained').textContent = this.state.streak;
+                document.getElementById('dashboard-phase').textContent = this.getPhaseForWeek(this.state.week);
+                document.getElementById('dashboard-mana').textContent = this.state.mana;
+
+                // Render player info, stats, achievements... (same as before)
                 document.getElementById('dashboard-player-name').textContent = this.state.playerName;
                 document.getElementById('dashboard-player-title').textContent = this.state.title;
-
-                // Render lift stats
                 const statsContainer = document.getElementById('lift-stats-container');
                 statsContainer.innerHTML = '';
                 Object.entries(this.state.lifts).forEach(([name, data]) => {
                     const statEl = document.createElement('div');
                     statEl.className = 'p-2 bg-gray-900 rounded-md';
-                    const value = data.weight ? `${data.weight} kg` : `${data.reps} reps`;
+                    let value = '';
+                    if (data.hasOwnProperty('weight')) {
+                        value = `${data.weight} kg`;
+                        if (data.e1rm) {
+                            value += ` <span class="text-xs text-gray-400 font-normal">(1RM: ${data.e1rm} kg)</span>`;
+                        }
+                    } else if (data.hasOwnProperty('height')) {
+                        value = `${data.height} in`;
+                    } else if (data.hasOwnProperty('reps')) {
+                        value = `${data.reps} reps`;
+                    }
                     statEl.innerHTML = `<p class="text-xs text-gray-400">${name}</p><p class="text-lg sm:text-xl font-bold text-indigo-300">${value}</p>`;
                     statsContainer.appendChild(statEl);
                 });
-
-                // Render achievements
                 const achievementsContainer = document.getElementById('achievements-list');
                 achievementsContainer.innerHTML = '';
                 this.achievementsData.forEach(ach => {
                     const isUnlocked = this.state.achievements.includes(ach.id);
                     const achEl = document.createElement('div');
-
                     let classes = 'p-3 sm:p-4 rounded-lg flex items-center gap-3 sm:gap-4 transition-all duration-300 ';
                     if (isUnlocked) {
                         classes += 'bg-indigo-900/50 border border-indigo-700 achievement-unlocked-glow';
@@ -563,28 +1307,14 @@
                         classes += 'bg-gray-800 text-gray-500';
                     }
                     achEl.className = classes;
-
-                    const trophySVG = `
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 flex-shrink-0 ${isUnlocked ? 'text-indigo-300' : 'text-gray-600'}">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"/>
-                        </svg>
-                    `;
-
-                    achEl.innerHTML = `
-                        ${trophySVG}
-                        <div>
-                            <p class="font-bold text-sm sm:text-base ${isUnlocked ? 'text-white' : ''}">${ach.name}</p>
-                            <p class="text-xs ${isUnlocked ? 'text-gray-300' : 'text-gray-500'}">${ach.description}</p>
-                        </div>
-                    `;
+                    const trophySVG = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 flex-shrink-0 ${isUnlocked ? 'text-indigo-300' : 'text-gray-600'}"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"/></svg>`;
+                    achEl.innerHTML = `${trophySVG}<div><p class="font-bold text-sm sm:text-base ${isUnlocked ? 'text-white' : ''}">${ach.name}</p><p class="text-xs ${isUnlocked ? 'text-gray-300' : 'text-gray-500'}">${ach.description}</p></div>`;
                     achievementsContainer.appendChild(achEl);
                 });
 
                 // --- Chart Logic ---
                 const liftSelect = document.getElementById('lift-select');
                 const mainLifts = ['Squat', 'Bench Press', 'Barbell Row', 'Overhead Press', 'Deadlift'];
-
-                // Populate dropdown only once
                 if (liftSelect.options.length === 0) {
                     mainLifts.forEach(lift => {
                         const option = document.createElement('option');
@@ -593,89 +1323,60 @@
                         liftSelect.appendChild(option);
                     });
                 }
-
-                // Add event listener
-                liftSelect.onchange = () => {
-                    this.updateChart(liftSelect.value);
-                };
-
-                // Initial chart render
-                this.updateChart(liftSelect.value || mainLifts[0]);
+                liftSelect.onchange = () => this.renderProgressChart();
+                document.querySelectorAll('.chart-toggle-btn').forEach(btn => {
+                    btn.onclick = (e) => {
+                        this.chartMetric = e.target.dataset.metric;
+                        document.querySelectorAll('.chart-toggle-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.renderProgressChart();
+                    };
+                });
+                this.renderProgressChart();
             },
 
-            updateChart(liftName) {
+            renderProgressChart() {
+                const liftName = document.getElementById('lift-select').value;
+                if (this.chartMetric === 'volume') {
+                    this.renderVolumeChart(liftName);
+                } else {
+                    this.renderWeightChart(liftName);
+                }
+            },
+
+            renderWeightChart(liftName) {
                 if (!window.Chart) return;
                 const ctx = document.getElementById('progress-chart').getContext('2d');
                 if (!ctx) return;
-
-                const liftHistory = this.state.history.filter(entry => entry.lift === liftName);
-
-                // Sort by date to ensure the line chart is correct
-                liftHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-                const labels = liftHistory.map(entry => {
-                    const d = new Date(entry.date);
-                    return `${d.getMonth() + 1}/${d.getDate()}`;
-                });
+                const liftHistory = this.state.history.filter(entry => entry.lift === liftName).sort((a, b) => new Date(a.date) - new Date(b.date));
+                const labels = liftHistory.map(entry => new Date(entry.date).toLocaleDateString());
                 const data = liftHistory.map(entry => entry.weight);
-
-                if (this.progressChart) {
-                    this.progressChart.destroy();
-                }
-
+                if (this.progressChart) this.progressChart.destroy();
                 this.progressChart = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: labels,
-                        datasets: [{
-                            label: `${liftName} Weight (kg)`,
-                            data: data,
-                            borderColor: '#818cf8', // indigo-400
-                            backgroundColor: 'rgba(129, 140, 248, 0.2)',
-                            fill: true,
-                            tension: 0.3,
-                            pointBackgroundColor: '#c7d2fe', // indigo-200
-                            pointHoverRadius: 6,
-                            pointHoverBackgroundColor: '#fff',
-                        }]
+                        labels,
+                        datasets: [{ label: `${liftName} Weight (kg)`, data, borderColor: '#818cf8', backgroundColor: 'rgba(129, 140, 248, 0.2)', fill: true, tension: 0.3 }]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                mode: 'index',
-                                intersect: false,
-                                backgroundColor: '#1f2937',
-                                titleColor: '#fff',
-                                bodyColor: '#e5e7eb',
-                                borderColor: '#4b5563',
-                                borderWidth: 1
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: false,
-                                grid: {
-                                    color: 'rgba(75, 85, 99, 0.5)'
-                                },
-                                ticks: {
-                                    color: '#9ca3af'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    color: 'rgba(75, 85, 99, 0.5)'
-                                },
-                                ticks: {
-                                    color: '#9ca3af'
-                                }
-                            }
-                        }
-                    }
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(75, 85, 99, 0.5)' }, ticks: { color: '#9ca3af' } }, x: { grid: { color: 'rgba(75, 85, 99, 0.5)' }, ticks: { color: '#9ca3af' } } } }
+                });
+            },
+
+            renderVolumeChart(liftName) {
+                if (!window.Chart) return;
+                const ctx = document.getElementById('progress-chart').getContext('2d');
+                if (!ctx) return;
+                const liftHistory = this.state.history.filter(entry => entry.lift === liftName).sort((a, b) => new Date(a.date) - new Date(b.date));
+                const labels = liftHistory.map(entry => new Date(entry.date).toLocaleDateString());
+                const data = liftHistory.map(entry => entry.weight * entry.sets * entry.reps);
+                if (this.progressChart) this.progressChart.destroy();
+                this.progressChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{ label: `${liftName} Volume (kg)`, data, backgroundColor: 'rgba(129, 140, 248, 0.6)', borderColor: '#818cf8', borderWidth: 1 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(75, 85, 99, 0.5)' }, ticks: { color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { color: '#9ca3af' } } } }
                 });
             },
 
@@ -766,43 +1467,87 @@
             },
             completeWorkout() {
                 let totalXpGained = 0;
-                const phase = this.state.week < 13 ? 1 : 2;
-                const workoutDay = this.workoutPlan[this.state.currentDayIndex];
-                const exercisesForDay = this.workoutPhases[phase].exercises[workoutDay.type];
-                const workoutSummary = { name: workoutDay.name, exercises: [] };
+                const isCustom = !!this.state.activeCustomWorkout;
+                let exercisesForDay;
+
+                if (isCustom) {
+                    exercisesForDay = this.state.activeCustomWorkout.exercises;
+                } else {
+                    const phase = this.getPhaseForWeek(this.state.week);
+                    const workoutDay = this.workoutPlan[this.state.currentDayIndex];
+                    exercisesForDay = this.workoutPhases[phase].exercises[workoutDay.type];
+                }
+
+                const workoutSummary = { name: isCustom ? this.state.activeCustomWorkout.name : this.workoutPlan[this.state.currentDayIndex].name, exercises: [] };
+
                 document.querySelectorAll('.exercise-item').forEach((item) => {
                     const exerciseName = item.dataset.exerciseName;
                     const checkboxes = item.querySelectorAll('.set-checkbox');
                     let setsCompleted = 0;
                     checkboxes.forEach(cb => { if (cb.checked) setsCompleted++; });
+
                     const exerciseDef = exercisesForDay.find(ex => ex.name === exerciseName);
                     if (setsCompleted > 0) {
-                        totalXpGained += (setsCompleted / exerciseDef.sets) * exerciseDef.xp;
+                        totalXpGained += (setsCompleted / (exerciseDef.sets || 3)) * (exerciseDef.xp || 10);
                     }
-                    this.state.lifts[exerciseName].lastCompletedSets = setsCompleted;
-                    workoutSummary.exercises.push({ name: exerciseName, sets: exerciseDef.sets, setsCompleted: setsCompleted, weight: this.state.lifts[exerciseName].weight });
+                    if(this.state.lifts[exerciseName]) {
+                        this.state.lifts[exerciseName].lastCompletedSets = setsCompleted;
+                        workoutSummary.exercises.push({ name: exerciseName, sets: exerciseDef.sets, setsCompleted: setsCompleted, weight: this.state.lifts[exerciseName].weight });
+                    }
                 });
+
                 this.state.lastWorkoutSummary = workoutSummary;
 
-                // Log main lifts to history for charting
+                if (isCustom) {
+                    totalXpGained = Math.round(totalXpGained * 0.8); // Reduce XP for custom workouts
+                } else {
+                    totalXpGained += 50; // Bonus for daily quest
+                    this.updateMana(100); // Mana for daily quest
+                }
+
+                // Log main lifts to history for charting, regardless of workout type
                 const mainLifts = ['Squat', 'Bench Press', 'Barbell Row', 'Overhead Press', 'Deadlift'];
                 const today = new Date().toISOString().split('T')[0];
                 workoutSummary.exercises.forEach(ex => {
                     if (mainLifts.includes(ex.name) && ex.setsCompleted > 0) {
+                        const exerciseDef = exercisesForDay.find(e => e.name === ex.name);
+                        let repsForCalc = 0;
+                        if (exerciseDef && exerciseDef.reps) {
+                            const repString = exerciseDef.reps;
+                            if (repString.includes('-')) {
+                                repsForCalc = parseInt(repString.split('-')[1]); // Use upper bound for volume
+                            } else if (!isNaN(parseInt(repString))) {
+                                repsForCalc = parseInt(repString);
+                            } else {
+                                repsForCalc = 5; // Default for schemes like 5/3/1
+                            }
+                        }
+
                         this.state.history.push({
                             date: today,
                             lift: ex.name,
-                            weight: ex.weight
+                            weight: ex.weight,
+                            sets: ex.setsCompleted,
+                            reps: repsForCalc
                         });
                     }
                 });
 
-                totalXpGained += 50;
                 this.addXp(totalXpGained);
-                this.progressLifts();
-                this.updateStreak();
-                this.state.currentDayIndex = (this.state.currentDayIndex + 1) % 7;
-                if (this.state.currentDayIndex === 0) this.state.week++;
+
+                // Only progress lifts and date if it's not a custom workout
+                if (!isCustom) {
+                    this.progressLifts();
+                    this.updateStreak();
+                    this.state.currentDayIndex = (this.state.currentDayIndex + 1) % 7;
+                    if (this.state.currentDayIndex === 0) this.state.week++;
+                }
+
+                // Clear active custom workout
+                if (isCustom) {
+                    this.state.activeCustomWorkout = null;
+                }
+
                 this.getMotivationalQuote();
                 this.saveState();
                 this.render();
@@ -810,20 +1555,48 @@
             confirmCompleteWorkout() {
                 this.showModal('Confirm Completion', 'Are you sure you want to complete this quest? This will advance you to the next day.', [
                     { text: 'Cancel', class: 'btn-secondary', action: () => this.hideModal() },
-                    { text: 'Complete', class: 'btn-primary', action: () => { this.completeWorkout(); this.hideModal(); } }
+                    { text: 'Complete', class: 'btn-primary', action: () => {
+                        this.playSound('workoutComplete');
+                        this.completeWorkout();
+                        this.hideModal();
+                    } }
                 ]);
             },
             addXp(amount) {
-                this.state.xp += Math.round(amount);
+                if (amount > 0) {
+                    this.state.xp += Math.round(amount);
+                    const xpBar = document.getElementById('xp-bar');
+                    xpBar.classList.remove('xp-bar-pulse');
+                    void xpBar.offsetWidth;
+                    xpBar.classList.add('xp-bar-pulse');
+                }
+
                 while (this.state.xp >= this.state.xpToNextLevel) {
                     this.state.xp -= this.state.xpToNextLevel;
                     this.state.level++;
                     this.state.xpToNextLevel = Math.round(this.state.xpToNextLevel * 1.5);
+                    this.triggerLevelUpAnimation();
                 }
                 this.updateTitle();
                 this.checkAchievements();
                 this.saveState();
             },
+
+            triggerLevelUpAnimation() {
+                this.playSound('levelUp');
+                const overlay = document.getElementById('level-up-overlay');
+                const numberEl = document.getElementById('level-up-number');
+                numberEl.textContent = this.state.level;
+
+                overlay.classList.remove('hidden');
+                overlay.classList.add('level-up-active');
+
+                setTimeout(() => {
+                    overlay.classList.remove('level-up-active');
+                    overlay.classList.add('hidden');
+                }, 3000);
+            },
+
             updateTitle() {
                 const newTitle = this.titlesData.slice().reverse().find(t => this.state.level >= t.level);
                 if (newTitle) this.state.title = newTitle.title;
@@ -842,13 +1615,31 @@
                 this.state.lastWorkoutDate = today;
             },
             progressLifts() {
-                const phase = this.state.week < 13 ? 1 : 2;
+                const phase = this.getPhaseForWeek(this.state.week);
                 const workoutType = this.workoutPlan[this.state.currentDayIndex].type;
                 const exercisesForDay = this.workoutPhases[phase].exercises[workoutType];
+
                 Object.entries(this.state.lifts).forEach(([name, data]) => {
                     const exerciseDef = exercisesForDay.find(ex => ex.name === name);
-                    if (exerciseDef && data.lastCompletedSets >= exerciseDef.sets) {
-                        const increment = (['Squat', 'Deadlift', 'Leg Press'].includes(name)) ? 5 : 2.5;
+                    if (exerciseDef && data.lastCompletedSets >= (exerciseDef.sets || 3)) {
+                        // Calculate e1RM before incrementing weight
+                        let repsForCalc = 0;
+                        const repString = exerciseDef.reps;
+                        if (repString.includes('-')) {
+                            repsForCalc = parseInt(repString.split('-')[0]);
+                        } else if (!isNaN(parseInt(repString))) {
+                            repsForCalc = parseInt(repString);
+                        }
+
+                        if (repsForCalc > 0) {
+                            const newE1RM = this.calculate1RM(data.weight, repsForCalc);
+                            if (newE1RM > (data.e1rm || 0)) {
+                                data.e1rm = newE1RM;
+                            }
+                        }
+
+                        // Now increment weight for next time
+                        const increment = (['Squat', 'Deadlift', 'Leg Press', 'Power Clean'].includes(name)) ? 5 : 2.5;
                         data.weight += increment;
                     }
                 });
@@ -857,15 +1648,20 @@
                 this.achievementsData.forEach(ach => {
                     if (!this.state.achievements.includes(ach.id) && ach.condition(this.state)) {
                         this.state.achievements.push(ach.id);
-                        this.showAchievementToast(ach.name);
+                        this.showToast(`Achievement: ${ach.name}`, 'special');
+                        this.playSound('achievement', 'G5', '4n');
                     }
                 });
             },
             showAchievementToast(name) {
-                const toast = document.getElementById('achievement-toast');
-                document.getElementById('achievement-toast-text').textContent = name;
+                this.showToast(`Achievement: ${name}`, 'special');
+            },
+
+            showPRToast(text) {
+                const toast = document.getElementById('pr-toast');
+                document.getElementById('pr-toast-text').textContent = text;
                 toast.classList.remove('hidden');
-                setTimeout(() => { toast.classList.add('hidden'); }, 4900);
+                setTimeout(() => { toast.classList.add('hidden'); }, 3900);
             },
             editPlayerName() {
                 const newName = prompt("Enter your new Hunter name:", this.state.playerName);
@@ -893,10 +1689,273 @@
             hideModal() {
                 document.getElementById('modal').classList.add('hidden');
                 document.getElementById('modal').classList.remove('flex');
+            },
+
+            getPhaseForWeek(week) {
+                if (week <= 12) return 1;
+                if (week <= 24) return 2;
+                if (week <= 36) return 3;
+                if (week <= 48) return 4;
+                return 4; // Default to last phase
+            },
+
+            calculate1RM(weight, reps) {
+                if (reps > 10 || reps < 1) return 0; // Formula is less accurate for high reps and invalid for 0 or less
+                return Math.round(weight / (1.0278 - 0.0278 * reps));
+            },
+
+            // --- NEW/MODIFIED FUNCTIONS FOR INVENTORY/MANA ---
+            updateMana(amount) {
+                this.state.mana += amount;
+                this.saveState();
+                this.renderPlayerStats();
+                if (this.state.currentPage === 'dashboard') {
+                    this.renderDashboard();
+                }
+            },
+
+            addItemToInventory(itemId, quantity) {
+                if (!this.state.inventory[itemId]) {
+                    this.state.inventory[itemId] = 0;
+                }
+                this.state.inventory[itemId] += quantity;
+                this.saveState();
+                this.renderInventory();
+            },
+
+            confirmUseItem(itemId) {
+                const itemDef = itemDefs[itemId];
+                if (!itemDef) return;
+
+                this.showModal(
+                    `Use ${itemDef.name}?`,
+                    `<p class="text-gray-300">${itemDef.description}</p>`,
+                    [
+                        { text: 'Cancel', class: 'btn-secondary', action: () => this.hideModal() },
+                        { text: 'Use', class: 'btn-primary', action: () => { this.useItem(itemId); this.hideModal(); } }
+                    ]
+                );
+            },
+
+            useItem(itemId) {
+                const itemDef = itemDefs[itemId];
+                if (!itemDef || !this.state.inventory[itemId] || this.state.inventory[itemId] <= 0) {
+                    return;
+                }
+
+                // The use function should return true if the item should be consumed
+                if (itemDef.use()) {
+                    this.playSound('itemUse');
+                    this.state.inventory[itemId]--;
+                    if (this.state.inventory[itemId] <= 0) {
+                        delete this.state.inventory[itemId];
+                    }
+                }
+
+                this.saveState();
+                this.render(); // Re-render to update inventory display
+            },
+
+            showToast(message, type = 'info') {
+                const toast = document.getElementById('achievement-toast');
+                const textEl = document.getElementById('achievement-toast-text');
+                const titleEl = toast.querySelector('p:first-child');
+
+                toast.className = 'fixed bottom-5 right-5 card-bg p-4 rounded-lg shadow-lg hidden achievement-unlocked w-11/12 max-w-xs border-l-4'; // Reset classes
+
+                let iconHTML = '<i class="fas fa-info-circle mr-2"></i>';
+                let borderColor = 'border-indigo-500';
+                let textColor = 'text-indigo-400';
+
+                switch(type) {
+                    case 'success':
+                        iconHTML = '<i class="fas fa-check-circle mr-2"></i>';
+                        borderColor = 'border-green-500';
+                        textColor = 'text-green-400';
+                        break;
+                    case 'error':
+                        iconHTML = '<i class="fas fa-times-circle mr-2"></i>';
+                        borderColor = 'border-red-500';
+                        textColor = 'text-red-400';
+                        break;
+                    case 'special':
+                        iconHTML = '<i class="fas fa-star mr-2"></i>';
+                        borderColor = 'border-yellow-500';
+                        textColor = 'text-yellow-400';
+                        break;
+                }
+
+                toast.classList.add(borderColor);
+                titleEl.className = `font-bold ${textColor}`;
+                titleEl.innerHTML = `${iconHTML} System Notification`;
+                textEl.textContent = message;
+
+                toast.classList.remove('hidden');
+                setTimeout(() => { toast.classList.add('hidden'); }, 4900);
+            },
+
+            async analyzeNutrition() {
+                const nutritionInput = document.getElementById('nutrition-input');
+                const mealText = nutritionInput.value.trim();
+
+                if (!mealText) {
+                    this.showToast('Please enter your meal before analyzing.', 'error');
+                    return;
+                }
+
+                const resultsContainer = document.getElementById('nutrition-results-container');
+                resultsContainer.innerHTML = `<div class="flex items-center justify-center p-8"><div class="spinner h-8 w-8 rounded-full border-4 border-gray-600"></div></div>`;
+
+                const prompt = `
+                    As the AI 'System' from a dark fantasy RPG, analyze the following meal consumed by a Hunter.
+                    The user's level is ${this.state.level}. Their goal is to maximize strength, performance, and recovery.
+                    Provide a nutritional analysis and actionable advice.
+
+                    The meal is: "${mealText}"
+
+                    Respond in Markdown format. The response should include:
+                    1.  A title: "Nutritional Analysis".
+                    2.  An estimated breakdown of macronutrients (Protein, Carbs, Fats) and total calories.
+                    3.  A "System Assessment" section (2-3 sentences) giving a verdict on the meal's suitability for a Hunter.
+                    4.  An "Optimization Advice" section with 2-3 bullet points of actionable tips for improvement.
+                    Keep the tone encouraging but direct, as a system guiding a powerful user.
+                `;
+
+                try {
+                    const analysis = await this.callGemini(prompt);
+                    // A simple markdown-to-html converter
+                    let htmlAnalysis = analysis
+                        .replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold text-indigo-300 mt-4 mb-2">$1</h3>')
+                        .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold text-indigo-400 mb-3">$1</h2>')
+                        .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-black text-white mb-4">$1</h1>')
+                        .replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*)\*/g, '<em>$1</em>')
+                        .replace(/^- (.*$)/gim, '<li class="ml-4 list-disc">$1</li>')
+                        .replace(/\n/g, '<br>');
+
+                    resultsContainer.innerHTML = `
+                        <div class="card-bg border border-gray-700 p-4 rounded-lg">
+                            ${htmlAnalysis}
+                        </div>
+                    `;
+
+                    // Also log to system log
+                    this.state.systemLog.push({
+                        date: new Date().toISOString(),
+                        title: "Nutrition Analysis Log",
+                        content: analysis // Store raw markdown
+                    });
+                    this.saveState();
+
+                } catch (error) {
+                    console.error("Nutrition analysis failed:", error);
+                    resultsContainer.innerHTML = `<p class="text-red-500">Error: Could not retrieve analysis. The System is currently unavailable.</p>`;
+                }
             }
         };
 
         app.init();
+    </script>
+    <script>
+        // Adding the settings functions in a separate script tag to avoid merge conflicts with the massive app object.
+        // This is a temporary measure for development. In a real-world scenario, this would be part of a proper module system.
+
+        app.confirmDeload = function() {
+            this.showModal(
+                'Confirm Deload Protocol',
+                'This will reduce the weight of your main lifts by 10%. This is non-reversible. Are you sure?',
+                [
+                    { text: 'Cancel', class: 'btn-secondary', action: () => this.hideModal() },
+                    { text: 'Confirm Deload', class: 'btn-primary', action: () => { this.triggerDeload(); this.hideModal(); } }
+                ]
+            );
+        };
+
+        app.triggerDeload = function() {
+            const mainLifts = ['Squat', 'Bench Press', 'Deadlift', 'Overhead Press'];
+            mainLifts.forEach(liftName => {
+                if (this.state.lifts[liftName]) {
+                    const currentWeight = this.state.lifts[liftName].weight;
+                    // Round to nearest 2.5 for standard plate loading
+                    const newWeight = Math.round((currentWeight * 0.9) / 2.5) * 2.5;
+                    this.state.lifts[liftName].weight = newWeight;
+                }
+            });
+            this.saveState();
+            this.showToast('Deload Protocol activated. Main lift weights reduced.', 'success');
+            if (this.state.currentPage === 'dashboard') {
+                this.renderDashboard();
+            }
+        };
+
+        app.confirmReset = function() {
+            const confirmationPrompt = `
+                <p class="mb-4">This action is permanent and cannot be undone. You will lose all progress.</p>
+                <p class="mb-2">To confirm, please type "RESET" into the box below.</p>
+                <input type="text" id="reset-confirmation-input" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 text-white">
+            `;
+            this.showModal(
+                'ARE YOU SURE?',
+                confirmationPrompt,
+                [
+                    { text: 'Cancel', class: 'btn-secondary', action: () => this.hideModal() },
+                    { text: 'RESET PROGRESS', class: 'bg-red-800 hover:bg-red-700', action: () => {
+                        const input = document.getElementById('reset-confirmation-input');
+                        if (input && input.value === 'RESET') {
+                            this.resetProgress();
+                        } else {
+                            this.showToast('Confirmation text did not match. Reset cancelled.', 'error');
+                            this.hideModal();
+                        }
+                    } }
+                ]
+            )
+        };
+
+        app.resetProgress = function() {
+            localStorage.removeItem('projectMonarchState');
+            window.location.reload();
+        };
+
+        app.exportData = function() {
+            try {
+                const dataStr = JSON.stringify(this.state);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+
+                const exportFileDefaultName = `project_monarch_backup_${new Date().toISOString().split('T')[0]}.json`;
+
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+                this.showToast('Data exported successfully.', 'success');
+            } catch (error) {
+                console.error("Export failed:", error);
+                this.showToast('Data export failed.', 'error');
+            }
+        };
+
+        app.importData = function(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = (e) => {
+                try {
+                    const newState = JSON.parse(e.target.result);
+                    // Basic validation to ensure it's a valid state object
+                    if (newState && newState.level && newState.lifts) {
+                        this.state = newState;
+                        this.saveState();
+                        this.showToast('Data imported successfully! Reloading...', 'success');
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        this.showToast('Invalid data file.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Import failed:', error);
+                    this.showToast('Failed to parse import file. Is it a valid backup?', 'error');
+                }
+            };
+            fileReader.readAsText(event.target.files[0]);
+        };
     </script>
 </body>
 </html>
