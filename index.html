@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Monarch 2.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: linear-gradient(180deg, #1a2333, #111827);
+            min-height: 100vh;
+        }
+
+        /* --- Typography & Effects --- */
+        .text-glow {
+            text-shadow: 0 0 8px rgba(99, 102, 241, 0.8), 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+
+        /* --- Components: Cards --- */
+        .card-bg {
+            background-image: linear-gradient(145deg, #2c3a4b, #1f2937);
+            border: 1px solid #4b5563;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-bg:hover {
+            border-color: rgba(99, 102, 241, 0.7);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.25);
+        }
+
+        /* --- Components: Buttons --- */
+        .btn-primary {
+            background-color: #4f46e5;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #6366f1;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+        }
+        .btn-secondary {
+            background-color: #374151;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        /* --- Components: Navigation --- */
+        .nav-btn {
+            transition: all 0.2s ease;
+        }
+        .nav-btn.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .nav-btn:not(.active):hover {
+            background-color: #374151;
+        }
+
+        /* --- Animations & Transitions --- */
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+        .achievement-unlocked {
+            animation: fadeInOut 5s forwards;
+        }
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translateY(20px); }
+            10%, 90% { opacity: 1; transform: translateY(0); }
+        }
+
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .spinner {
+            border-top-color: #6366f1;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Components: Workout Page --- */
+        .set-completed > span {
+            text-decoration: line-through;
+            color: #6b7280; /* gray-500 */
+        }
+
+        /* --- Components: Achievements --- */
+        .achievement-unlocked-glow {
+            box-shadow: 0 0 15px rgba(129, 140, 248, 0.5), 0 0 5px rgba(199, 210, 254, 0.7);
+            border-color: rgba(129, 140, 248, 0.8);
+        }
+
+        /* --- Components: Modal --- */
+        .modal.flex .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .modal-content {
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* --- Components: Modal --- */
+        .modal-backdrop {
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        /* --- Misc --- */
+        .header-bg {
+            background-image: url('http://googleusercontent.com/file_content/34');
+            background-size: cover;
+            background-position: center 30%;
+        }
+    </style>
+</head>
+<body class="text-white">
+
+    <div id="app" class="max-w-4xl mx-auto p-2 sm:p-6 md:p-8">
+
+        <!-- Header -->
+        <header class="text-center mb-6 p-6 sm:p-8 rounded-lg header-bg border-2 border-indigo-500/50">
+            <h1 class="text-3xl sm:text-5xl font-black uppercase text-white text-glow tracking-wider" style="text-shadow: 0 0 10px black, 0 0 20px black;">Project Monarch</h1>
+            <p class="text-sm sm:text-base text-gray-200 font-semibold" style="text-shadow: 0 0 5px black;">Your Path to Unrivaled Strength</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="flex justify-center gap-2 mb-6">
+            <button data-page="workout" class="nav-btn active inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/></svg>
+                <span class="hidden sm:inline">Quest</span>
+            </button>
+            <button data-page="dashboard" class="nav-btn inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg>
+                <span class="hidden sm:inline">Dashboard</span>
+            </button>
+            <button data-page="calendar" class="nav-btn inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"/></svg>
+                <span class="hidden sm:inline">Calendar</span>
+            </button>
+            <button data-page="log" class="nav-btn inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 6.75v10.5a2.25 2.25 0 0 0 2.25 2.25Zm.75-12h9v9h-9v-9Z"/></svg>
+                <span class="hidden sm:inline">System Log</span>
+            </button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main>
+            <!-- Workout Page -->
+            <div id="workout-page" class="page active">
+                <!-- Player Stats -->
+                <div class="grid grid-cols-2 gap-2 sm:gap-4 mb-6">
+                    <div class="card-bg p-3 sm:p-4 rounded-lg text-center">
+                        <p class="text-xs sm:text-sm text-gray-400 uppercase font-bold">Level</p>
+                        <p id="player-level" class="text-xl sm:text-2xl font-semibold text-indigo-300">1</p>
+                    </div>
+                    <div class="card-bg p-3 sm:p-4 rounded-lg text-center">
+                        <p class="text-xs sm:text-sm text-gray-400 uppercase font-bold">Title</p>
+                        <p id="player-title" class="text-xl sm:text-2xl font-semibold text-indigo-300 truncate">The Weakest</p>
+                    </div>
+                    <div class="card-bg p-3 sm:p-4 rounded-lg text-center">
+                        <p class="text-xs sm:text-sm text-gray-400 uppercase font-bold">Streak</p>
+                        <p id="player-streak" class="text-xl sm:text-2xl font-semibold text-indigo-300"><i class="fas fa-fire"></i> 0</p>
+                    </div>
+                    <div class="card-bg p-3 sm:p-4 rounded-lg text-center">
+                        <p class="text-xs sm:text-sm text-gray-400 uppercase font-bold">Phase</p>
+                        <p id="workout-phase" class="text-xl sm:text-2xl font-semibold text-indigo-300">I</p>
+                    </div>
+                </div>
+
+                <!-- XP Bar -->
+                <div class="mb-6 card-bg p-4 rounded-lg">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-semibold text-indigo-300">XP</span>
+                        <span id="xp-text" class="text-sm text-gray-400">0 / 100</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-4">
+                        <div id="xp-bar" class="bg-indigo-500 h-4 rounded-full progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Daily Quest / Workout -->
+                <div id="workout-container" class="card-bg p-4 sm:p-6 rounded-lg">
+                    <div id="motivational-quote-container" class="mb-4 text-center p-3 bg-gray-800/50 rounded-lg border-l-4 border-indigo-500">
+                        <p id="motivational-quote" class="text-sm sm:text-base text-gray-300 italic">"Loading system directive..."</p>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold mb-1 text-glow text-indigo-400">Daily Quest</h2>
+                    <p id="workout-day-title" class="text-base sm:text-lg font-semibold text-gray-300 mb-4">Loading your mission...</p>
+                    <div id="exercise-list" class="space-y-6"></div>
+                    <button id="complete-workout-btn" class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg mt-8 text-base sm:text-lg uppercase tracking-wider hidden">Mission Complete</button>
+                    <button id="analyze-workout-btn" class="w-full btn-secondary text-white font-bold py-3 px-4 rounded-lg mt-4 text-base sm:text-lg uppercase tracking-wider hidden">✨ Analyze Performance</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 card-bg p-6 rounded-lg text-center">
+                        <img src="http://googleusercontent.com/file_content/38" alt="Player Avatar" class="w-32 h-32 sm:w-40 sm:h-40 rounded-full mx-auto mb-4 border-4 border-indigo-500">
+                        <h2 id="dashboard-player-name" class="text-2xl sm:text-3xl font-bold">Player</h2>
+                        <p id="dashboard-player-title" class="text-indigo-300 text-base sm:text-lg mb-4">The Weakest Hunter</p>
+                        <button id="edit-name-btn" class="text-sm text-gray-400 hover:text-white"><i class="fas fa-pencil-alt mr-1"></i> Edit Name</button>
+                        <hr class="my-6 border-gray-600">
+                        <h3 class="text-lg sm:text-xl font-bold text-glow text-indigo-400 mb-4">Strength Stats</h3>
+                        <div id="lift-stats-container" class="grid grid-cols-2 gap-4 text-center"></div>
+                    </div>
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="card-bg p-4 sm:p-6 rounded-lg">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg sm:text-xl font-bold text-glow text-indigo-400">Progress Chart</h3>
+                                <select id="lift-select" class="bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:ring-indigo-500 focus:border-indigo-500 p-2">
+                                    <!-- Options will be populated by JS -->
+                                </select>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="progress-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card-bg p-4 sm:p-6 rounded-lg">
+                            <h3 class="text-lg sm:text-xl font-bold text-glow text-indigo-400 mb-4">Achievements</h3>
+                            <div id="achievements-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Page -->
+            <div id="calendar-page" class="page">
+                <div class="card-bg p-4 sm:p-6 rounded-lg">
+                    <h2 class="text-xl sm:text-2xl font-bold mb-4 text-glow text-indigo-400">12-Week Forecast</h2>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-1 sm:gap-2 text-center"></div>
+                </div>
+            </div>
+
+            <!-- System Log Page -->
+            <div id="log-page" class="page">
+                <div class="card-bg p-4 sm:p-6 rounded-lg">
+                    <h2 class="text-xl sm:text-2xl font-bold mb-4 text-glow text-indigo-400">AI System Log</h2>
+                    <div id="system-log-content" class="space-y-4">
+                        <p class="text-gray-400">No entries yet. Complete a workout and run an analysis to populate the log.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 z-50 items-center justify-center hidden">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="modal-content card-bg rounded-lg shadow-xl p-6 w-full max-w-md m-4 relative">
+            <h3 id="modal-title" class="text-xl font-bold mb-4"></h3>
+            <div id="modal-body" class="text-gray-300 mb-6 max-h-96 overflow-y-auto"></div>
+            <div id="modal-actions" class="flex justify-end gap-4"></div>
+        </div>
+    </div>
+
+    <!-- Achievement Unlocked Toast -->
+    <div id="achievement-toast" class="fixed bottom-5 right-5 card-bg p-4 rounded-lg shadow-lg hidden achievement-unlocked border-l-4 border-indigo-500 w-11/12 max-w-xs">
+        <p class="font-bold text-indigo-400"><i class="fas fa-star mr-2"></i>Achievement Unlocked!</p>
+        <p id="achievement-toast-text" class="text-gray-300 text-sm"></p>
+    </div>
+
+    <script>
+        const app = {
+            progressChart: null,
+            // --- STATE ---
+            state: {
+                currentPage: 'workout',
+                playerName: 'Player',
+                level: 1,
+                xp: 0,
+                xpToNextLevel: 100,
+                title: 'The Weakest',
+                currentDayIndex: 0,
+                week: 1,
+                streak: 0,
+                lastWorkoutDate: null,
+                lifts: {
+                    'Squat': { weight: 20, lastCompletedSets: 0 },
+                    'Bench Press': { weight: 20, lastCompletedSets: 0 },
+                    'Barbell Row': { weight: 20, lastCompletedSets: 0 },
+                    'Overhead Press': { weight: 20, lastCompletedSets: 0 },
+                    'Deadlift': { weight: 30, lastCompletedSets: 0 },
+                    'Incline DB Press': { weight: 10, lastCompletedSets: 0 },
+                    'Tricep Pushdown': { weight: 15, lastCompletedSets: 0 },
+                    'Lateral Raise': { weight: 5, lastCompletedSets: 0 },
+                    'Lat Pulldown': { weight: 30, lastCompletedSets: 0 },
+                    'Bicep Curl': { weight: 10, lastCompletedSets: 0 },
+                    'Romanian Deadlift': { weight: 40, lastCompletedSets: 0 },
+                    'Leg Press': { weight: 50, lastCompletedSets: 0 },
+                    'Calf Raise': { weight: 40, lastCompletedSets: 0 },
+                },
+                achievements: [],
+                systemLog: [],
+                history: [],
+                lastWorkoutSummary: null,
+            },
+
+            // --- DATA ---
+            workoutPlan: [
+                { day: 'Monday', type: 'Push', name: 'Push Day' },
+                { day: 'Tuesday', type: 'Pull', name: 'Pull Day' },
+                { day: 'Wednesday', type: 'Legs', name: 'Leg Day' },
+                { day: 'Thursday', type: 'Push', name: 'Push Day' },
+                { day: 'Friday', type: 'Pull', name: 'Pull Day' },
+                { day: 'Saturday', type: 'Legs', name: 'Leg Day' },
+                { day: 'Sunday', type: 'Rest', name: 'Rest & Recover' },
+            ],
+            workoutPhases: {
+                1: {
+                    name: "Foundational Strength",
+                    exercises: {
+                        'Push': [
+                            { name: 'Bench Press', sets: 3, reps: '5-8', xp: 20, videoId: 'gRVjAtPip0Y' },
+                            { name: 'Overhead Press', sets: 3, reps: '5-8', xp: 20, videoId: '2yjwXTZQDDI' },
+                            { name: 'Incline DB Press', sets: 3, reps: '8-12', xp: 15, videoId: '8iPEnn-ltC8' },
+                            { name: 'Tricep Pushdown', sets: 3, reps: '8-12', xp: 10, videoId: '2-LAMcpzODU' },
+                            { name: 'Lateral Raise', sets: 3, reps: '10-15', xp: 10, videoId: '3VcKaXpzqRo' },
+                        ],
+                        'Pull': [
+                            { name: 'Barbell Row', sets: 3, reps: '5-8', xp: 20, videoId: 'T3N-tLpso_E' },
+                            { name: 'Lat Pulldown', sets: 3, reps: '8-12', xp: 15, videoId: 'eGo4IYlbE5g' },
+                            { name: 'Bicep Curl', sets: 3, reps: '8-12', xp: 10, videoId: 'kwG2ZsmYpsY' },
+                        ],
+                        'Legs': [
+                            { name: 'Squat', sets: 3, reps: '5-8', xp: 25, videoId: 'bEv6CCg2BC8' },
+                            { name: 'Romanian Deadlift', sets: 3, reps: '8-12', xp: 20, videoId: 'JCXUYuzwNrM' },
+                            { name: 'Leg Press', sets: 3, reps: '8-12', xp: 15, videoId: 'GvRgijoJ2xY' },
+                            { name: 'Calf Raise', sets: 4, reps: '10-15', xp: 10, videoId: 'Jifcyb0p_gU' },
+                        ]
+                    }
+                },
+                2: {
+                    name: "Strength Hypertrophy",
+                     exercises: {
+                        'Push': [
+                            { name: 'Bench Press', sets: 4, reps: '4-6', xp: 25, videoId: 'gRVjAtPip0Y' },
+                            { name: 'Overhead Press', sets: 4, reps: '4-6', xp: 25, videoId: '2yjwXTZQDDI' },
+                            { name: 'Incline DB Press', sets: 3, reps: '8-10', xp: 15, videoId: '8iPEnn-ltC8' },
+                            { name: 'Tricep Pushdown', sets: 4, reps: '8-10', xp: 10, videoId: '2-LAMcpzODU' },
+                            { name: 'Lateral Raise', sets: 4, reps: '10-15', xp: 10, videoId: '3VcKaXpzqRo' },
+                        ],
+                        'Pull': [
+                            { name: 'Deadlift', sets: 1, reps: '3-5', xp: 35, videoId: 'wYREQk5P_zI' },
+                            { name: 'Barbell Row', sets: 4, reps: '6-8', xp: 20, videoId: 'T3N-tLpso_E' },
+                            { name: 'Lat Pulldown', sets: 4, reps: '8-10', xp: 15, videoId: 'eGo4IYlbE5g' },
+                            { name: 'Bicep Curl', sets: 4, reps: '8-10', xp: 10, videoId: 'kwG2ZsmYpsY' },
+                        ],
+                        'Legs': [
+                            { name: 'Squat', sets: 4, reps: '4-6', xp: 30, videoId: 'bEv6CCg2BC8' },
+                            { name: 'Romanian Deadlift', sets: 3, reps: '8-10', xp: 20, videoId: 'JCXUYuzwNrM' },
+                            { name: 'Leg Press', sets: 4, reps: '10-12', xp: 15, videoId: 'GvRgijoJ2xY' },
+                            { name: 'Calf Raise', sets: 5, reps: '10-15', xp: 10, videoId: 'Jifcyb0p_gU' },
+                        ]
+                    }
+                }
+            },
+            titlesData: [
+                { level: 1, title: 'The Weakest' },
+                { level: 5, title: 'Demon Hunter' },
+                { level: 10, title: 'Knight Killer' },
+                { level: 20, title: 'Elite Knight' },
+                { level: 30, title: 'Commander' },
+                { level: 50, title: 'Monarch' },
+            ],
+            achievementsData: [
+                { id: 'first_workout', name: 'Goblin Slayer', description: 'Complete your first workout.', condition: (s) => s.level > 1, icon: 'fa-shield-halved' },
+                { id: 'level_5', name: 'Demon Hunter', description: 'Reach Level 5.', condition: (s) => s.level >= 5, icon: 'fa-dragon' },
+                { id: 'level_10', name: 'Knight Killer', description: 'Reach Level 10.', condition: (s) => s.level >= 10, icon: 'fa-chess-knight' },
+                { id: 'streak_7', name: 'Unbroken Will', description: 'Maintain a 7-day workout streak.', condition: (s) => s.streak >= 7, icon: 'fa-fire' },
+                { id: 'squat_50', name: 'Earth Shaker', description: 'Squat 50kg.', condition: (s) => s.lifts['Squat'].weight >= 50, icon: 'fa-mountain' },
+                { id: 'bench_50', name: 'Plateau Breaker', description: 'Bench Press 50kg.', condition: (s) => s.lifts['Bench Press'].weight >= 50, icon: 'fa-anchor' },
+                { id: 'deadlift_80', name: 'World Lifter', description: 'Deadlift 80kg.', condition: (s) => s.lifts['Deadlift'].weight >= 80, icon: 'fa-globe' },
+                { id: 'phase_2', name: 'Second Awakening', description: 'Advance to Workout Phase II.', condition: (s) => s.week >= 13, icon: 'fa-bolt' },
+                { id: 'squat_100', name: 'Centurion', description: 'Squat 100kg.', condition: (s) => s.lifts['Squat'].weight >= 100, icon: 'fa-gavel' },
+                { id: 'bench_80', name: 'Titan\'s Press', description: 'Bench Press 80kg.', condition: (s) => s.lifts['Bench Press'].weight >= 80, icon: 'fa-gem' },
+                { id: 'deadlift_120', name: 'Gravity Defied', description: 'Deadlift 120kg.', condition: (s) => s.lifts['Deadlift'].weight >= 120, icon: 'fa-rocket' },
+                { id: 'level_50', name: 'Monarch of Strength', description: 'Reach Level 50.', condition: (s) => s.level >= 50, icon: 'fa-crown' },
+            ],
+
+            // --- JAVASCRIPT LOGIC ---
+            init() {
+                this.loadState();
+                const today = new Date();
+                const dayOfWeek = today.getDay();
+                this.state.currentDayIndex = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.addEventListener('click', () => this.showPage(btn.dataset.page));
+                });
+                document.getElementById('complete-workout-btn').addEventListener('click', () => this.confirmCompleteWorkout());
+                document.getElementById('analyze-workout-btn').addEventListener('click', () => this.analyzeWorkout());
+                document.getElementById('edit-name-btn').addEventListener('click', () => this.editPlayerName());
+
+                this.getMotivationalQuote();
+                this.render();
+            },
+            saveState() { localStorage.setItem('projectMonarchState', JSON.stringify(this.state)); },
+            loadState() {
+                const savedState = localStorage.getItem('projectMonarchState');
+                if (savedState) {
+                    const parsedState = JSON.parse(savedState);
+                    this.state = { ...this.state, ...parsedState };
+                    this.state.systemLog = this.state.systemLog || [];
+                    this.state.history = this.state.history || [];
+                }
+            },
+            showPage(pageId) {
+                this.state.currentPage = pageId;
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(`${pageId}-page`).classList.add('active');
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector(`.nav-btn[data-page="${pageId}"]`).classList.add('active');
+                this.render();
+            },
+            render() {
+                this.renderPlayerStats();
+                if (this.state.currentPage === 'workout') this.renderWorkout();
+                if (this.state.currentPage === 'dashboard') this.renderDashboard();
+                if (this.state.currentPage === 'calendar') this.renderCalendar();
+                if (this.state.currentPage === 'log') this.renderSystemLog();
+            },
+            renderWorkout() {
+                const workoutDay = this.workoutPlan[this.state.currentDayIndex];
+                const exerciseListEl = document.getElementById('exercise-list');
+                const completeBtn = document.getElementById('complete-workout-btn');
+                const analyzeBtn = document.getElementById('analyze-workout-btn');
+
+                document.getElementById('workout-day-title').textContent = `${workoutDay.day}: ${workoutDay.name}`;
+                exerciseListEl.innerHTML = '';
+
+                if (this.state.lastWorkoutSummary) {
+                    completeBtn.classList.add('hidden');
+                    analyzeBtn.classList.remove('hidden');
+                } else {
+                    completeBtn.classList.remove('hidden');
+                    analyzeBtn.classList.add('hidden');
+                }
+
+                if (workoutDay.type === 'Rest') {
+                    exerciseListEl.innerHTML = `<div class="text-center py-8">
+                        <img src="http://googleusercontent.com/file_content/37" class="mx-auto h-32 w-32 opacity-50 mb-4">
+                        <p class="text-gray-400">Your body grows stronger during rest. Recover well, Hunter.</p>
+                    </div>`;
+                    completeBtn.classList.add('hidden');
+                    analyzeBtn.classList.add('hidden');
+                } else {
+                    const phase = this.state.week < 13 ? 1 : 2;
+                    const exercisesForDay = this.workoutPhases[phase].exercises[workoutDay.type];
+                    exercisesForDay.forEach(ex => {
+                        const lift = this.state.lifts[ex.name];
+                        const exerciseEl = this.createExerciseElement(ex, lift);
+                        exerciseListEl.appendChild(exerciseEl);
+                    });
+                }
+            },
+            renderSystemLog() {
+                const logContent = document.getElementById('system-log-content');
+                logContent.innerHTML = '';
+                if (this.state.systemLog.length === 0) {
+                    logContent.innerHTML = `<p class="text-gray-400">No entries yet. Complete a workout and run an analysis to populate the log.</p>`;
+                    return;
+                }
+                this.state.systemLog.slice().reverse().forEach(entry => {
+                    const logEl = document.createElement('div');
+                    logEl.className = 'card-bg p-4 rounded-lg';
+                    logEl.innerHTML = `
+                        <p class="text-sm text-gray-400 mb-2">${new Date(entry.date).toLocaleString()}</p>
+                        <p class="font-semibold text-indigo-300 mb-2">${entry.title}</p>
+                        <p class="text-gray-300 whitespace-pre-wrap">${entry.content}</p>
+                    `;
+                    logContent.appendChild(logEl);
+                });
+            },
+            renderPlayerStats() {
+                document.getElementById('player-level').textContent = this.state.level;
+                document.getElementById('player-title').textContent = this.state.title;
+                document.getElementById('player-streak').innerHTML = `<i class="fas fa-fire"></i> ${this.state.streak}`;
+                const phase = this.state.week < 13 ? 1 : 2;
+                document.getElementById('workout-phase').textContent = phase;
+                const xpPercentage = (this.state.xp / this.state.xpToNextLevel) * 100;
+                document.getElementById('xp-bar').style.width = `${xpPercentage}%`;
+                document.getElementById('xp-text').textContent = `${this.state.xp} / ${this.state.xpToNextLevel}`;
+            },
+            createExerciseElement(exercise, liftData) {
+                const el = document.createElement('div');
+                el.className = 'exercise-item border-l-4 border-indigo-500 pl-4';
+                el.dataset.exerciseName = exercise.name;
+
+                let setsHtml = '';
+                for (let i = 1; i <= exercise.sets; i++) {
+                    setsHtml += `<div class="flex items-center justify-between p-2 bg-gray-800 rounded-md mb-2 transition-colors duration-300">
+                        <span class="font-semibold text-sm sm:text-base transition-colors duration-300">Set ${i}</span>
+                        <span class="text-gray-400 text-sm sm:text-base transition-colors duration-300">${exercise.reps} Reps</span>
+                        <input type="checkbox" class="set-checkbox w-5 h-5 sm:w-6 sm:h-6 bg-gray-700 rounded text-indigo-500 focus:ring-indigo-600 cursor-pointer">
+                    </div>`;
+                }
+
+                const weightDisplay = `${liftData.weight} kg`;
+
+                el.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg sm:text-xl font-bold">${exercise.name}</h3>
+                        <a href="https://www.youtube.com/watch?v=${exercise.videoId}" target="_blank" class="text-indigo-400 hover:text-indigo-300 text-sm">How-to Video</a>
+                    </div>
+                    <p class="text-base sm:text-lg font-semibold text-indigo-300 mb-3">${exercise.sets} x ${exercise.reps} @ ${weightDisplay}</p>
+                    <div class="sets-container space-y-2">${setsHtml}</div>`;
+
+                el.querySelectorAll('.set-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        const setContainer = e.target.parentElement;
+                        if (e.target.checked) {
+                            setContainer.classList.add('set-completed');
+                        } else {
+                            setContainer.classList.remove('set-completed');
+                        }
+                    });
+                });
+
+                return el;
+            },
+            renderDashboard() {
+                // Render player info
+                document.getElementById('dashboard-player-name').textContent = this.state.playerName;
+                document.getElementById('dashboard-player-title').textContent = this.state.title;
+
+                // Render lift stats
+                const statsContainer = document.getElementById('lift-stats-container');
+                statsContainer.innerHTML = '';
+                Object.entries(this.state.lifts).forEach(([name, data]) => {
+                    const statEl = document.createElement('div');
+                    statEl.className = 'p-2 bg-gray-900 rounded-md';
+                    const value = data.weight ? `${data.weight} kg` : `${data.reps} reps`;
+                    statEl.innerHTML = `<p class="text-xs text-gray-400">${name}</p><p class="text-lg sm:text-xl font-bold text-indigo-300">${value}</p>`;
+                    statsContainer.appendChild(statEl);
+                });
+
+                // Render achievements
+                const achievementsContainer = document.getElementById('achievements-list');
+                achievementsContainer.innerHTML = '';
+                this.achievementsData.forEach(ach => {
+                    const isUnlocked = this.state.achievements.includes(ach.id);
+                    const achEl = document.createElement('div');
+
+                    let classes = 'p-3 sm:p-4 rounded-lg flex items-center gap-3 sm:gap-4 transition-all duration-300 ';
+                    if (isUnlocked) {
+                        classes += 'bg-indigo-900/50 border border-indigo-700 achievement-unlocked-glow';
+                    } else {
+                        classes += 'bg-gray-800 text-gray-500';
+                    }
+                    achEl.className = classes;
+
+                    const trophySVG = `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 flex-shrink-0 ${isUnlocked ? 'text-indigo-300' : 'text-gray-600'}">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"/>
+                        </svg>
+                    `;
+
+                    achEl.innerHTML = `
+                        ${trophySVG}
+                        <div>
+                            <p class="font-bold text-sm sm:text-base ${isUnlocked ? 'text-white' : ''}">${ach.name}</p>
+                            <p class="text-xs ${isUnlocked ? 'text-gray-300' : 'text-gray-500'}">${ach.description}</p>
+                        </div>
+                    `;
+                    achievementsContainer.appendChild(achEl);
+                });
+
+                // --- Chart Logic ---
+                const liftSelect = document.getElementById('lift-select');
+                const mainLifts = ['Squat', 'Bench Press', 'Barbell Row', 'Overhead Press', 'Deadlift'];
+
+                // Populate dropdown only once
+                if (liftSelect.options.length === 0) {
+                    mainLifts.forEach(lift => {
+                        const option = document.createElement('option');
+                        option.value = lift;
+                        option.textContent = lift;
+                        liftSelect.appendChild(option);
+                    });
+                }
+
+                // Add event listener
+                liftSelect.onchange = () => {
+                    this.updateChart(liftSelect.value);
+                };
+
+                // Initial chart render
+                this.updateChart(liftSelect.value || mainLifts[0]);
+            },
+
+            updateChart(liftName) {
+                if (!window.Chart) return;
+                const ctx = document.getElementById('progress-chart').getContext('2d');
+                if (!ctx) return;
+
+                const liftHistory = this.state.history.filter(entry => entry.lift === liftName);
+
+                // Sort by date to ensure the line chart is correct
+                liftHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                const labels = liftHistory.map(entry => {
+                    const d = new Date(entry.date);
+                    return `${d.getMonth() + 1}/${d.getDate()}`;
+                });
+                const data = liftHistory.map(entry => entry.weight);
+
+                if (this.progressChart) {
+                    this.progressChart.destroy();
+                }
+
+                this.progressChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: `${liftName} Weight (kg)`,
+                            data: data,
+                            borderColor: '#818cf8', // indigo-400
+                            backgroundColor: 'rgba(129, 140, 248, 0.2)',
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: '#c7d2fe', // indigo-200
+                            pointHoverRadius: 6,
+                            pointHoverBackgroundColor: '#fff',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: '#1f2937',
+                                titleColor: '#fff',
+                                bodyColor: '#e5e7eb',
+                                borderColor: '#4b5563',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: {
+                                    color: 'rgba(75, 85, 99, 0.5)'
+                                },
+                                ticks: {
+                                    color: '#9ca3af'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(75, 85, 99, 0.5)'
+                                },
+                                ticks: {
+                                    color: '#9ca3af'
+                                }
+                            }
+                        }
+                    }
+                });
+            },
+
+            renderCalendar() {
+                const grid = document.getElementById('calendar-grid');
+                grid.innerHTML = '';
+                const daysOfWeek = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                daysOfWeek.forEach(day => {
+                    grid.innerHTML += `<div class="font-bold text-indigo-400 text-xs sm:text-base">${day}</div>`;
+                });
+
+                const today = new Date();
+                const startDate = new Date(today.setDate(today.getDate() - today.getDay()));
+
+                for (let i = 0; i < 84; i++) { // 12 weeks
+                    const date = new Date(startDate);
+                    date.setDate(startDate.getDate() + i);
+                    const dayIndex = date.getDay();
+                    const workoutDay = this.workoutPlan.find(wd => wd.day.toLowerCase() === date.toLocaleString('en-US', { weekday: 'long' }).toLowerCase());
+                    const workoutType = workoutDay ? workoutDay.type : 'Rest';
+
+                    let bgColor = 'bg-gray-800';
+                    if (workoutType !== 'Rest') bgColor = 'bg-indigo-800/70';
+
+                    const cell = document.createElement('div');
+                    cell.className = `p-1 sm:p-2 rounded ${bgColor}`;
+                    cell.innerHTML = `<p class="text-xs">${date.getDate()}</p><p class="font-bold text-xs sm:text-sm">${workoutType}</p>`;
+                    grid.appendChild(cell);
+                }
+            },
+            async callGemini(prompt, retries = 3, delay = 1000) {
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    if (!response.ok) {
+                        if (response.status === 429 && retries > 0) {
+                            await new Promise(res => setTimeout(res, delay));
+                            return this.callGemini(prompt, retries - 1, delay * 2);
+                        }
+                        throw new Error(`API Error: ${response.statusText}`);
+                    }
+                    const result = await response.json();
+                    return result.candidates[0].content.parts[0].text;
+                } catch (error) {
+                    console.error("Gemini API call failed:", error);
+                    return "System error: Could not retrieve data.";
+                }
+            },
+            async getMotivationalQuote() {
+                const quoteEl = document.getElementById('motivational-quote');
+                const workoutDay = this.workoutPlan[this.state.currentDayIndex];
+                if (workoutDay.type === 'Rest') {
+                    quoteEl.textContent = "Even monarchs must rest. The shadows rebuild in silence.";
+                    return;
+                }
+                const prompt = `Generate a short, powerful, motivational quote for a user about to start their workout. The theme is a dark fantasy RPG system like 'Solo Leveling'. The user is a hunter trying to get stronger. The quote should be one or two sentences.`;
+                const quote = await this.callGemini(prompt);
+                quoteEl.textContent = `"${quote}"`;
+                this.state.systemLog.push({
+                    date: new Date().toISOString(),
+                    title: "System Directive: Daily Motivation",
+                    content: quote
+                });
+                this.saveState();
+            },
+            async analyzeWorkout() {
+                const summary = this.state.lastWorkoutSummary;
+                if (!summary) return;
+                const modalBody = document.getElementById('modal-body');
+                this.showModal('System Analysis', '', [{ text: 'Close', class: 'btn-secondary', action: () => this.hideModal() }]);
+                modalBody.innerHTML = `<div class="flex items-center justify-center p-8"><div class="spinner h-8 w-8 rounded-full border-4 border-gray-600"></div></div>`;
+                const prompt = `Analyze this workout performance for a user named ${this.state.playerName} who is trying to get stronger. Their current level is ${this.state.level}. Be encouraging and act as an AI System from a dark fantasy RPG like 'Solo Leveling'. Provide a short analysis (2-3 paragraphs) and one key tip for their next session. Here is the data:\n\nWorkout Type: ${summary.name}\nExercises Performed:\n${summary.exercises.map(ex => `- ${ex.name}: ${ex.setsCompleted}/${ex.sets} sets completed at ${ex.weight} kg.`).join('\n')}`;
+                const analysis = await this.callGemini(prompt);
+                modalBody.innerHTML = `<p class="whitespace-pre-wrap">${analysis}</p>`;
+                this.state.systemLog.push({
+                    date: new Date().toISOString(),
+                    title: `Performance Analysis: ${summary.name}`,
+                    content: analysis
+                });
+                this.state.lastWorkoutSummary = null;
+                document.getElementById('analyze-workout-btn').classList.add('hidden');
+                this.saveState();
+            },
+            completeWorkout() {
+                let totalXpGained = 0;
+                const phase = this.state.week < 13 ? 1 : 2;
+                const workoutDay = this.workoutPlan[this.state.currentDayIndex];
+                const exercisesForDay = this.workoutPhases[phase].exercises[workoutDay.type];
+                const workoutSummary = { name: workoutDay.name, exercises: [] };
+                document.querySelectorAll('.exercise-item').forEach((item) => {
+                    const exerciseName = item.dataset.exerciseName;
+                    const checkboxes = item.querySelectorAll('.set-checkbox');
+                    let setsCompleted = 0;
+                    checkboxes.forEach(cb => { if (cb.checked) setsCompleted++; });
+                    const exerciseDef = exercisesForDay.find(ex => ex.name === exerciseName);
+                    if (setsCompleted > 0) {
+                        totalXpGained += (setsCompleted / exerciseDef.sets) * exerciseDef.xp;
+                    }
+                    this.state.lifts[exerciseName].lastCompletedSets = setsCompleted;
+                    workoutSummary.exercises.push({ name: exerciseName, sets: exerciseDef.sets, setsCompleted: setsCompleted, weight: this.state.lifts[exerciseName].weight });
+                });
+                this.state.lastWorkoutSummary = workoutSummary;
+
+                // Log main lifts to history for charting
+                const mainLifts = ['Squat', 'Bench Press', 'Barbell Row', 'Overhead Press', 'Deadlift'];
+                const today = new Date().toISOString().split('T')[0];
+                workoutSummary.exercises.forEach(ex => {
+                    if (mainLifts.includes(ex.name) && ex.setsCompleted > 0) {
+                        this.state.history.push({
+                            date: today,
+                            lift: ex.name,
+                            weight: ex.weight
+                        });
+                    }
+                });
+
+                totalXpGained += 50;
+                this.addXp(totalXpGained);
+                this.progressLifts();
+                this.updateStreak();
+                this.state.currentDayIndex = (this.state.currentDayIndex + 1) % 7;
+                if (this.state.currentDayIndex === 0) this.state.week++;
+                this.getMotivationalQuote();
+                this.saveState();
+                this.render();
+            },
+            confirmCompleteWorkout() {
+                this.showModal('Confirm Completion', 'Are you sure you want to complete this quest? This will advance you to the next day.', [
+                    { text: 'Cancel', class: 'btn-secondary', action: () => this.hideModal() },
+                    { text: 'Complete', class: 'btn-primary', action: () => { this.completeWorkout(); this.hideModal(); } }
+                ]);
+            },
+            addXp(amount) {
+                this.state.xp += Math.round(amount);
+                while (this.state.xp >= this.state.xpToNextLevel) {
+                    this.state.xp -= this.state.xpToNextLevel;
+                    this.state.level++;
+                    this.state.xpToNextLevel = Math.round(this.state.xpToNextLevel * 1.5);
+                }
+                this.updateTitle();
+                this.checkAchievements();
+                this.saveState();
+            },
+            updateTitle() {
+                const newTitle = this.titlesData.slice().reverse().find(t => this.state.level >= t.level);
+                if (newTitle) this.state.title = newTitle.title;
+            },
+            updateStreak() {
+                const today = new Date().toISOString().split('T')[0];
+                if (!this.state.lastWorkoutDate) {
+                    this.state.streak = 1;
+                } else {
+                    const lastDate = new Date(this.state.lastWorkoutDate);
+                    const todayDate = new Date(today);
+                    const diffTime = Math.abs(todayDate - lastDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays === 1) { this.state.streak++; } else if (diffDays > 1) { this.state.streak = 1; }
+                }
+                this.state.lastWorkoutDate = today;
+            },
+            progressLifts() {
+                const phase = this.state.week < 13 ? 1 : 2;
+                const workoutType = this.workoutPlan[this.state.currentDayIndex].type;
+                const exercisesForDay = this.workoutPhases[phase].exercises[workoutType];
+                Object.entries(this.state.lifts).forEach(([name, data]) => {
+                    const exerciseDef = exercisesForDay.find(ex => ex.name === name);
+                    if (exerciseDef && data.lastCompletedSets >= exerciseDef.sets) {
+                        const increment = (['Squat', 'Deadlift', 'Leg Press'].includes(name)) ? 5 : 2.5;
+                        data.weight += increment;
+                    }
+                });
+            },
+            checkAchievements() {
+                this.achievementsData.forEach(ach => {
+                    if (!this.state.achievements.includes(ach.id) && ach.condition(this.state)) {
+                        this.state.achievements.push(ach.id);
+                        this.showAchievementToast(ach.name);
+                    }
+                });
+            },
+            showAchievementToast(name) {
+                const toast = document.getElementById('achievement-toast');
+                document.getElementById('achievement-toast-text').textContent = name;
+                toast.classList.remove('hidden');
+                setTimeout(() => { toast.classList.add('hidden'); }, 4900);
+            },
+            editPlayerName() {
+                const newName = prompt("Enter your new Hunter name:", this.state.playerName);
+                if (newName && newName.trim() !== '') {
+                    this.state.playerName = newName.trim();
+                    this.saveState();
+                    this.renderDashboard();
+                }
+            },
+            showModal(title, body, actions) {
+                document.getElementById('modal-title').textContent = title;
+                document.getElementById('modal-body').innerHTML = body;
+                const actionsContainer = document.getElementById('modal-actions');
+                actionsContainer.innerHTML = '';
+                actions.forEach(action => {
+                    const btn = document.createElement('button');
+                    btn.textContent = action.text;
+                    btn.className = `px-4 py-2 rounded-lg font-semibold text-white ${action.class}`;
+                    btn.onclick = action.action;
+                    actionsContainer.appendChild(btn);
+                });
+                document.getElementById('modal').classList.remove('hidden');
+                document.getElementById('modal').classList.add('flex');
+            },
+            hideModal() {
+                document.getElementById('modal').classList.add('hidden');
+                document.getElementById('modal').classList.remove('flex');
+            }
+        };
+
+        app.init();
+    </script>
+</body>
+</html>
