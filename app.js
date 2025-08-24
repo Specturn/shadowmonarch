@@ -22,7 +22,35 @@ const app = {
     db: null,
 
     // State
-    state: { currentPage: 'workout', playerName: 'Player', level: 1, xp: 0, xpToNextLevel: 100, title: 'The Weakest', currentDayIndex: 0, week: 1, streak: 0, lastWorkoutDate: null, mana: 0, inventory: {}, gate: null, gates: [], workoutsCompleted: 0, gatesCleared: 0, sRanksCleared: 0, personalRecords: {}, customWorkouts: [], activeCustomWorkout: null, lastGateGenerationDate: null, lifts: { 'Squat': { weight: 20, lastCompletedSets: 0, e1rm: 0 }, 'Bench Press': { weight: 20, lastCompletedSets: 0, e1rm: 0 }, 'Barbell Row': { weight: 20, lastCompletedSets: 0, e1rm: 0 }, 'Overhead Press': { weight: 20, lastCompletedSets: 0, e1rm: 0 }, 'Deadlift': { weight: 30, lastCompletedSets: 0, e1rm: 0 }, 'Incline DB Press': { weight: 10, lastCompletedSets: 0 }, 'Tricep Pushdown': { weight: 15, lastCompletedSets: 0 }, 'Lateral Raise': { weight: 5, lastCompletedSets: 0 }, 'Lat Pulldown': { weight: 30, lastCompletedSets: 0 }, 'Bicep Curl': { weight: 10, lastCompletedSets: 0 }, 'Romanian Deadlift': { weight: 40, lastCompletedSets: 0 }, 'Leg Press': { weight: 50, lastCompletedSets: 0 }, 'Calf Raise': { weight: 40, lastCompletedSets: 0 }, 'Power Clean': { weight: 30, lastCompletedSets: 0 }, 'Kettlebell Swing': { weight: 16, lastCompletedSets: 0 }, 'Box Jump': { height: 24, lastCompletedSets: 0 }, 'Dips': { weight: 0, lastCompletedSets: 0 }, 'Face Pull': { weight: 10, lastCompletedSets: 0 }, 'Leg Curls': { weight: 20, lastCompletedSets: 0 }, }, achievements: [], systemLog: [], history: [], lastWorkoutSummary: null, },
+    state: {
+        initialized: false,
+        currentPage: 'workout',
+        playerName: 'Player',
+        level: 1,
+        xp: 0,
+        xpToNextLevel: 100,
+        title: 'The Weakest',
+        currentDayIndex: 0,
+        week: 1,
+        streak: 0,
+        lastWorkoutDate: null,
+        mana: 0,
+        inventory: {},
+        gate: null,
+        gates: [],
+        workoutsCompleted: 0,
+        gatesCleared: 0,
+        sRanksCleared: 0,
+        personalRecords: {},
+        customWorkouts: [],
+        activeCustomWorkout: null,
+        lastGateGenerationDate: null,
+        lifts: { 'Squat': { weight: 20, lastCompletedSets: 0, e1rm: 0 }, 'Bench Press': { weight: 20, lastCompletedSets: 0, e1rm: 0 }, 'Barbell Row': { weight: 20, lastCompletedSets: 0, e1rm: 0 }, 'Overhead Press': { weight: 20, lastCompletedSets: 0, e1rm: 0 }, 'Deadlift': { weight: 30, lastCompletedSets: 0, e1rm: 0 }, 'Incline DB Press': { weight: 10, lastCompletedSets: 0 }, 'Tricep Pushdown': { weight: 15, lastCompletedSets: 0 }, 'Lateral Raise': { weight: 5, lastCompletedSets: 0 }, 'Lat Pulldown': { weight: 30, lastCompletedSets: 0 }, 'Bicep Curl': { weight: 10, lastCompletedSets: 0 }, 'Romanian Deadlift': { weight: 40, lastCompletedSets: 0 }, 'Leg Press': { weight: 50, lastCompletedSets: 0 }, 'Calf Raise': { weight: 40, lastCompletedSets: 0 }, 'Power Clean': { weight: 30, lastCompletedSets: 0 }, 'Kettlebell Swing': { weight: 16, lastCompletedSets: 0 }, 'Box Jump': { height: 24, lastCompletedSets: 0 }, 'Dips': { weight: 0, lastCompletedSets: 0 }, 'Face Pull': { weight: 10, lastCompletedSets: 0 }, 'Leg Curls': { weight: 20, lastCompletedSets: 0 }, },
+        achievements: [],
+        systemLog: [],
+        history: [],
+        lastWorkoutSummary: null,
+    },
 
     // Data
     workoutPlan: [ { day: 'Monday', type: 'Push', name: 'Push Day' }, { day: 'Tuesday', type: 'Pull', name: 'Pull Day' }, { day: 'Wednesday', type: 'Legs', name: 'Leg Day' }, { day: 'Thursday', type: 'Push', name: 'Push Day' }, { day: 'Friday', type: 'Pull', name: 'Pull Day' }, { day: 'Saturday', type: 'Legs', name: 'Leg Day' }, { day: 'Sunday', type: 'Rest', name: 'Rest & Recover' }, ],
@@ -47,6 +75,8 @@ const app = {
     },
 
     async init() {
+        if (this.state.initialized) return; // Prevent re-initializing
+
         try {
             await this.loadState();
         } catch (e) {
@@ -74,6 +104,7 @@ const app = {
         this.setupAvatarUpload();
         this.getMotivationalQuote();
         this.render();
+        this.state.initialized = true; // Set the flag at the end
     },
 
     initSounds() {
@@ -180,21 +211,27 @@ const analytics = getAnalytics(firebaseApp);
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 const provider = new GoogleAuthProvider();
-const loginScreen = document.getElementById('login-screen');
-const appScreen = document.getElementById('app');
-const loginBtn = document.getElementById('login-btn');
 
-loginBtn.addEventListener('click', () => { signInWithPopup(auth, provider).catch((error) => { console.error("Authentication failed:", error); alert("Login failed. Please try again."); }); });
+onAuthStateChanged(auth, (user) => {
+    const loginScreen = document.getElementById('login-screen');
+    const appScreen = document.getElementById('app');
 
-onAuthStateChanged(auth, async (user) => {
     if (user) {
+        // User is signed in.
         app.user = user;
         app.db = db;
+
+        // IMPORTANT: Make the app visible FIRST
         loginScreen.classList.add('hidden');
         appScreen.classList.remove('hidden');
-        await app.init();
+
+        // THEN, initialize the app to attach event listeners
+        app.init();
+
     } else {
+        // User is signed out.
         loginScreen.classList.remove('hidden');
         appScreen.classList.add('hidden');
+        app.state.initialized = false; // Reset flag on logout
     }
 });
