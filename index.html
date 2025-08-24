@@ -207,10 +207,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/></svg>
                 <span class="hidden sm:inline">Architect</span>
             </button>
-            <button data-page="nutrition" class="nav-btn inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg>
-                <span class="hidden sm:inline">Nutrition</span>
-            </button>
             <button data-page="calendar" class="nav-btn inline-flex items-center px-3 py-2 sm:px-4 text-sm sm:text-base rounded-lg font-semibold">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 sm:mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"/></svg>
                 <span class="hidden sm:inline">Calendar</span>
@@ -406,29 +402,6 @@
                                 <!-- Saved routines will be populated here -->
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Nutrition Page -->
-            <div id="nutrition-page" class="page">
-                <div class="card-bg p-4 sm:p-6 rounded-lg">
-                    <h2 class="text-xl sm:text-2xl font-bold mb-4 text-glow text-indigo-400">Nutrition Analysis</h2>
-                    <p class="text-gray-400 mb-6">
-                        Enter the meal you've consumed today. The System will analyze the contents and provide a nutritional breakdown and recommendations to optimize your performance.
-                    </p>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label for="nutrition-input" class="block text-sm font-medium text-gray-300 mb-1">Log your meal</label>
-                            <textarea id="nutrition-input" rows="6" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., '300g chicken breast, 150g brown rice, 1 cup broccoli'"></textarea>
-                        </div>
-
-                        <button id="analyze-nutrition-btn" class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg text-base sm:text-lg uppercase tracking-wider">Analyze Meal</button>
-                    </div>
-
-                    <div id="nutrition-results-container" class="mt-6">
-                        <!-- Analysis results will be displayed here -->
                     </div>
                 </div>
             </div>
@@ -718,18 +691,19 @@
                 { level: 50, title: 'Monarch' },
             ],
             achievementsData: [
-                { id: 'first_workout', name: 'Goblin Slayer', description: 'Complete your first workout.', condition: (s) => s.level > 1, icon: 'fa-shield-halved' },
-                { id: 'level_5', name: 'Demon Hunter', description: 'Reach Level 5.', condition: (s) => s.level >= 5, icon: 'fa-dragon' },
-                { id: 'level_10', name: 'Knight Killer', description: 'Reach Level 10.', condition: (s) => s.level >= 10, icon: 'fa-chess-knight' },
-                { id: 'streak_7', name: 'Unbroken Will', description: 'Maintain a 7-day workout streak.', condition: (s) => s.streak >= 7, icon: 'fa-fire' },
-                { id: 'squat_50', name: 'Earth Shaker', description: 'Squat 50kg.', condition: (s) => s.lifts['Squat'].weight >= 50, icon: 'fa-mountain' },
-                { id: 'bench_50', name: 'Plateau Breaker', description: 'Bench Press 50kg.', condition: (s) => s.lifts['Bench Press'].weight >= 50, icon: 'fa-anchor' },
-                { id: 'deadlift_80', name: 'World Lifter', description: 'Deadlift 80kg.', condition: (s) => s.lifts['Deadlift'].weight >= 80, icon: 'fa-globe' },
-                { id: 'phase_2', name: 'Second Awakening', description: 'Advance to Workout Phase II.', condition: (s) => s.week >= 13, icon: 'fa-bolt' },
-                { id: 'squat_100', name: 'Centurion', description: 'Squat 100kg.', condition: (s) => s.lifts['Squat'].weight >= 100, icon: 'fa-gavel' },
-                { id: 'bench_80', name: 'Titan\'s Press', description: 'Bench Press 80kg.', condition: (s) => s.lifts['Bench Press'].weight >= 80, icon: 'fa-gem' },
-                { id: 'deadlift_120', name: 'Gravity Defied', description: 'Deadlift 120kg.', condition: (s) => s.lifts['Deadlift'].weight >= 120, icon: 'fa-rocket' },
-                { id: 'level_50', name: 'Monarch of Strength', description: 'Reach Level 50.', condition: (s) => s.level >= 50, icon: 'fa-crown' },
+                { id: 'first_workout', name: 'The First Step', description: 'Complete your first workout.', condition: (s) => s.level > 1, icon: 'fa-shoe-prints' },
+                { id: 'level_15', name: 'Elite Hunter', description: 'Reach Level 15.', condition: (s) => s.level >= 15, icon: 'fa-dragon' },
+                { id: 'level_40', name: 'Commander Class', description: 'Reach Level 40.', condition: (s) => s.level >= 40, icon: 'fa-chess-knight' },
+                { id: 'streak_30', name: 'Iron Will', description: 'Maintain a 30-day workout streak.', condition: (s) => s.streak >= 30, icon: 'fa-fire' },
+                { id: 'squat_100', name: 'The Foundation', description: 'Squat 100kg (225 lbs).', condition: (s) => s.lifts['Squat'].weight >= 100, icon: 'fa-mountain' },
+                { id: 'bench_80', name: 'The Bar-Bender', description: 'Bench Press 80kg (175 lbs).', condition: (s) => s.lifts['Bench Press'].weight >= 80, icon: 'fa-anchor' },
+                { id: 'deadlift_140', name: 'Gravity Master', description: 'Deadlift 140kg (315 lbs).', condition: (s) => s.lifts['Deadlift'].weight >= 140, icon: 'fa-globe' },
+                { id: 'phase_3', name: 'Power Awakened', description: 'Advance to Workout Phase III.', condition: (s) => s.week >= 25, icon: 'fa-bolt' },
+                { id: 'squat_140', name: 'Beast of the Deep', description: 'Squat 140kg (315 lbs).', condition: (s) => s.lifts['Squat'].weight >= 140, icon: 'fa-gavel' },
+                { id: 'bench_100', name: 'The Centurion', description: 'Bench Press 100kg (225 lbs).', condition: (s) => s.lifts['Bench Press'].weight >= 100, icon: 'fa-gem' },
+                { id: 'deadlift_180', name: 'World Breaker', description: 'Deadlift 180kg (405 lbs).', condition: (s) => s.lifts['Deadlift'].weight >= 180, icon: 'fa-rocket' },
+                { id: 'level_75', name: 'Marshal Grade', description: 'Reach Level 75.', condition: (s) => s.level >= 75, icon: 'fa-star' },
+                { id: 'level_100', name: 'Monarch', description: 'Reach Level 100.', condition: (s) => s.level >= 100, icon: 'fa-crown' }
             ],
 
             gatesData: {
@@ -798,7 +772,6 @@
                 document.getElementById('edit-name-btn').addEventListener('click', () => this.editPlayerName());
                 document.getElementById('architect-add-exercise-btn').addEventListener('click', () => this.architectAddExercise());
                 document.getElementById('architect-save-routine-btn').addEventListener('click', () => this.architectSaveRoutine());
-                document.getElementById('analyze-nutrition-btn').addEventListener('click', () => this.analyzeNutrition());
                 document.getElementById('trigger-deload-btn').addEventListener('click', () => this.confirmDeload());
                 document.getElementById('reset-progress-btn').addEventListener('click', () => this.confirmReset());
                 document.getElementById('export-data-btn').addEventListener('click', () => this.exportData());
@@ -1297,20 +1270,19 @@
                 });
                 const achievementsContainer = document.getElementById('achievements-list');
                 achievementsContainer.innerHTML = '';
-                this.achievementsData.forEach(ach => {
-                    const isUnlocked = this.state.achievements.includes(ach.id);
-                    const achEl = document.createElement('div');
-                    let classes = 'p-3 sm:p-4 rounded-lg flex items-center gap-3 sm:gap-4 transition-all duration-300 ';
-                    if (isUnlocked) {
-                        classes += 'bg-indigo-900/50 border border-indigo-700 achievement-unlocked-glow';
-                    } else {
-                        classes += 'bg-gray-800 text-gray-500';
-                    }
-                    achEl.className = classes;
-                    const trophySVG = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 flex-shrink-0 ${isUnlocked ? 'text-indigo-300' : 'text-gray-600'}"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"/></svg>`;
-                    achEl.innerHTML = `${trophySVG}<div><p class="font-bold text-sm sm:text-base ${isUnlocked ? 'text-white' : ''}">${ach.name}</p><p class="text-xs ${isUnlocked ? 'text-gray-300' : 'text-gray-500'}">${ach.description}</p></div>`;
-                    achievementsContainer.appendChild(achEl);
-                });
+                const unlockedAchievements = this.achievementsData.filter(ach => this.state.achievements.includes(ach.id));
+
+                if (unlockedAchievements.length === 0) {
+                    achievementsContainer.innerHTML = `<p class="text-gray-500 italic text-center col-span-1 sm:col-span-2">Your legend has yet to be written. Complete quests to earn achievements.</p>`;
+                } else {
+                    unlockedAchievements.forEach(ach => {
+                        const achEl = document.createElement('div');
+                        achEl.className = 'p-3 sm:p-4 rounded-lg flex items-center gap-3 sm:gap-4 transition-all duration-300 bg-indigo-900/50 border border-indigo-700 achievement-unlocked-glow';
+                        const iconHtml = `<i class="fas ${ach.icon} fa-2x w-8 text-center text-indigo-300"></i>`;
+                        achEl.innerHTML = `${iconHtml}<div><p class="font-bold text-sm sm:text-base text-white">${ach.name}</p><p class="text-xs text-gray-300">${ach.description}</p></div>`;
+                        achievementsContainer.appendChild(achEl);
+                    });
+                }
 
                 // --- Chart Logic ---
                 const liftSelect = document.getElementById('lift-select');
@@ -1792,65 +1764,6 @@
 
                 toast.classList.remove('hidden');
                 setTimeout(() => { toast.classList.add('hidden'); }, 4900);
-            },
-
-            async analyzeNutrition() {
-                const nutritionInput = document.getElementById('nutrition-input');
-                const mealText = nutritionInput.value.trim();
-
-                if (!mealText) {
-                    this.showToast('Please enter your meal before analyzing.', 'error');
-                    return;
-                }
-
-                const resultsContainer = document.getElementById('nutrition-results-container');
-                resultsContainer.innerHTML = `<div class="flex items-center justify-center p-8"><div class="spinner h-8 w-8 rounded-full border-4 border-gray-600"></div></div>`;
-
-                const prompt = `
-                    As the AI 'System' from a dark fantasy RPG, analyze the following meal consumed by a Hunter.
-                    The user's level is ${this.state.level}. Their goal is to maximize strength, performance, and recovery.
-                    Provide a nutritional analysis and actionable advice.
-
-                    The meal is: "${mealText}"
-
-                    Respond in Markdown format. The response should include:
-                    1.  A title: "Nutritional Analysis".
-                    2.  An estimated breakdown of macronutrients (Protein, Carbs, Fats) and total calories.
-                    3.  A "System Assessment" section (2-3 sentences) giving a verdict on the meal's suitability for a Hunter.
-                    4.  An "Optimization Advice" section with 2-3 bullet points of actionable tips for improvement.
-                    Keep the tone encouraging but direct, as a system guiding a powerful user.
-                `;
-
-                try {
-                    const analysis = await this.callGemini(prompt);
-                    // A simple markdown-to-html converter
-                    let htmlAnalysis = analysis
-                        .replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold text-indigo-300 mt-4 mb-2">$1</h3>')
-                        .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold text-indigo-400 mb-3">$1</h2>')
-                        .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-black text-white mb-4">$1</h1>')
-                        .replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\*(.*)\*/g, '<em>$1</em>')
-                        .replace(/^- (.*$)/gim, '<li class="ml-4 list-disc">$1</li>')
-                        .replace(/\n/g, '<br>');
-
-                    resultsContainer.innerHTML = `
-                        <div class="card-bg border border-gray-700 p-4 rounded-lg">
-                            ${htmlAnalysis}
-                        </div>
-                    `;
-
-                    // Also log to system log
-                    this.state.systemLog.push({
-                        date: new Date().toISOString(),
-                        title: "Nutrition Analysis Log",
-                        content: analysis // Store raw markdown
-                    });
-                    this.saveState();
-
-                } catch (error) {
-                    console.error("Nutrition analysis failed:", error);
-                    resultsContainer.innerHTML = `<p class="text-red-500">Error: Could not retrieve analysis. The System is currently unavailable.</p>`;
-                }
             }
         };
 
