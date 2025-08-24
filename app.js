@@ -75,7 +75,7 @@ const app = {
     },
 
     async init() {
-        if (this.state.initialized) return; // Prevent re-initializing
+        if (this.state.initialized) return;
 
         try {
             await this.loadState();
@@ -88,6 +88,8 @@ const app = {
         if (this.state.lastGateGenerationDate !== today) { this.generateGate(); }
         const dayOfWeek = new Date().getDay();
         this.state.currentDayIndex = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+
+        // Event Listeners
         document.querySelectorAll('.nav-btn').forEach(btn => { btn.addEventListener('click', () => this.showPage(btn.dataset.page)); });
         document.getElementById('preview-quest-btn').addEventListener('click', () => this.previewQuest());
         document.getElementById('begin-quest-btn').addEventListener('click', () => this.confirmBeginQuest());
@@ -101,10 +103,20 @@ const app = {
         document.getElementById('import-file-input').addEventListener('change', (e) => this.importData(e));
         document.getElementById('app').addEventListener('click', (e) => { if (e.target && e.target.id === 'gate-complete-btn') { this.completeGateChallenge(); } });
         window.addEventListener('storage', (event) => { if (event.key === 'dungeonCompletionData') { const newState = JSON.parse(event.newValue); if (newState) { this.state = newState; this.saveState(); this.render(); this.showToast('Dungeon cleared! Progress has been saved.', 'success'); localStorage.removeItem('dungeonCompletionData'); } } });
+
+        document.getElementById('routine-name').addEventListener('input', (e) => {
+            const container = document.getElementById('architect-exercise-list-container');
+            if (e.target.value.trim() !== '') {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        });
+
         this.setupAvatarUpload();
         this.getMotivationalQuote();
         this.render();
-        this.state.initialized = true; // Set the flag at the end
+        this.state.initialized = true;
     },
 
     initSounds() {
@@ -230,7 +242,7 @@ onAuthStateChanged(auth, (user) => {
 
     } else {
         // User is signed out.
-        loginScreen.classList.remove('hidden');
+        loginScreen.classList.add('hidden');
         appScreen.classList.add('hidden');
         app.state.initialized = false; // Reset flag on logout
     }
