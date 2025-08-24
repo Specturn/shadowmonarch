@@ -58,6 +58,21 @@ const app = {
     titlesData: [ { level: 1, title: 'The Weakest' }, { level: 5, title: 'Demon Hunter' }, { level: 10, title: 'Knight Killer' }, { level: 20, title: 'Elite Knight' }, { level: 30, title: 'Commander' }, { level: 50, title: 'Monarch' }, ],
     achievementsData: [ { id: 'level_15', name: 'Elite Hunter', description: 'Reach Level 15.', condition: (s) => s.level >= 15, icon: 'fa-dragon' }, { id: 'level_40', name: 'Commander Class', description: 'Reach Level 40.', condition: (s) => s.level >= 40, icon: 'fa-chess-knight' }, { id: 'level_75', name: 'Marshal Grade', description: 'Reach Level 75.', condition: (s) => s.level >= 75, icon: 'fa-star' }, { id: 'level_100', name: 'Monarch', description: 'Reach Level 100.', condition: (s) => s.level >= 100, icon: 'fa-crown' }, { id: 'level_150', name: 'The Pinnacle', description: 'Reach Level 150.', condition: (s) => s.level >= 150, icon: 'fa-mountain-sun' }, { id: 'squat_100', name: 'The Foundation', description: 'Squat 100kg.', condition: (s) => s.lifts['Squat'].weight >= 100, icon: 'fa-mountain' }, { id: 'squat_140', name: 'Beast of the Deep', description: 'Squat 140kg.', condition: (s) => s.lifts['Squat'].weight >= 140, icon: 'fa-gavel' }, { id: 'squat_180', name: 'Earthshaker', description: 'Squat 180kg.', condition: (s) => s.lifts['Squat'].weight >= 180, icon: 'fa-diamond' }, { id: 'bench_100', name: 'The Centurion', description: 'Bench Press 100kg.', condition: (s) => s.lifts['Bench Press'].weight >= 100, icon: 'fa-gem' }, { id: 'bench_120', name: 'Titan\'s Chest', description: 'Bench Press 120kg.', condition: (s) => s.lifts['Bench Press'].weight >= 120, icon: 'fa-shield-heart' }, { id: 'deadlift_140', name: 'Gravity Master', description: 'Deadlift 140kg.', condition: (s) => s.lifts['Deadlift'].weight >= 140, icon: 'fa-globe' }, { id: 'deadlift_180', name: 'World Breaker', description: 'Deadlift 180kg.', condition: (s) => s.lifts['Deadlift'].weight >= 180, icon: 'fa-rocket' }, { id: 'deadlift_220', name: 'The Unmovable', description: 'Deadlift 220kg.', condition: (s) => s.lifts['Deadlift'].weight >= 220, icon: 'fa-anchor-circle-exclamation' }, { id: 'ohp_80', name: 'Skyward Press', description: 'Overhead Press 80kg.', condition: (s) => s.lifts['Overhead Press'].weight >= 80, icon: 'fa-arrow-up-from-ground-water' }, { id: 'streak_30', name: 'Iron Will', description: 'Maintain a 30-day workout streak.', condition: (s) => s.streak >= 30, icon: 'fa-fire' }, { id: 'streak_100', name: 'Unbreakable', description: 'Maintain a 100-day workout streak.', condition: (s) => s.streak >= 100, icon: 'fa-fire-flame-curved' }, { id: 'streak_365', name: 'Legend', description: 'Maintain a 365-day workout streak.', condition: (s) => s.streak >= 365, icon: 'fa-infinity' }, { id: 'workouts_100', name: 'Veteran Hunter', description: 'Complete 100 total workouts.', condition: (s) => s.workoutsCompleted >= 100, icon: 'fa-shield-halved' }, { id: 'workouts_500', name: 'Shadow General', description: 'Complete 500 total workouts.', condition: (s) => s.workoutsCompleted >= 500, icon: 'fa-user-astronaut' }, { id: 'gates_50', name: 'Gatekeeper', description: 'Clear 50 Gates.', condition: (s) => s.gatesCleared >= 50, icon: 'fa-dungeon' }, { id: 's_rank_gate', name: 'S-Rank Hunter', description: 'Clear your first S-Rank Gate.', condition: (s) => s.sRanksCleared >= 1, icon: 'fa-skull-crossbones' }, { id: 's_rank_10', name: 'National Level', description: 'Clear 10 S-Rank Gates.', condition: (s) => s.sRanksCleared >= 10, icon: 'fa-trophy' }, { id: 'phase_3', name: 'Power Awakened', description: 'Advance to Workout Phase III.', condition: (s) => s.week >= 25, icon: 'fa-bolt' }, { id: 'phase_4', name: 'Peak Condition', description: 'Advance to Workout Phase IV.', condition: (s) => s.week >= 37, icon: 'fa-bolt-lightning' }, { id: 'year_one', name: 'Survivor', description: 'Complete one full year of training.', condition: (s) => s.week >= 52, icon: 'fa-calendar-check' } ],
     gatesData: { 'E': [ { id: 'e_squats', description: 'Perform 20 bodyweight squats.', xp: 10, mana: 5 }, { id: 'e_hydration', description: 'Hydration Check: Log that you drank 2L of water today.', xp: 5, mana: 0 } ], 'D': [ { id: 'd_lunges', description: 'Perform 40 walking lunges.', xp: 20, mana: 10 }, { id: 'd_cardio', description: 'Cardio Burst: Complete 10 minutes of high-intensity cardio (running, jump rope).', xp: 25, mana: 5 } ], 'C': [ { id: 'c_plank', description: 'Hold a plank for a total of 3 minutes.', xp: 30, mana: 15 }, { id: 'c_time_attack', description: 'Time Attack: Complete your first 3 exercises in under 20 minutes.', xp: 40, mana: 20, requiresWorkout: true } ], 'B': [ { id: 'b_amrap', description: 'On your last set of the main lift, perform As Many Reps As Possible (AMRAP).', xp: 50, mana: 25, requiresWorkout: true }, { id: 'b_technique', description: 'Technique Focus: Record a video of your main lift and review your form.', xp: 60, mana: 30, requiresWorkout: true } ], 'A': [ { id: 'a_slow_negative', description: 'Complete your final set of your main lift with a 10-second slow negative.', xp: 75, mana: 50, requiresWorkout: true }, { id: 'a_red_gate', description: 'Red Gate: Perform your entire workout with no more than 60 seconds of rest between sets.', xp: 100, mana: 60, requiresWorkout: true } ], 'S': [ { id: 's_100_pushups', description: 'Complete your entire workout, then perform 100 push-ups.', xp: 200, mana: 100, requiresWorkout: true, canDropKey: true }, { id: 's_monarch_shadow', description: "The Monarch's Shadow: Complete your workout, then perform 50 pull-ups (can be broken into sets).", xp: 250, mana: 120, requiresWorkout: true, canDropKey: true } ] },
+    masterExerciseList: [
+        // Barbell Lifts
+        'Squat', 'Bench Press', 'Deadlift', 'Overhead Press', 'Barbell Row',
+        'Romanian Deadlift', 'Front Squat', 'Good Morning', 'Hip Thrust',
+        // Dumbbell Lifts
+        'Dumbbell Bench Press', 'Incline DB Press', 'Dumbbell Row', 'Goblet Squat',
+        'Bulgarian Split Squat', 'Dumbbell Shoulder Press', 'Lateral Raise',
+        'Dumbbell Curl', 'Hammer Curl', 'Tricep Skullcrusher', 'Dumbbell Fly',
+        // Machine & Cable Lifts
+        'Lat Pulldown', 'Cable Row', 'Tricep Pushdown', 'Cable Crossover',
+        'Leg Press', 'Leg Extension', 'Hamstring Curl', 'Calf Raise',
+        'Pec Deck', 'Machine Shoulder Press',
+        // Bodyweight
+        'Pull-up', 'Chin-up', 'Dip', 'Push-up', 'Plank', 'Lunge'
+    ],
 
     // Methods
     generateGate(forceHighRank = false) {
@@ -157,6 +172,11 @@ const app = {
         document.getElementById(`${pageId}-page`).classList.add('active');
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.querySelector(`.nav-btn[data-page="${pageId}"]`).classList.add('active');
+
+        if (pageId === 'architect') {
+            this.populateExerciseDropdown();
+        }
+
         this.saveState();
         this.render();
     },
@@ -169,6 +189,21 @@ const app = {
         if (this.state.currentPage === 'calendar') this.renderCalendar();
         if (this.state.currentPage === 'log') this.renderSystemLog();
         if (this.state.currentPage === 'architect') this.renderArchitect();
+    },
+
+    populateExerciseDropdown() {
+        const selectEl = document.getElementById('architect-exercise-select');
+        if (!selectEl) return; // Safety check
+
+        // Clear any existing options
+        selectEl.innerHTML = '<option value="" disabled selected>Select an exercise...</option>';
+
+        this.masterExerciseList.forEach(exercise => {
+            const option = document.createElement('option');
+            option.value = exercise;
+            option.textContent = exercise;
+            selectEl.appendChild(option);
+        });
     },
 
     renderInventory() { /* ... content from original script ... */ },
