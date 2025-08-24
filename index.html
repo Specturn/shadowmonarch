@@ -309,7 +309,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-1 card-bg p-6 rounded-lg text-center">
                         <div id="avatar-container" class="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-4 cursor-pointer group">
-                            <img src="images/avatar.png" id="player-avatar-img" alt="Player Avatar" class="w-full h-full rounded-full border-4 border-indigo-500 object-cover">
+                            <img src="images/avatar.png" id="dashboard-avatar-img" alt="Player Avatar" class="w-full h-full rounded-full border-4 border-indigo-500 object-cover">
                             <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <i class="fas fa-camera fa-2x text-white"></i>
                             </div>
@@ -841,6 +841,17 @@
             },
 
             saveState() { localStorage.setItem('projectMonarchState', JSON.stringify(this.state)); },
+
+            loadCustomAvatar() {
+                const customAvatarData = localStorage.getItem('customAvatar');
+                const avatarImg = document.getElementById('dashboard-avatar-img');
+                if (customAvatarData && avatarImg) {
+                    avatarImg.src = customAvatarData;
+                } else if (avatarImg) {
+                    avatarImg.src = 'images/avatar.png'; // Fallback to default
+                }
+            },
+
             loadState() {
                 const savedState = localStorage.getItem('projectMonarchState');
                 if (savedState) {
