@@ -308,7 +308,12 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-1 card-bg p-6 rounded-lg text-center">
-                        <img src="http://googleusercontent.com/file_content/38" alt="Player Avatar" class="w-32 h-32 sm:w-40 sm:h-40 rounded-full mx-auto mb-4 border-4 border-indigo-500">
+                        <div id="avatar-container" class="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-4 cursor-pointer group">
+                            <img src="images/avatar.png" id="player-avatar-img" alt="Player Avatar" class="w-full h-full rounded-full border-4 border-indigo-500 object-cover">
+                            <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-camera fa-2x text-white"></i>
+                            </div>
+                        </div>
                         <h2 id="dashboard-player-name" class="text-2xl sm:text-3xl font-bold">Player</h2>
                         <p id="dashboard-player-title" class="text-indigo-300 text-base sm:text-lg mb-4">The Weakest Hunter</p>
                         <button id="edit-name-btn" class="text-sm text-gray-400 hover:text-white"><i class="fas fa-pencil-alt mr-1"></i> Edit Name</button>
@@ -440,6 +445,7 @@
         </main>
 
         <input type="file" id="import-file-input" class="hidden" accept=".json">
+        <input type="file" id="avatar-upload-input" class="hidden" accept="image/*">
     </div>
 
     <!-- Modal -->
@@ -757,6 +763,7 @@
             init() {
                 this.loadState();
                 this.initSounds();
+                this.loadCustomAvatar();
                 const today = new Date().toISOString().split('T')[0];
                 if (this.state.lastGateGenerationDate !== today) {
                     this.generateGate();
@@ -777,6 +784,8 @@
                 document.getElementById('export-data-btn').addEventListener('click', () => this.exportData());
                 document.getElementById('import-data-btn').addEventListener('click', () => document.getElementById('import-file-input').click());
                 document.getElementById('import-file-input').addEventListener('change', (e) => this.importData(e));
+                document.getElementById('avatar-container').addEventListener('click', () => document.getElementById('avatar-upload-input').click());
+                document.getElementById('avatar-upload-input').addEventListener('change', (e) => this.handleAvatarUpload(e));
 
                 // Event delegation for dynamic buttons
                 document.getElementById('app').addEventListener('click', (e) => {
@@ -1868,6 +1877,32 @@
                 }
             };
             fileReader.readAsText(event.target.files[0]);
+        };
+
+        app.loadCustomAvatar = function() {
+            const customAvatar = localStorage.getItem('customAvatar');
+            if (customAvatar) {
+                document.getElementById('player-avatar-img').src = customAvatar;
+            }
+        };
+
+        app.handleAvatarUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                this.showToast('File is too large. Please select an image under 2MB.', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64String = e.target.result;
+                localStorage.setItem('customAvatar', base64String);
+                document.getElementById('player-avatar-img').src = base64String;
+                this.showToast('Avatar updated successfully!', 'success');
+            };
+            reader.readAsDataURL(file);
         };
     </script>
 </body>
