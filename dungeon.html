@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon Instance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .task-card {
+            background-image: linear-gradient(145deg, #2c3a4b, #1f2937);
+            border: 1px solid #4b5563;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+        }
+        .btn-primary:hover {
+            background-color: #6366f1;
+        }
+        .btn-primary:disabled {
+            background-color: #374151;
+            cursor: not-allowed;
+        }
+        .set-checkbox:checked + span {
+            text-decoration: line-through;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div id="dungeon-container" class="w-full max-w-lg mx-auto">
+        <div id="task-card" class="task-card p-6 sm:p-8 rounded-lg shadow-lg">
+            <h1 id="task-counter" class="text-sm font-bold uppercase text-indigo-400 mb-2">Task 1 / 5</h1>
+            <h2 id="exercise-name" class="text-2xl sm:text-3xl font-bold text-white mb-4">Exercise Name</h2>
+            <p id="exercise-details" class="text-lg text-gray-300 mb-6">3 sets of 8-12 reps @ 50 kg</p>
+
+            <div id="sets-container" class="space-y-4 mb-8">
+                <!-- Checkboxes will be injected here by JS -->
+            </div>
+
+            <button id="next-task-btn" class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg uppercase tracking-wider" disabled>Next Task</button>
+        </div>
+
+        <div id="completion-screen" class="hidden text-center">
+            <h1 class="text-3xl font-bold text-green-400 mb-4">Quest Complete</h1>
+            <p class="text-gray-300 mb-8">You have cleared the dungeon. Your rewards have been recorded.</p>
+            <button id="return-btn" class="btn-primary text-white font-bold py-3 px-4 rounded-lg">Return to Base</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const questDataString = localStorage.getItem('dungeonQuestData');
+            if (!questDataString) {
+                document.body.innerHTML = '<h1 class="text-red-500 text-2xl">Error: No Quest Data Found. This tab will close automatically.</h1>';
+                setTimeout(() => window.close(), 3000);
+                return;
+            }
+
+            localStorage.removeItem('dungeonQuestData'); // Clean up immediately
+            const questData = JSON.parse(questDataString);
+            let currentTaskIndex = 0;
+
+            const taskCounterEl = document.getElementById('task-counter');
+            const exerciseNameEl = document.getElementById('exercise-name');
+            const exerciseDetailsEl = document.getElementById('exercise-details');
+            const setsContainerEl = document.getElementById('sets-container');
+            const nextTaskBtn = document.getElementById('next-task-btn');
+            const taskCardEl = document.getElementById('task-card');
+            const completionScreenEl = document.getElementById('completion-screen');
+            const returnBtn = document.getElementById('return-btn');
+
+            function renderCurrentTask() {
+                const exercise = questData.exercises[currentTaskIndex];
+                const lift = questData.state.lifts[exercise.name];
+                const weight = lift ? lift.weight : 'N/A';
+
+                taskCounterEl.textContent = `Task ${currentTaskIndex + 1} / ${questData.exercises.length}`;
+                exerciseNameEl.textContent = exercise.name;
+                exerciseDetailsEl.textContent = `${exercise.sets} sets of ${exercise.reps} reps @ ${weight} kg`;
+
+                setsContainerEl.innerHTML = '';
+                for (let i = 0; i < exercise.sets; i++) {
+                    const setId = `set-${currentTaskIndex}-${i}`;
+                    const setEl = document.createElement('div');
+                    setEl.className = 'flex items-center gap-3 p-3 bg-gray-800 rounded-md';
+                    setEl.innerHTML = `
+                        <input type="checkbox" id="${setId}" class="set-checkbox h-6 w-6 bg-gray-700 rounded text-indigo-500 focus:ring-indigo-600 cursor-pointer">
+                        <label for="${setId}" class="text-lg cursor-pointer"><span>Set ${i + 1}</span></label>
+                    `;
+                    setsContainerEl.appendChild(setEl);
+                }
+
+                addCheckboxListeners();
+                checkIfTaskComplete();
+            }
+
+            function addCheckboxListeners() {
+                document.querySelectorAll('.set-checkbox').forEach(cb => {
+                    cb.addEventListener('change', checkIfTaskComplete);
+                });
+            }
+
+            function checkIfTaskComplete() {
+                const allSets = document.querySelectorAll('.set-checkbox');
+                const allSetsCompleted = Array.from(allSets).every(cb => cb.checked);
+                nextTaskBtn.disabled = !allSetsCompleted;
+            }
+
+            function completeDungeon() {
+                // --- Recalculate State ---
+                let totalXpGained = 50; // Base for completing the quest
+                questData.exercises.forEach(ex => {
+                    totalXpGained += ex.xp;
+                });
+
+                questData.state.xp += Math.round(totalXpGained);
+                while (questData.state.xp >= questData.state.xpToNextLevel) {
+                    questData.state.xp -= questData.state.xpToNextLevel;
+                    questData.state.level++;
+                    questData.state.xpToNextLevel = Math.round(questData.state.xpToNextLevel * 1.5);
+                }
+
+                questData.state.workoutsCompleted++;
+                questData.state.mana += 100;
+
+                // Update streak
+                const today = new Date().toISOString().split('T')[0];
+                if (!questData.state.lastWorkoutDate) {
+                    questData.state.streak = 1;
+                } else {
+                    const lastDate = new Date(questData.state.lastWorkoutDate);
+                    const todayDate = new Date(today);
+                    const diffTime = Math.abs(todayDate - lastDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays === 1) { questData.state.streak++; } else if (diffDays > 1) { questData.state.streak = 1; }
+                }
+                questData.state.lastWorkoutDate = today;
+
+                // Update lifts (simplified for dungeon context)
+                questData.exercises.forEach(ex => {
+                    const lift = questData.state.lifts[ex.name];
+                    if (lift) {
+                        const increment = (['Squat', 'Deadlift', 'Leg Press'].includes(ex.name)) ? 5 : 2.5;
+                        lift.weight += increment;
+                    }
+                });
+
+                questData.state.currentDayIndex = (questData.state.currentDayIndex + 1) % 7;
+                if (questData.state.currentDayIndex === 0) questData.state.week++;
+
+                // --- Save and show completion ---
+                localStorage.setItem('dungeonCompletionData', JSON.stringify(questData.state));
+                taskCardEl.classList.add('hidden');
+                completionScreenEl.classList.remove('hidden');
+            }
+
+            nextTaskBtn.addEventListener('click', () => {
+                currentTaskIndex++;
+                if (currentTaskIndex >= questData.exercises.length) {
+                    completeDungeon();
+                } else {
+                    renderCurrentTask();
+                }
+            });
+
+            returnBtn.addEventListener('click', () => {
+                window.close();
+            });
+
+            // Initial render
+            renderCurrentTask();
+        });
+    </script>
+</body>
+</html>

@@ -185,7 +185,16 @@
 </head>
 <body class="text-white">
 
-    <div id="app" class="max-w-4xl mx-auto p-2 sm:p-6 md:p-8">
+    <div id="login-screen" class="flex flex-col items-center justify-center min-h-screen">
+        <h1 class="text-4xl font-bold mb-2 text-glow text-white">Project Monarch</h1>
+        <p class="text-gray-400 mb-8">Your path to unrivaled strength begins.</p>
+        <button id="login-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg flex items-center gap-2 transition-all duration-300">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.082,5.571l6.19,5.238C42.02,35.622,44,30.138,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+            <span>Login with Google</span>
+        </button>
+    </div>
+
+    <div id="app" class="max-w-4xl mx-auto p-2 sm:p-6 md:p-8 hidden">
 
         <!-- Header -->
         <header class="text-center mb-6 p-6 sm:p-8 rounded-lg header-bg border-2 border-indigo-500/50">
@@ -278,9 +287,10 @@
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold mb-1 text-glow text-indigo-400">Daily Quest</h2>
                     <p id="workout-day-title" class="text-base sm:text-lg font-semibold text-gray-300 mb-4">Loading your mission...</p>
-                    <div id="exercise-list" class="space-y-6"></div>
-                    <button id="complete-workout-btn" class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg mt-8 text-base sm:text-lg uppercase tracking-wider hidden">Mission Complete</button>
-                    <button id="analyze-workout-btn" class="w-full btn-secondary text-white font-bold py-3 px-4 rounded-lg mt-4 text-base sm:text-lg uppercase tracking-wider hidden">✨ Analyze Performance</button>
+                    <div id="quest-controls" class="mt-6 flex gap-4">
+                        <button id="preview-quest-btn" class="w-full btn-secondary text-white font-bold py-3 px-4 rounded-lg">Preview Quest</button>
+                        <button id="begin-quest-btn" class="w-full btn-primary text-white font-bold py-3 px-4 rounded-lg">Begin Quest</button>
+                    </div>
                 </div>
             </div>
 
@@ -309,7 +319,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-1 card-bg p-6 rounded-lg text-center">
                         <div id="avatar-container" class="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-4 cursor-pointer group">
-                            <img src="images/avatar.png" id="player-avatar-img" alt="Player Avatar" class="w-full h-full rounded-full border-4 border-indigo-500 object-cover">
+                            <img src="images/avatar.png" id="dashboard-avatar-img" alt="Player Avatar" class="w-full h-full rounded-full border-4 border-indigo-500 object-cover">
                             <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <i class="fas fa-camera fa-2x text-white"></i>
                             </div>
@@ -436,9 +446,9 @@
 
                         <h3 class="text-lg font-semibold text-red-500">Danger Zone</h3>
                         <p class="text-gray-400 mb-4">
-                            Reset all your progress. This action is irreversible and will delete all your levels, stats, and achievements.
+                            Permanently delete your account and all associated data. This action is irreversible.
                         </p>
-                        <button id="reset-progress-btn" class="w-full bg-red-800 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg uppercase">Reset All Progress</button>
+                        <button id="delete-account-btn" class="w-full bg-red-800 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg uppercase">Delete Account</button>
                     </div>
                 </div>
             </div>
@@ -548,6 +558,9 @@
                 inventory: {}, // e.g., { 'stamina-potion': 2 }
                 gate: null, // e.g., { id: 'e_rank_squats', rank: 'E', description: 'Perform 20 bodyweight squats.', xp: 10 }
                 gates: [],
+                workoutsCompleted: 0,
+                gatesCleared: 0,
+                sRanksCleared: 0,
                 personalRecords: {}, // e.g., { 'Squat': { reps: 5, weight: 100 } }
                 customWorkouts: [],
                 activeCustomWorkout: null,
@@ -697,28 +710,67 @@
                 { level: 50, title: 'Monarch' },
             ],
             achievementsData: [
-                { id: 'first_workout', name: 'The First Step', description: 'Complete your first workout.', condition: (s) => s.level > 1, icon: 'fa-shoe-prints' },
+                // Level Milestones
                 { id: 'level_15', name: 'Elite Hunter', description: 'Reach Level 15.', condition: (s) => s.level >= 15, icon: 'fa-dragon' },
                 { id: 'level_40', name: 'Commander Class', description: 'Reach Level 40.', condition: (s) => s.level >= 40, icon: 'fa-chess-knight' },
-                { id: 'streak_30', name: 'Iron Will', description: 'Maintain a 30-day workout streak.', condition: (s) => s.streak >= 30, icon: 'fa-fire' },
-                { id: 'squat_100', name: 'The Foundation', description: 'Squat 100kg (225 lbs).', condition: (s) => s.lifts['Squat'].weight >= 100, icon: 'fa-mountain' },
-                { id: 'bench_80', name: 'The Bar-Bender', description: 'Bench Press 80kg (175 lbs).', condition: (s) => s.lifts['Bench Press'].weight >= 80, icon: 'fa-anchor' },
-                { id: 'deadlift_140', name: 'Gravity Master', description: 'Deadlift 140kg (315 lbs).', condition: (s) => s.lifts['Deadlift'].weight >= 140, icon: 'fa-globe' },
-                { id: 'phase_3', name: 'Power Awakened', description: 'Advance to Workout Phase III.', condition: (s) => s.week >= 25, icon: 'fa-bolt' },
-                { id: 'squat_140', name: 'Beast of the Deep', description: 'Squat 140kg (315 lbs).', condition: (s) => s.lifts['Squat'].weight >= 140, icon: 'fa-gavel' },
-                { id: 'bench_100', name: 'The Centurion', description: 'Bench Press 100kg (225 lbs).', condition: (s) => s.lifts['Bench Press'].weight >= 100, icon: 'fa-gem' },
-                { id: 'deadlift_180', name: 'World Breaker', description: 'Deadlift 180kg (405 lbs).', condition: (s) => s.lifts['Deadlift'].weight >= 180, icon: 'fa-rocket' },
                 { id: 'level_75', name: 'Marshal Grade', description: 'Reach Level 75.', condition: (s) => s.level >= 75, icon: 'fa-star' },
-                { id: 'level_100', name: 'Monarch', description: 'Reach Level 100.', condition: (s) => s.level >= 100, icon: 'fa-crown' }
+                { id: 'level_100', name: 'Monarch', description: 'Reach Level 100.', condition: (s) => s.level >= 100, icon: 'fa-crown' },
+                { id: 'level_150', name: 'The Pinnacle', description: 'Reach Level 150.', condition: (s) => s.level >= 150, icon: 'fa-mountain-sun' },
+
+                // Strength Plateaus (KG)
+                { id: 'squat_100', name: 'The Foundation', description: 'Squat 100kg.', condition: (s) => s.lifts['Squat'].weight >= 100, icon: 'fa-mountain' },
+                { id: 'squat_140', name: 'Beast of the Deep', description: 'Squat 140kg.', condition: (s) => s.lifts['Squat'].weight >= 140, icon: 'fa-gavel' },
+                { id: 'squat_180', name: 'Earthshaker', description: 'Squat 180kg.', condition: (s) => s.lifts['Squat'].weight >= 180, icon: 'fa-diamond' },
+                { id: 'bench_100', name: 'The Centurion', description: 'Bench Press 100kg.', condition: (s) => s.lifts['Bench Press'].weight >= 100, icon: 'fa-gem' },
+                { id: 'bench_120', name: 'Titan\'s Chest', description: 'Bench Press 120kg.', condition: (s) => s.lifts['Bench Press'].weight >= 120, icon: 'fa-shield-heart' },
+                { id: 'deadlift_140', name: 'Gravity Master', description: 'Deadlift 140kg.', condition: (s) => s.lifts['Deadlift'].weight >= 140, icon: 'fa-globe' },
+                { id: 'deadlift_180', name: 'World Breaker', description: 'Deadlift 180kg.', condition: (s) => s.lifts['Deadlift'].weight >= 180, icon: 'fa-rocket' },
+                { id: 'deadlift_220', name: 'The Unmovable', description: 'Deadlift 220kg.', condition: (s) => s.lifts['Deadlift'].weight >= 220, icon: 'fa-anchor-circle-exclamation' },
+                { id: 'ohp_80', name: 'Skyward Press', description: 'Overhead Press 80kg.', condition: (s) => s.lifts['Overhead Press'].weight >= 80, icon: 'fa-arrow-up-from-ground-water' },
+
+                // Consistency & Streaks
+                { id: 'streak_30', name: 'Iron Will', description: 'Maintain a 30-day workout streak.', condition: (s) => s.streak >= 30, icon: 'fa-fire' },
+                { id: 'streak_100', name: 'Unbreakable', description: 'Maintain a 100-day workout streak.', condition: (s) => s.streak >= 100, icon: 'fa-fire-flame-curved' },
+                { id: 'streak_365', name: 'Legend', description: 'Maintain a 365-day workout streak.', condition: (s) => s.streak >= 365, icon: 'fa-infinity' },
+                { id: 'workouts_100', name: 'Veteran Hunter', description: 'Complete 100 total workouts.', condition: (s) => s.workoutsCompleted >= 100, icon: 'fa-shield-halved' },
+                { id: 'workouts_500', name: 'Shadow General', description: 'Complete 500 total workouts.', condition: (s) => s.workoutsCompleted >= 500, icon: 'fa-user-astronaut' },
+
+                // Gate & Challenge Milestones
+                { id: 'gates_50', name: 'Gatekeeper', description: 'Clear 50 Gates.', condition: (s) => s.gatesCleared >= 50, icon: 'fa-dungeon' },
+                { id: 's_rank_gate', name: 'S-Rank Hunter', description: 'Clear your first S-Rank Gate.', condition: (s) => s.sRanksCleared >= 1, icon: 'fa-skull-crossbones' },
+                { id: 's_rank_10', name: 'National Level', description: 'Clear 10 S-Rank Gates.', condition: (s) => s.sRanksCleared >= 10, icon: 'fa-trophy' },
+
+                // Phase Progression
+                { id: 'phase_3', name: 'Power Awakened', description: 'Advance to Workout Phase III.', condition: (s) => s.week >= 25, icon: 'fa-bolt' },
+                { id: 'phase_4', name: 'Peak Condition', description: 'Advance to Workout Phase IV.', condition: (s) => s.week >= 37, icon: 'fa-bolt-lightning' },
+                { id: 'year_one', name: 'Survivor', description: 'Complete one full year of training.', condition: (s) => s.week >= 52, icon: 'fa-calendar-check' }
             ],
 
             gatesData: {
-                'E': [ { id: 'e_squats', description: 'Perform 20 bodyweight squats.', xp: 10, mana: 5 } ],
-                'D': [ { id: 'd_lunges', description: 'Perform 40 walking lunges.', xp: 20, mana: 10 } ],
-                'C': [ { id: 'c_plank', description: 'Hold a plank for a total of 3 minutes.', xp: 30, mana: 15 } ],
-                'B': [ { id: 'b_amrap', description: 'On your last set of the main lift, perform As Many Reps As Possible (AMRAP).', xp: 50, mana: 25, requiresWorkout: true } ],
-                'A': [ { id: 'a_slow_negative', description: 'Complete your final set of your main lift with a 10-second slow negative.', xp: 75, mana: 50, requiresWorkout: true } ],
-                'S': [ { id: 's_100_pushups', description: 'Complete your entire workout, then perform 100 push-ups.', xp: 200, mana: 100, requiresWorkout: true, canDropKey: true } ]
+                'E': [
+                    { id: 'e_squats', description: 'Perform 20 bodyweight squats.', xp: 10, mana: 5 },
+                    { id: 'e_hydration', description: 'Hydration Check: Log that you drank 2L of water today.', xp: 5, mana: 0 }
+                ],
+                'D': [
+                    { id: 'd_lunges', description: 'Perform 40 walking lunges.', xp: 20, mana: 10 },
+                    { id: 'd_cardio', description: 'Cardio Burst: Complete 10 minutes of high-intensity cardio (running, jump rope).', xp: 25, mana: 5 }
+                ],
+                'C': [
+                    { id: 'c_plank', description: 'Hold a plank for a total of 3 minutes.', xp: 30, mana: 15 },
+                    { id: 'c_time_attack', description: 'Time Attack: Complete your first 3 exercises in under 20 minutes.', xp: 40, mana: 20, requiresWorkout: true }
+                ],
+                'B': [
+                    { id: 'b_amrap', description: 'On your last set of the main lift, perform As Many Reps As Possible (AMRAP).', xp: 50, mana: 25, requiresWorkout: true },
+                    { id: 'b_technique', description: 'Technique Focus: Record a video of your main lift and review your form.', xp: 60, mana: 30, requiresWorkout: true }
+                ],
+                'A': [
+                    { id: 'a_slow_negative', description: 'Complete your final set of your main lift with a 10-second slow negative.', xp: 75, mana: 50, requiresWorkout: true },
+                    { id: 'a_red_gate', description: 'Red Gate: Perform your entire workout with no more than 60 seconds of rest between sets.', xp: 100, mana: 60, requiresWorkout: true }
+                ],
+                'S': [
+                    { id: 's_100_pushups', description: 'Complete your entire workout, then perform 100 push-ups.', xp: 200, mana: 100, requiresWorkout: true, canDropKey: true },
+                    { id: 's_monarch_shadow', description: "The Monarch's Shadow: Complete your workout, then perform 50 pull-ups (can be broken into sets).", xp: 250, mana: 120, requiresWorkout: true, canDropKey: true }
+                ]
             },
 
             generateGate(forceHighRank = false) {
@@ -760,8 +812,14 @@
             },
 
             // --- JAVASCRIPT LOGIC ---
-            init() {
-                this.loadState();
+            async init(user, db) {
+                this.user = user;
+                this.db = db;
+                try {
+                    await this.loadState();
+                } catch (e) {
+                    console.error("Failed to load state from Firestore, continuing with default state.", e);
+                }
                 this.initSounds();
                 this.loadCustomAvatar();
                 const today = new Date().toISOString().split('T')[0];
@@ -774,13 +832,13 @@
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.addEventListener('click', () => this.showPage(btn.dataset.page));
                 });
-                document.getElementById('complete-workout-btn').addEventListener('click', () => this.confirmCompleteWorkout());
-                document.getElementById('analyze-workout-btn').addEventListener('click', () => this.analyzeWorkout());
+                document.getElementById('preview-quest-btn').addEventListener('click', () => this.previewQuest());
+                document.getElementById('begin-quest-btn').addEventListener('click', () => this.confirmBeginQuest());
                 document.getElementById('edit-name-btn').addEventListener('click', () => this.editPlayerName());
                 document.getElementById('architect-add-exercise-btn').addEventListener('click', () => this.architectAddExercise());
                 document.getElementById('architect-save-routine-btn').addEventListener('click', () => this.architectSaveRoutine());
                 document.getElementById('trigger-deload-btn').addEventListener('click', () => this.confirmDeload());
-                document.getElementById('reset-progress-btn').addEventListener('click', () => this.confirmReset());
+                document.getElementById('delete-account-btn').addEventListener('click', () => this.confirmDelete());
                 document.getElementById('export-data-btn').addEventListener('click', () => this.exportData());
                 document.getElementById('import-data-btn').addEventListener('click', () => document.getElementById('import-file-input').click());
                 document.getElementById('import-file-input').addEventListener('change', (e) => this.importData(e));
@@ -791,6 +849,19 @@
                 document.getElementById('app').addEventListener('click', (e) => {
                     if (e.target && e.target.id === 'gate-complete-btn') {
                         this.completeGateChallenge();
+                    }
+                });
+
+                window.addEventListener('storage', (event) => {
+                    if (event.key === 'dungeonCompletionData') {
+                        const newState = JSON.parse(event.newValue);
+                        if (newState) {
+                            this.state = newState;
+                            this.saveState(); // This now saves to Firestore
+                            this.render();
+                            this.showToast('Dungeon cleared! Progress has been saved.', 'success');
+                            localStorage.removeItem('dungeonCompletionData'); // Clean up
+                        }
                     }
                 });
 
@@ -840,37 +911,43 @@
                 }
             },
 
-            saveState() { localStorage.setItem('projectMonarchState', JSON.stringify(this.state)); },
-            loadState() {
-                const savedState = localStorage.getItem('projectMonarchState');
-                if (savedState) {
-                    const parsedState = JSON.parse(savedState);
-
-                    // --- Migration for inventory from array to object ---
-                    if (Array.isArray(parsedState.inventory)) {
-                        const newInventory = {};
-                        parsedState.inventory.forEach(item => {
-                            if (item.id && item.quantity) {
-                                newInventory[item.id] = (newInventory[item.id] || 0) + item.quantity;
-                            }
-                        });
-                        parsedState.inventory = newInventory;
-                    }
-
-                    this.state = { ...this.state, ...parsedState };
-                    // --- Safely initialize new properties for users with old save data ---
-                    this.state.systemLog = this.state.systemLog || [];
-                    this.state.history = this.state.history || [];
-                    this.state.mana = this.state.mana || 0;
-                    this.state.inventory = this.state.inventory || {}; // Ensure it's an object
-                    this.state.gate = this.state.gate || null;
-                    this.state.gates = this.state.gates || [];
-                    this.state.personalRecords = this.state.personalRecords || {};
-                    this.state.customWorkouts = this.state.customWorkouts || [];
-                    this.state.activeCustomWorkout = this.state.activeCustomWorkout || null;
-                    this.state.lastGateGenerationDate = this.state.lastGateGenerationDate || null;
+            async saveState() {
+                if (!this.user) return;
+                try {
+                    const userDocRef = doc(this.db, "users", this.user.uid);
+                    await setDoc(userDocRef, this.state);
+                } catch (error) {
+                    console.error("Error saving state to Firestore:", error);
+                    this.showToast('Error saving progress to the cloud.', 'error');
                 }
             },
+
+            async loadState() {
+                if (!this.user) return;
+
+                const userDocRef = doc(this.db, "users", this.user.uid);
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const loadedState = docSnap.data();
+                    this.state = { ...this.state, ...loadedState };
+                } else {
+                    console.log("No such document! Creating initial state for new user.");
+                    this.state.playerName = this.user.displayName || 'Hunter';
+                    await this.saveState();
+                }
+            },
+
+            loadCustomAvatar() {
+                const customAvatarData = localStorage.getItem('customAvatar');
+                const avatarImg = document.getElementById('dashboard-avatar-img');
+                if (customAvatarData && avatarImg) {
+                    avatarImg.src = customAvatarData;
+                } else if (avatarImg) {
+                    avatarImg.src = 'images/avatar.png'; // Fallback to default
+                }
+            },
+
             showPage(pageId) {
                 this.state.currentPage = pageId;
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1126,6 +1203,11 @@
                 const gate = this.state.gate;
                 this.addXp(gate.xp);
                 this.updateMana(gate.mana || 0);
+
+                this.state.gatesCleared++;
+                if (gate.rank === 'S') {
+                    this.state.sRanksCleared++;
+                }
 
                 if (gate.canDropKey && Math.random() < 0.1) { // 10% chance for key drop on S-Rank
                     this.addItemToInventory('key-dungeon', 1);
@@ -1446,102 +1528,53 @@
                 document.getElementById('analyze-workout-btn').classList.add('hidden');
                 this.saveState();
             },
-            completeWorkout() {
-                let totalXpGained = 0;
-                const isCustom = !!this.state.activeCustomWorkout;
-                let exercisesForDay;
+            previewQuest() {
+                const workoutDay = this.workoutPlan[this.state.currentDayIndex];
+                const phase = this.getPhaseForWeek(this.state.week);
+                const exercisesForDay = this.workoutPhases[phase].exercises[workoutDay.type];
 
-                if (isCustom) {
-                    exercisesForDay = this.state.activeCustomWorkout.exercises;
-                } else {
-                    const phase = this.getPhaseForWeek(this.state.week);
-                    const workoutDay = this.workoutPlan[this.state.currentDayIndex];
-                    exercisesForDay = this.workoutPhases[phase].exercises[workoutDay.type];
+                if (!exercisesForDay) {
+                    this.showToast("No quest available for today.", "info");
+                    return;
                 }
 
-                const workoutSummary = { name: isCustom ? this.state.activeCustomWorkout.name : this.workoutPlan[this.state.currentDayIndex].name, exercises: [] };
+                const exerciseListHtml = exercisesForDay.map(ex => {
+                    const lift = this.state.lifts[ex.name];
+                    const weight = lift ? lift.weight : 'N/A';
+                    return `<li class="flex justify-between"><span>${ex.name} (${ex.sets}x${ex.reps})</span> <span class="text-gray-400">${weight} kg</span></li>`;
+                }).join('');
 
-                document.querySelectorAll('.exercise-item').forEach((item) => {
-                    const exerciseName = item.dataset.exerciseName;
-                    const checkboxes = item.querySelectorAll('.set-checkbox');
-                    let setsCompleted = 0;
-                    checkboxes.forEach(cb => { if (cb.checked) setsCompleted++; });
-
-                    const exerciseDef = exercisesForDay.find(ex => ex.name === exerciseName);
-                    if (setsCompleted > 0) {
-                        totalXpGained += (setsCompleted / (exerciseDef.sets || 3)) * (exerciseDef.xp || 10);
-                    }
-                    if(this.state.lifts[exerciseName]) {
-                        this.state.lifts[exerciseName].lastCompletedSets = setsCompleted;
-                        workoutSummary.exercises.push({ name: exerciseName, sets: exerciseDef.sets, setsCompleted: setsCompleted, weight: this.state.lifts[exerciseName].weight });
-                    }
-                });
-
-                this.state.lastWorkoutSummary = workoutSummary;
-
-                if (isCustom) {
-                    totalXpGained = Math.round(totalXpGained * 0.8); // Reduce XP for custom workouts
-                } else {
-                    totalXpGained += 50; // Bonus for daily quest
-                    this.updateMana(100); // Mana for daily quest
-                }
-
-                // Log main lifts to history for charting, regardless of workout type
-                const mainLifts = ['Squat', 'Bench Press', 'Barbell Row', 'Overhead Press', 'Deadlift'];
-                const today = new Date().toISOString().split('T')[0];
-                workoutSummary.exercises.forEach(ex => {
-                    if (mainLifts.includes(ex.name) && ex.setsCompleted > 0) {
-                        const exerciseDef = exercisesForDay.find(e => e.name === ex.name);
-                        let repsForCalc = 0;
-                        if (exerciseDef && exerciseDef.reps) {
-                            const repString = exerciseDef.reps;
-                            if (repString.includes('-')) {
-                                repsForCalc = parseInt(repString.split('-')[1]); // Use upper bound for volume
-                            } else if (!isNaN(parseInt(repString))) {
-                                repsForCalc = parseInt(repString);
-                            } else {
-                                repsForCalc = 5; // Default for schemes like 5/3/1
-                            }
-                        }
-
-                        this.state.history.push({
-                            date: today,
-                            lift: ex.name,
-                            weight: ex.weight,
-                            sets: ex.setsCompleted,
-                            reps: repsForCalc
-                        });
-                    }
-                });
-
-                this.addXp(totalXpGained);
-
-                // Only progress lifts and date if it's not a custom workout
-                if (!isCustom) {
-                    this.progressLifts();
-                    this.updateStreak();
-                    this.state.currentDayIndex = (this.state.currentDayIndex + 1) % 7;
-                    if (this.state.currentDayIndex === 0) this.state.week++;
-                }
-
-                // Clear active custom workout
-                if (isCustom) {
-                    this.state.activeCustomWorkout = null;
-                }
-
-                this.getMotivationalQuote();
-                this.saveState();
-                this.render();
+                const modalBody = `<ul class="space-y-2">${exerciseListHtml}</ul>`;
+                this.showModal('Quest Preview', modalBody, [{ text: 'Close', class: 'btn-secondary', action: () => this.hideModal() }]);
             },
-            confirmCompleteWorkout() {
-                this.showModal('Confirm Completion', 'Are you sure you want to complete this quest? This will advance you to the next day.', [
-                    { text: 'Cancel', class: 'btn-secondary', action: () => this.hideModal() },
-                    { text: 'Complete', class: 'btn-primary', action: () => {
-                        this.playSound('workoutComplete');
-                        this.completeWorkout();
-                        this.hideModal();
-                    } }
-                ]);
+
+            confirmBeginQuest() {
+                const workoutDay = this.workoutPlan[this.state.currentDayIndex];
+                if (workoutDay.type === 'Rest') {
+                    this.showToast("Cannot begin a quest on a rest day.", "info");
+                    return;
+                }
+
+                this.showModal(
+                    'Begin Quest?',
+                    '<p>The Dungeon awaits. Will you proceed with the quest now?</p>',
+                    [
+                        { text: 'No', class: 'btn-secondary', action: () => this.hideModal() },
+                        { text: 'Yes', class: 'btn-primary', action: () => {
+                            const phase = this.getPhaseForWeek(this.state.week);
+                            const exercisesForDay = this.workoutPhases[phase].exercises[workoutDay.type];
+
+                            const questData = {
+                                exercises: exercisesForDay,
+                                state: this.state
+                            };
+
+                            localStorage.setItem('dungeonQuestData', JSON.stringify(questData));
+                            window.open('dungeon.html', '_blank');
+                            this.hideModal();
+                        } }
+                    ]
+                );
             },
             addXp(amount) {
                 if (amount > 0) {
@@ -1775,8 +1808,6 @@
                 setTimeout(() => { toast.classList.add('hidden'); }, 4900);
             }
         };
-
-        app.init();
     </script>
     <script>
         // Adding the settings functions in a separate script tag to avoid merge conflicts with the massive app object.
@@ -1810,33 +1841,61 @@
             }
         };
 
-        app.confirmReset = function() {
-            const confirmationPrompt = `
-                <p class="mb-4">This action is permanent and cannot be undone. You will lose all progress.</p>
-                <p class="mb-2">To confirm, please type "RESET" into the box below.</p>
-                <input type="text" id="reset-confirmation-input" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 text-white">
+        app.confirmDelete = function() {
+            const modalBody = `
+                <p class="mb-4 text-gray-300">This action is permanent. It will delete your entire cloud-saved progress and your account. This cannot be undone.</p>
+                <p class="mb-2 font-semibold text-gray-200">To confirm, please type your character name "<span class="text-yellow-400">${this.state.playerName}</span>" into the box below.</p>
+                <input type="text" id="delete-confirmation-input" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 text-white" autocomplete="off">
             `;
             this.showModal(
-                'ARE YOU SURE?',
-                confirmationPrompt,
+                'Confirm Account Deletion',
+                modalBody,
                 [
                     { text: 'Cancel', class: 'btn-secondary', action: () => this.hideModal() },
-                    { text: 'RESET PROGRESS', class: 'bg-red-800 hover:bg-red-700', action: () => {
-                        const input = document.getElementById('reset-confirmation-input');
-                        if (input && input.value === 'RESET') {
-                            this.resetProgress();
-                        } else {
-                            this.showToast('Confirmation text did not match. Reset cancelled.', 'error');
-                            this.hideModal();
-                        }
-                    } }
+                    { text: 'Delete Account', id: 'confirm-delete-btn', class: 'bg-gray-600 text-gray-400 cursor-not-allowed', action: () => { this.deleteAccount(); }, disabled: true }
                 ]
-            )
+            );
+
+            const input = document.getElementById('delete-confirmation-input');
+            const deleteBtn = document.getElementById('confirm-delete-btn');
+
+            input.addEventListener('input', () => {
+                if (input.value === this.state.playerName) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.classList.remove('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
+                    deleteBtn.classList.add('bg-red-800', 'hover:bg-red-700');
+                } else {
+                    deleteBtn.disabled = true;
+                    deleteBtn.classList.add('bg-gray-600', 'text-gray-400', 'cursor-not-allowed');
+                    deleteBtn.classList.remove('bg-red-800', 'hover:bg-red-700');
+                }
+            });
         };
 
-        app.resetProgress = function() {
-            localStorage.removeItem('projectMonarchState');
-            window.location.reload();
+        app.deleteAccount = async function() {
+            this.hideModal();
+            try {
+                const user = this.user;
+                if (!user) throw new Error("No user is currently signed in.");
+
+                // 1. Delete Firestore document
+                const userDocRef = doc(this.db, "users", user.uid);
+                await deleteDoc(userDocRef);
+                this.showToast('User data deleted.', 'success');
+
+                // 2. Delete Firebase Auth user
+                await deleteUser(user);
+                this.showToast('Account deleted successfully. Logging out.', 'success');
+                // onAuthStateChanged will handle hiding the app and showing the login screen.
+
+            } catch (error) {
+                console.error("Error deleting account:", error);
+                if (error.code === 'auth/requires-recent-login') {
+                    this.showToast('This is a sensitive operation. Please log out and log back in again before deleting your account.', 'error');
+                } else {
+                    this.showToast('Failed to delete account.', 'error');
+                }
+            }
         };
 
         app.exportData = function() {
@@ -1904,6 +1963,63 @@
             };
             reader.readAsDataURL(file);
         };
+    </script>
+
+    <!-- Firebase Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAK5DS4dixAQWwJ8kms2JiKr738PPKFdA4",
+            authDomain: "shadowmonarch-f4a17.firebaseapp.com",
+            projectId: "shadowmonarch-f4a17",
+            storageBucket: "shadowmonarch-f4a17.firebasestorage.app",
+            messagingSenderId: "524012291883",
+            appId: "1:524012291883:web:be243162b1c0912090276e",
+            measurementId: "G-6EVHJ6EDPJ"
+        };
+
+        // --- Initialize Firebase ---
+        const firebaseApp = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(firebaseApp);
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+        window.firebase_db = db; // Expose for testing
+        const provider = new GoogleAuthProvider();
+
+        // --- DOM Elements ---
+        const loginScreen = document.getElementById('login-screen');
+        const appScreen = document.getElementById('app');
+        const loginBtn = document.getElementById('login-btn');
+
+        // --- Authentication Logic ---
+        loginBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider)
+                .catch((error) => {
+                    console.error("Authentication failed:", error);
+                    alert("Login failed. Please try again.");
+                });
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in.
+                loginScreen.classList.add('hidden');
+                appScreen.classList.remove('hidden');
+
+                // Pass user and db to the main app initialization
+                await app.init(user, db);
+            } else {
+                // User is signed out.
+                loginScreen.classList.remove('hidden');
+                appScreen.classList.add('hidden');
+            }
+        });
+
     </script>
 </body>
 </html>
