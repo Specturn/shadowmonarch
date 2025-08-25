@@ -142,8 +142,15 @@
                     </div>
                     <div class="md:col-span-3 card-bg p-6 rounded-lg mt-6">
                         <h3 class="text-xl font-bold mb-4">Activity Log</h3>
-                        <div id="activity-calendar-grid" class="grid grid-cols-7 gap-1.5">
-                            <!-- Calendar squares will be rendered here by JavaScript -->
+                        <div class="flex gap-3">
+                            <div class="flex flex-col justify-between text-xs text-stone-400 py-1">
+                                <span>Mon</span>
+                                <span>Wed</span>
+                                <span>Fri</span>
+                            </div>
+                            <div id="activity-calendar-grid" class="grid grid-rows-7 grid-flow-col gap-1.5 grow">
+                                <!-- Calendar squares will be rendered here by JavaScript -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -716,11 +723,11 @@
             renderActivityCalendar() {
                 const grid = document.getElementById('activity-calendar-grid');
                 if (!grid) return;
-                grid.innerHTML = '';
+                grid.innerHTML = ''; // Clear previous content
 
                 const today = new Date();
                 const activityMap = new Map();
-                this.state.activityLog.forEach(log => {
+                (this.state.activityLog || []).forEach(log => {
                     const date = log.date;
                     if (!activityMap.has(date)) {
                         activityMap.set(date, []);
@@ -728,9 +735,22 @@
                     activityMap.get(date).push(log.type);
                 });
 
-                for (let i = 89; i >= 0; i--) {
-                    const date = new Date();
-                    date.setDate(today.getDate() - i);
+                const startDate = new Date();
+                startDate.setDate(today.getDate() - 89);
+
+                // Add spacer divs to align the first day correctly
+                let dayOfWeek = startDate.getDay(); // 0=Sun, 1=Mon, ...
+                let spacers = (dayOfWeek === 0) ? 6 : dayOfWeek - 1; // Monday is 0
+
+                for (let i = 0; i < spacers; i++) {
+                    const spacer = document.createElement('div');
+                    grid.appendChild(spacer);
+                }
+
+                // Render the last 90 days
+                for (let i = 0; i < 90; i++) {
+                    const date = new Date(startDate);
+                    date.setDate(startDate.getDate() + i);
                     const dateString = date.toISOString().split('T')[0];
 
                     const daySquare = document.createElement('div');
@@ -740,10 +760,12 @@
                     if (activities) {
                         let tooltipText = `${dateString}\n`;
                         if (activities.includes('workout')) {
+                            daySquare.classList.remove('bg-stone-700');
                             daySquare.classList.add('bg-indigo-500');
                             tooltipText += '- Daily Quest Cleared\n';
                         }
                         if (activities.includes('gate')) {
+                            daySquare.classList.remove('bg-stone-700');
                             daySquare.classList.add('bg-amber-500');
                             tooltipText += '- Gate Cleared\n';
                         }
