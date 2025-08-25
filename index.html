@@ -349,6 +349,7 @@
                 calendar: {
                     viewDate: new Date()
                 },
+                accountCreationDate: new Date().toISOString(),
             },
 
             masterExerciseList: [
@@ -612,6 +613,7 @@
                     const data = userSnap.data();
                     Object.assign(this.state, data);
                 } else {
+                    this.state.accountCreationDate = new Date().toISOString();
                     await this.saveData();
                 }
             },
@@ -805,13 +807,50 @@
                 const container = document.getElementById('activity-calendar-container');
                 if (!container) return;
 
-                // Main container structure
+                const viewDate = new Date(this.state.calendar.viewDate);
+                const creationDate = new Date(this.state.accountCreationDate);
+                const firstYear = creationDate.getFullYear();
+                const firstMonth = creationDate.getMonth();
+                const currentYear = new Date().getFullYear();
+                const currentMonth = new Date().getMonth();
+
+                const month = viewDate.getMonth();
+                const year = viewDate.getFullYear();
+                const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+                // Dynamically generate Year options
+                let yearOptions = '';
+                for (let y = currentYear; y >= firstYear; y--) {
+                    yearOptions += `<div class="custom-select-option" data-action="selectYear" data-value="${y}">${y}</div>`;
+                }
+
+                // Dynamically generate Month options based on selected year
+                let monthOptions = '';
+                months.forEach((m, i) => {
+                    if (year === firstYear && i < firstMonth) return; // Don't show months before account creation
+                    if (year === currentYear && i > currentMonth) return; // Don't show future months
+                    monthOptions += `<div class="custom-select-option" data-action="selectMonth" data-value="${i}">${m}</div>`;
+                });
+
+                // The rest of the function remains the same, rendering the UI...
                 container.innerHTML = `
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-bold">Activity Log</h3>
                         <div class="flex gap-2">
-                            <div id="month-dropdown-container"></div>
-                            <div id="year-dropdown-container"></div>
+                            <!-- Custom Month Dropdown -->
+                            <div class="custom-select-container w-32">
+                                <div class="custom-select-value" data-action="toggleDropdown" data-value="month-options">
+                                    <span>${months[month]}</span><i class="fas fa-chevron-down text-xs"></i>
+                                </div>
+                                <div id="month-options" class="custom-select-options hidden">${monthOptions}</div>
+                            </div>
+                            <!-- Custom Year Dropdown -->
+                            <div class="custom-select-container w-24">
+                                <div class="custom-select-value" data-action="toggleDropdown" data-value="year-options">
+                                    <span>${year}</span><i class="fas fa-chevron-down text-xs"></i>
+                                </div>
+                                <div id="year-options" class="custom-select-options hidden">${yearOptions}</div>
+                            </div>
                         </div>
                     </div>
                     <div id="calendar-header" class="grid grid-cols-7 text-center text-xs text-stone-400 mb-2">
@@ -820,38 +859,7 @@
                     <div id="calendar-grid" class="grid grid-cols-7 gap-1.5"></div>
                 `;
 
-                const viewDate = new Date(this.state.calendar.viewDate);
-                const month = viewDate.getMonth();
-                const year = viewDate.getFullYear();
-
-                // Create month dropdown
-                const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                const monthOptions = months.map((m, i) => ({ value: i, label: m }));
-                this.createCustomDropdown({
-                    containerSelector: '#month-dropdown-container',
-                    currentValue: month,
-                    options: monthOptions,
-                    actionName: 'selectMonth',
-                    optionsId: 'month-options',
-                    widthClass: 'w-32'
-                });
-
-                // Create year dropdown
-                const currentYear = new Date().getFullYear();
-                const yearOptions = [];
-                for (let y = currentYear; y >= currentYear - 5; y--) {
-                    yearOptions.push({ value: y, label: y });
-                }
-                this.createCustomDropdown({
-                    containerSelector: '#year-dropdown-container',
-                    currentValue: year,
-                    options: yearOptions,
-                    actionName: 'selectYear',
-                    optionsId: 'year-options',
-                    widthClass: 'w-24'
-                });
-
-                // Calendar grid rendering logic
+                // Calendar grid rendering logic (remains the same)
                 const grid = document.getElementById('calendar-grid');
                 const firstDayOfMonth = new Date(year, month, 1).getDay();
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
