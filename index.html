@@ -344,7 +344,7 @@
                 longestStreak: 0,
                 showcase: [],
                 gates: [],
-                completedGates: [],
+                completedGates: [], // Stores ranks of gates that have been completed.
                 activityLog: [],
                 calendar: {
                     viewDate: new Date()
@@ -612,6 +612,9 @@
                 if (userSnap.exists()) {
                     const data = userSnap.data();
                     Object.assign(this.state, data);
+                    if (!Array.isArray(this.state.completedGates)) {
+                        this.state.completedGates = [];
+                    }
                 } else {
                     this.state.accountCreationDate = new Date().toISOString();
                     await this.saveData();
@@ -1501,12 +1504,14 @@
                 // Remove expired
                 this.state.gates = this.state.gates.filter(g => g.expiresAt > now);
                 if (Math.random() < 0.5 && this.state.gates.length < 3) {
-                    // Filter out already active gates and recently completed gates
-                    const availableGates = this.gatesData.filter(gate => {
-                        const isActive = this.state.gates.some(active => active.rank === gate.rank);
-                        const wasCompleted = this.state.completedGates.includes(gate.rank);
-                        return !isActive && !wasCompleted;
-                    });
+                    // Filter out gates that are currently active
+                    let availableGates = this.gatesData.filter(gate =>
+                        !this.state.gates.some(active => active.rank === gate.rank)
+                    );
+                    // Further filter out gates that have already been completed
+                    availableGates = availableGates.filter(gate =>
+                        !this.state.completedGates.includes(gate.rank)
+                    );
                     
                     if (availableGates.length > 0) {
                         const base = availableGates[Math.floor(Math.random() * availableGates.length)];
@@ -1541,7 +1546,7 @@
                             if (g.rank === 'C') this.state.stats.cRanksCleared++;
                             if (g.rank === 'D') this.state.stats.dRanksCleared++;
                             if (g.rank === 'E') this.state.stats.eRanksCleared++;
-                            // Add to completed gates history
+                            // Add to completed gates history to prevent it from appearing again.
                             if (!this.state.completedGates.includes(g.rank)) {
                                 this.state.completedGates.push(g.rank);
                             }
