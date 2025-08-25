@@ -18,12 +18,30 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         #dungeon-overlay { background-color: rgba(0,0,0,0.9); }
         .gate-card { border-left: 4px solid #f59e0b; }
+        .achievement-locked { opacity: 0.6; filter: grayscale(80%); }
+        .progress-bar { height: 8px; background-color: #374151; border-radius: 9999px; overflow: hidden; }
+        .progress-bar-inner { height: 100%; background-color: #4f46e5; }
+        /* Modal */
+        #modal-overlay { background-color: rgba(0,0,0,0.7); }
+        .modal-card { background-color: #111827; border: 1px solid #374151; }
+        .modal-btn { background-color: #374151; }
+        .modal-btn.primary { background-color: #4f46e5; }
+        /* Particles containers */
+        #particles-login, #particles-dashboard { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+        .with-particles { position: relative; }
+        /* Level up animation */
+        .level-up { animation: pulseGlow 1.2s ease-out 1; }
+        @keyframes pulseGlow { 0% { transform: scale(0.9); box-shadow: 0 0 0px #4f46e5; } 50% { transform: scale(1.03); box-shadow: 0 0 30px #6366f180; } 100% { transform: scale(1); box-shadow: 0 0 0px transparent; } }
     </style>
+    <!-- Chart.js and particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 </head>
 <body class="text-white">
 
     <!-- Login Screen -->
-    <div id="login-screen" class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div id="login-screen" class="min-h-screen with-particles flex flex-col items-center justify-center p-4">
+        <div id="particles-login"></div>
         <h1 class="text-5xl font-black uppercase text-indigo-400 mb-2">Project Monarch</h1>
         <p class="text-gray-400 mb-8">Your path to unrivaled strength begins.</p>
         <button id="login-btn" class="btn-primary text-white font-bold py-3 px-6 rounded-lg flex items-center">
@@ -32,22 +50,25 @@
     </div>
 
     <!-- Main App Content (Initially Hidden) -->
-    <div id="app-content" class="hidden max-w-4xl mx-auto p-4">
-        <header class="text-center mb-6 p-8 rounded-lg card-bg">
+    <div id="app-content" class="hidden max-w-4xl mx-auto p-4 with-particles">
+        <div id="particles-dashboard"></div>
+        <header class="relative z-10 text-center mb-6 p-8 rounded-lg card-bg">
             <h1 id="header-title" class="text-4xl font-black uppercase text-indigo-400">Dashboard</h1>
         </header>
         
         <nav class="flex justify-center gap-2 mb-6">
-            <button data-page="dashboard" class="nav-btn active px-4 py-2 rounded-lg font-semibold">Dashboard</button>
-            <button data-page="workout" class="nav-btn px-4 py-2 rounded-lg font-semibold">Workout</button>
-            <button data-page="architect" class="nav-btn px-4 py-2 rounded-lg font-semibold">Architect</button>
-            <button data-page="settings" class="nav-btn px-4 py-2 rounded-lg font-semibold">Settings</button>
+            <button data-page="dashboard" data-action="nav:dashboard" class="nav-btn active px-4 py-2 rounded-lg font-semibold">Dashboard</button>
+            <button data-page="workout" data-action="nav:workout" class="nav-btn px-4 py-2 rounded-lg font-semibold">Workout</button>
+            <button data-page="gates" data-action="nav:gates" class="nav-btn px-4 py-2 rounded-lg font-semibold">Gates</button>
+            <button data-page="architect" data-action="nav:architect" class="nav-btn px-4 py-2 rounded-lg font-semibold">Architect</button>
+            <button data-page="achievements" data-action="nav:achievements" class="nav-btn px-4 py-2 rounded-lg font-semibold">Achievements</button>
+            <button data-page="settings" data-action="nav:settings" class="nav-btn px-4 py-2 rounded-lg font-semibold">Settings</button>
         </nav>
 
         <main>
             <!-- Dashboard Page -->
             <div id="dashboard-page" class="page active">
-                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
                     <div class="md:col-span-1 card-bg p-6 rounded-lg text-center">
                         <div id="avatar-container" class="relative w-32 h-32 mx-auto mb-4 cursor-pointer group">
                              <div id="avatar-placeholder" class="w-full h-full rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center bg-gray-800">
@@ -60,12 +81,63 @@
                         </div>
                         <input type="file" id="avatar-upload-input" class="hidden" accept="image/*">
                         <h2 id="player-name-display" class="text-2xl font-bold">Player</h2>
-                        <button id="edit-name-btn" class="text-sm text-gray-400 hover:text-white"><i class="fas fa-pencil-alt mr-1"></i> Edit Name</button>
+                        <button id="edit-name-btn" data-action="player:editName" class="text-sm text-gray-400 hover:text-white"><i class="fas fa-pencil-alt mr-1"></i> Edit Name</button>
+                        <div class="grid grid-cols-2 gap-3 mt-4 text-left">
+                            <div class="p-3 bg-gray-800 rounded">
+                                <p class="text-xs uppercase text-gray-400">Level</p>
+                                <p id="pc-level" class="text-xl font-bold">1</p>
                     </div>
-                    <div class="md:col-span-2 card-bg p-6 rounded-lg">
+                            <div class="p-3 bg-gray-800 rounded">
+                                <p class="text-xs uppercase text-gray-400">Current Streak</p>
+                                <p id="pc-streak" class="text-xl font-bold">0</p>
+                            </div>
+                            <div class="p-3 bg-gray-800 rounded col-span-2">
+                                <p class="text-xs uppercase text-gray-400">Longest Streak</p>
+                                <p id="pc-longest" class="text-xl font-bold">0</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-left">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-sm font-semibold">Showcased Achievements</p>
+                                <button data-action="player:selectShowcase" class="text-xs px-2 py-1 bg-gray-800 rounded border border-gray-700 hover:border-indigo-500">Select Showcase</button>
+                            </div>
+                            <div id="showcase-achievements" class="grid grid-cols-3 gap-2"></div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2 grid grid-cols-1 gap-6">
+                        <div class="card-bg p-6 rounded-lg grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="text-center">
+                                <p class="text-xs uppercase text-gray-400">Level</p>
+                                <p id="stat-level" class="text-2xl font-bold">1</p>
+                                <div class="progress-bar mt-2"><div id="xp-bar" class="progress-bar-inner" style="width: 0%"></div></div>
+                                <p id="stat-xp" class="text-xs text-gray-400 mt-1">0 / 100 XP</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs uppercase text-gray-400">Mana</p>
+                                <p id="stat-mana" class="text-2xl font-bold">0</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs uppercase text-gray-400">Streak</p>
+                                <p id="stat-streak" class="text-2xl font-bold">0</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs uppercase text-gray-400">Workouts</p>
+                                <p id="stat-workouts" class="text-2xl font-bold">0</p>
+                            </div>
+                        </div>
+
+                        <div class="card-bg p-6 rounded-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-xl font-bold">Strength Profile</h3>
+                            </div>
+                            <canvas id="radar-chart" height="120"></canvas>
+                        </div>
+
+                        <div class="card-bg p-6 rounded-lg">
                         <h3 class="text-xl font-bold mb-4">Achievements</h3>
                         <div id="achievements-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                              <p class="text-gray-400 col-span-full">Your legend has yet to be written. Complete quests to earn achievements.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -77,8 +149,8 @@
                     <h2 class="text-2xl font-bold mb-2">Daily Quest</h2>
                     <p id="workout-day-title" class="text-indigo-400 font-semibold mb-4">Loading mission...</p>
                     <div id="quest-buttons" class="flex gap-4 justify-center">
-                        <button id="preview-quest-btn" class="btn-primary py-2 px-4 rounded">Preview Quest</button>
-                        <button id="begin-quest-btn" class="bg-green-600 hover:bg-green-500 py-2 px-4 rounded">Begin Quest</button>
+                        <button id="preview-quest-btn" data-action="workout:preview" class="btn-primary py-2 px-4 rounded">Preview Quest</button>
+                        <button id="begin-quest-btn" data-action="workout:begin" class="bg-green-600 hover:bg-green-500 py-2 px-4 rounded">Begin Quest</button>
                     </div>
                      <p id="rest-day-message" class="text-gray-400 hidden">Rest is when you grow stronger. Recover well.</p>
                 </div>
@@ -86,7 +158,7 @@
                     <div class="card-bg p-6 rounded-lg text-center gate-card">
                         <h2 class="text-2xl font-bold mb-2 text-amber-400">Warning: Gate Detected!</h2>
                         <p id="gate-description" class="text-gray-300 mb-4"></p>
-                        <button id="complete-gate-btn" class="bg-amber-500 hover:bg-amber-400 py-2 px-4 rounded">Complete Gate Challenge</button>
+                        <button id="complete-gate-btn" data-action="gate:complete" class="bg-amber-500 hover:bg-amber-400 py-2 px-4 rounded">Complete Gate Challenge</button>
                     </div>
                 </div>
             </div>
@@ -120,14 +192,42 @@
                 </div>
             </div>
             
+            <!-- Gates Page -->
+            <div id="gates-page" class="page">
+                <div class="card-bg p-6 rounded-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold">Active Gates</h2>
+                        <!-- Gate spawning is automatic and random -->
+                    </div>
+                    <div id="gates-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </div>
+
+            <!-- Achievements Page -->
+            <div id="achievements-page" class="page">
+                <div class="card-bg p-6 rounded-lg">
+                    <h2 class="text-2xl font-bold mb-4">Trophy Case</h2>
+                    <div id="achievements-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+            </div>
+            
             <!-- Settings Page -->
             <div id="settings-page" class="page">
                  <div class="card-bg p-6 rounded-lg">
                     <h2 class="text-2xl font-bold mb-4">Settings</h2>
                     <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Difficulty</label>
+                            <select id="difficulty-select" data-change="settings:diff" class="w-full p-2 bg-gray-800 rounded border border-gray-700 focus:border-indigo-500 focus:ring-0">
+                                <option value="Easy">Easy</option>
+                                <option value="Normal" selected>Normal</option>
+                                <option value="Hard">Hard</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Easy: +1.25 kg, Normal: +2.5 kg, Hard: +5 kg</p>
+                        </div>
                         <h3 class="text-lg font-semibold text-red-500">Danger Zone</h3>
                         <p class="text-gray-400 text-sm">This action is irreversible. All your progress will be lost.</p>
-                        <button id="delete-account-btn" class="bg-red-600 hover:bg-red-500 py-2 px-4 rounded">Delete Account</button>
+                        <button id="delete-account-btn" data-action="settings:delete" class="bg-red-600 hover:bg-red-500 py-2 px-4 rounded">Delete Account</button>
                     </div>
                 </div>
             </div>
@@ -136,8 +236,20 @@
     
     <!-- Dungeon Overlay -->
     <div id="dungeon-overlay" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-        <div id="dungeon-content" class="card-bg p-8 rounded-lg w-full max-w-md text-center">
+        <div id="dungeon-content" class="card-bg p-6 rounded-lg w-full max-w-xl text-left">
             <!-- Dungeon content will be injected here -->
+        </div>
+    </div>
+
+    <!-- Global Modal Overlay -->
+    <div id="modal-overlay" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-card w-full max-w-lg p-6 rounded-xl">
+            <div class="flex items-start justify-between mb-4">
+                <h3 id="modal-title" class="text-xl font-bold text-white">Modal</h3>
+                <button id="modal-close" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modal-body" class="text-gray-200"></div>
+            <div id="modal-actions" class="mt-6 flex gap-3 justify-end"></div>
         </div>
     </div>
 
@@ -175,12 +287,16 @@
                 savedRoutines: [],
                 achievements: [],
                 level: 1,
+                xp: 0,
+                xpToNextLevel: 100,
+                mana: 0,
                 week: 1,
+                difficulty: 'Normal',
                 lifts: {
-                    'Squat': 20, 'Bench Press': 20, 'Deadlift': 30, 'Overhead Press': 20, 'Barbell Row': 20,
-                    'Incline DB Press': 10, 'Tricep Pushdown': 15, 'Lateral Raise': 5, 'Lat Pulldown': 30,
-                    'Bicep Curl': 10, 'Romanian Deadlift': 40, 'Leg Press': 50, 'Calf Raise': 40,
-                    'Power Clean': 20, 'Box Jump': 0
+                    'Squat': { weight: 20 }, 'Bench Press': { weight: 20 }, 'Deadlift': { weight: 30 }, 'Overhead Press': { weight: 20 }, 'Barbell Row': { weight: 20 },
+                    'Incline DB Press': { weight: 10 }, 'Tricep Pushdown': { weight: 15 }, 'Lateral Raise': { weight: 5 }, 'Lat Pulldown': { weight: 30 },
+                    'Bicep Curl': { weight: 10 }, 'Romanian Deadlift': { weight: 40 }, 'Leg Press': { weight: 50 }, 'Calf Raise': { weight: 40 },
+                    'Power Clean': { weight: 20 }, 'Box Jump': { weight: 0 }
                 },
                 dungeon: {
                     isActive: false,
@@ -189,6 +305,14 @@
                 },
                 activeGate: null,
                 lastGateDate: null,
+                lastWorkoutDate: null,
+                streak: 0,
+                stats: { dungeonsCleared: 0, gatesCleared: 0, sRanksCleared: 0, eRanksCleared: 0, cRanksCleared: 0, totalWorkouts: 0, totalVolumeKg: 0 },
+                liftHistory: { 'Squat': [], 'Bench Press': [], 'Deadlift': [], 'Overhead Press': [] },
+                longestStreak: 0,
+                showcase: [],
+                gates: [],
+                completedGates: [],
             },
 
             masterExerciseList: [
@@ -221,16 +345,50 @@
             ],
             
             gatesData: [
-                { rank: 'E', description: 'Hydration Check: Drink 2L of water today.', reward: 10 },
-                { rank: 'D', description: 'Cardio Burst: Complete 10 minutes of high-intensity cardio.', reward: 25 },
-                { rank: 'C', description: 'Time Attack: Complete your first 3 exercises in under 20 minutes.', reward: 50 },
+                { rank: 'E', description: 'Active Recovery: Perform 15 minutes of light stretching or foam rolling.', reward: 10 },
+                { rank: 'D', description: 'Grip Strength Test: Perform a dead hang from a pull-up bar for at least 30 seconds.', reward: 25 },
+                { rank: 'C', description: 'Finisher: After your main workout, perform 100 push-ups in as few sets as possible.', reward: 50 },
+                { rank: 'B', description: 'Endurance Trial: Complete 30 minutes of steady-state cardio (running, cycling, etc.).', reward: 75 },
                 { rank: 'A', description: 'Red Gate: Perform your entire workout with no more than 60 seconds of rest between sets.', reward: 100 },
-                { rank: 'S', description: 'The Monarch\'s Shadow: Complete your workout, then perform 50 pull-ups.', reward: 250 },
+                { rank: 'S', description: 'The Monarch\'s Shadow: Complete your workout, then set a new personal record on any bodyweight exercise (pull-ups, dips, etc.).', reward: 250 },
             ],
 
             achievementsData: [
-                { id: 'level_15', name: 'Elite Hunter', description: 'Reach Level 15.', condition: (s) => s.level >= 15, icon: 'fa-dragon' },
-                { id: 'level_40', name: 'Commander Class', description: 'Reach Level 40.', condition: (s) => s.level >= 40, icon: 'fa-chess-knight' },
+                // Level Milestones
+                { id: 'level_10', name: 'Hunter Rank C', description: 'Reach Level 10.', icon: 'fa-user-shield', target: 10, progress: (s) => s.level },
+                { id: 'level_25', name: 'Hunter Rank B', description: 'Reach Level 25.', icon: 'fa-user-ninja', target: 25, progress: (s) => s.level },
+                { id: 'level_50', name: 'Hunter Rank A', description: 'Reach Level 50.', icon: 'fa-user-astronaut', target: 50, progress: (s) => s.level },
+                { id: 'level_75', name: 'Hunter Rank S', description: 'Reach Level 75.', icon: 'fa-crown', target: 75, progress: (s) => s.level },
+                { id: 'level_100', name: 'National Level Hunter', description: 'Reach Level 100.', icon: 'fa-shield-halved', target: 100, progress: (s) => s.level },
+
+                // Strength Plateaus (KG)
+                { id: 'squat_100', name: 'The Foundation', description: 'Squat 100kg.', icon: 'fa-mountain', target: 100, progress: (s) => s.lifts['Squat'].weight },
+                { id: 'squat_140', name: 'Beast of the Deep', description: 'Squat 140kg.', icon: 'fa-gavel', target: 140, progress: (s) => s.lifts['Squat'].weight },
+                { id: 'squat_180', name: 'Earthshaker', description: 'Squat 180kg.', icon: 'fa-meteor', target: 180, progress: (s) => s.lifts['Squat'].weight },
+                { id: 'bench_100', name: 'The Centurion', description: 'Bench Press 100kg.', icon: 'fa-gem', target: 100, progress: (s) => s.lifts['Bench Press'].weight },
+                { id: 'bench_120', name: 'Titan\'s Chest', description: 'Bench Press 120kg.', icon: 'fa-dumbbell', target: 120, progress: (s) => s.lifts['Bench Press'].weight },
+                { id: 'deadlift_180', name: 'World Breaker', description: 'Deadlift 180kg.', icon: 'fa-rocket', target: 180, progress: (s) => s.lifts['Deadlift'].weight },
+                { id: 'deadlift_220', name: 'The Unmovable', description: 'Deadlift 220kg.', icon: 'fa-anchor', target: 220, progress: (s) => s.lifts['Deadlift'].weight },
+                { id: 'ohp_80', name: 'Skyward Press', description: 'Overhead Press 80kg.', icon: 'fa-arrow-up', target: 80, progress: (s) => s.lifts['Overhead Press'].weight },
+
+                // Dungeon & Gate Milestones
+                { id: 'dungeons_10', name: 'Dungeon Crawler', description: 'Clear 10 Dungeons.', icon: 'fa-dungeon', target: 10, progress: (s) => s.stats.dungeonsCleared },
+                { id: 'dungeons_50', name: 'Dungeon Conqueror', description: 'Clear 50 Dungeons.', icon: 'fa-chess-king', target: 50, progress: (s) => s.stats.dungeonsCleared },
+                { id: 'dungeons_100', name: 'Dungeon Master', description: 'Clear 100 Dungeons.', icon: 'fa-crown', target: 100, progress: (s) => s.stats.dungeonsCleared },
+                { id: 'gates_25', name: 'Gatekeeper', description: 'Clear 25 Gates.', icon: 'fa-door-open', target: 25, progress: (s) => s.stats.gatesCleared },
+                { id: 'gates_100', name: 'Gate Warden', description: 'Clear 100 Gates.', icon: 'fa-door-closed', target: 100, progress: (s) => s.stats.gatesCleared },
+                { id: 's_rank_gate', name: 'S-Rank Hunter', description: 'Clear your first S-Rank Gate.', icon: 'fa-skull-crossbones', target: 1, progress: (s) => s.stats.sRanksCleared },
+                { id: 'gate_e_rank', name: 'Gate Novice', description: 'Clear your first E-Rank Gate.', icon: 'fa-dungeon', target: 1, progress: (s) => s.stats.eRanksCleared },
+                { id: 'gate_c_rank', name: 'Gate Specialist', description: 'Clear your first C-Rank Gate.', icon: 'fa-door-open', target: 1, progress: (s) => s.stats.cRanksCleared },
+                { id: 'gates_cleared_25', name: 'Gatekeeper', description: 'Clear a total of 25 Gates.', icon: 'fa-shield-halberd', target: 25, progress: (s) => s.stats.gatesCleared },
+                { id: 's_rank_10', name: 'National Level', description: 'Clear 10 S-Rank Gates.', icon: 'fa-skull', target: 10, progress: (s) => s.stats.sRanksCleared },
+
+                // Consistency & Volume
+                { id: 'streak_30', name: 'Iron Will', description: 'Maintain a 30-day workout streak.', icon: 'fa-fire', target: 30, progress: (s) => s.streak },
+                { id: 'streak_100', name: 'Unbreakable', description: 'Maintain a 100-day workout streak.', icon: 'fa-fire-flame-curved', target: 100, progress: (s) => s.streak },
+                { id: 'workouts_100', name: 'Veteran Hunter', description: 'Complete 100 total workouts.', icon: 'fa-medal', target: 100, progress: (s) => s.stats.totalWorkouts },
+                { id: 'workouts_500', name: 'Shadow General', description: 'Complete 500 total workouts.', icon: 'fa-trophy', target: 500, progress: (s) => s.stats.totalWorkouts },
+                { id: 'volume_1M', name: 'One Million Kilos', description: 'Lift a total of 1,000,000 kg.', icon: 'fa-weight-hanging', target: 1000000, progress: (s) => s.stats.totalVolumeKg },
             ],
 
             // --- CORE LIFECYCLE ---
@@ -274,21 +432,49 @@
 
             // --- EVENT BINDING ---
             bindEvents() {
-                console.log("Binding all application events...");
-                document.querySelectorAll('.nav-btn').forEach(btn => {
-                    btn.addEventListener('click', () => this.showPage(btn.dataset.page));
+                console.log("Binding delegated events...");
+                // Global event delegation
+                document.body.addEventListener('click', (e) => {
+                    const target = e.target.closest('[data-action]');
+                    if (!target) return;
+                    const action = target.getAttribute('data-action');
+                    if (this.actions[action]) {
+                        e.preventDefault();
+                        this.actions[action](e, target);
+                    }
                 });
-                document.getElementById('edit-name-btn').addEventListener('click', () => this.editPlayerName());
+                // Global change delegation (for selects etc.)
+                document.body.addEventListener('change', (e) => {
+                    const target = e.target.closest('[data-change]');
+                    if (!target) return;
+                    const action = target.getAttribute('data-change');
+                    if (this.actions[action]) {
+                        this.actions[action](e, target);
+                    }
+                });
+                // Direct inputs
                 document.getElementById('avatar-container').addEventListener('click', () => document.getElementById('avatar-upload-input').click());
                 document.getElementById('avatar-upload-input').addEventListener('change', (e) => this.handleAvatarUpload(e));
                 document.getElementById('architect-routine-name').addEventListener('input', (e) => this.handleRoutineNameInput(e));
-                document.getElementById('architect-add-exercise-btn').addEventListener('click', () => this.addExerciseToRoutine());
-                document.getElementById('architect-save-routine-btn').addEventListener('click', () => this.saveCurrentRoutine());
-                document.getElementById('delete-account-btn').addEventListener('click', () => this.confirmDeleteAccount());
-                document.getElementById('preview-quest-btn').addEventListener('click', () => this.previewQuest());
-                document.getElementById('begin-quest-btn').addEventListener('click', () => this.beginQuest());
-                document.getElementById('complete-gate-btn').addEventListener('click', () => this.completeGate());
-                console.log("Event binding complete.");
+                const diffSel = document.getElementById('difficulty-select');
+                if (diffSel) diffSel.value = this.state.difficulty || 'Normal';
+                console.log("Delegated events ready.");
+            },
+            actions: {
+                'nav:dashboard': (e, el) => app.showPage('dashboard'),
+                'nav:workout': (e, el) => app.showPage('workout'),
+                'nav:gates': (e, el) => app.showPage('gates'),
+                'nav:architect': (e, el) => app.showPage('architect'),
+                'nav:achievements': (e, el) => app.showPage('achievements'),
+                'nav:settings': (e, el) => app.showPage('settings'),
+                'player:editName': () => app.editPlayerName(),
+                'player:selectShowcase': () => app.openShowcaseSelector(),
+                'workout:preview': () => app.previewQuest(),
+                'workout:begin': () => app.beginQuest(),
+                'gate:complete': () => app.completeGate(),
+                'gates:open': (e, el) => app.completeGate(e, el.getAttribute('data-gate-id')),
+                'settings:delete': () => app.confirmDeleteAccount(),
+                'settings:diff': (e, el) => { app.state.difficulty = el.value; app.saveData(); }
             },
 
             // --- UI & RENDERING ---
@@ -296,6 +482,8 @@
                 this.renderDashboard();
                 this.renderArchitect();
                 this.renderWorkoutPage();
+                this.renderAchievementsPage();
+                this.renderGatesPage();
             },
 
             renderDashboard() {
@@ -324,6 +512,30 @@
                 } else {
                     achievementsGrid.innerHTML = '<p class="text-gray-400 col-span-full">Your legend has yet to be written. Complete quests to earn achievements.</p>';
                 }
+                // Stats
+                const lvlEl = document.getElementById('stat-level');
+                const xpEl = document.getElementById('stat-xp');
+                const manaEl = document.getElementById('stat-mana');
+                const streakEl = document.getElementById('stat-streak');
+                const workoutsEl = document.getElementById('stat-workouts');
+                const xpBar = document.getElementById('xp-bar');
+                if (lvlEl) lvlEl.textContent = this.state.level;
+                if (xpEl) xpEl.textContent = `${this.state.xp} / ${this.state.xpToNextLevel} XP`;
+                if (manaEl) manaEl.textContent = this.state.mana;
+                if (streakEl) streakEl.textContent = this.state.streak;
+                if (workoutsEl) workoutsEl.textContent = this.state.stats.totalWorkouts;
+                if (xpBar) xpBar.style.width = `${Math.min(100, Math.round((this.state.xp / this.state.xpToNextLevel) * 100))}%`;
+                // Player card mirrors
+                const pcLevel = document.getElementById('pc-level');
+                const pcStreak = document.getElementById('pc-streak');
+                const pcLongest = document.getElementById('pc-longest');
+                if (pcLevel) pcLevel.textContent = this.state.level;
+                if (pcStreak) pcStreak.textContent = this.state.streak;
+                if (pcLongest) pcLongest.textContent = this.state.longestStreak || 0;
+                // Radar chart
+                this.renderRadarChart();
+                // Showcase
+                this.renderShowcase();
             },
             
             renderArchitect() {
@@ -356,6 +568,46 @@
                     saveBtn.classList.add('hidden');
                 }
             },
+            renderRadarChart() {
+                const ctx = document.getElementById('radar-chart');
+                if (!ctx) return;
+                const pillars = ['Upper Body Push', 'Upper Body Pull', 'Leg Strength', 'Core', 'Power'];
+                const get = (name) => (this.state.lifts[name] ? this.state.lifts[name].weight : 0);
+                const push = (get('Bench Press') * 0.7 + get('Overhead Press') * 0.3);
+                const pull = (get('Barbell Row') * 0.6 + get('Lat Pulldown') * 0.4);
+                const legs = (get('Squat') * 0.7 + get('Deadlift') * 0.3);
+                const core = (get('Romanian Deadlift') * 0.5 + get('Leg Press') * 0.5); // proxy
+                const power = (get('Power Clean') * 0.7 + get('Box Jump') * 0.3);
+                const data = [push, pull, legs, core, power].map(v => Math.round(v));
+                if (this._radarChart) {
+                    this._radarChart.data.datasets[0].data = data;
+                    this._radarChart.update();
+                } else {
+                    this._radarChart = new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels: pillars,
+                            datasets: [{ label: 'Strength Pillars', data, backgroundColor: 'rgba(99,102,241,0.2)', borderColor: '#6366f1', pointBackgroundColor: '#a5b4fc' }]
+                        },
+                        options: { scales: { r: { angleLines: { color: '#374151' }, grid: { color: '#374151' }, pointLabels: { color: '#e5e7eb' }, ticks: { display: false } } }, plugins: { legend: { labels: { color: '#e5e7eb' } } } }
+                    });
+                }
+            },
+            renderShowcase() {
+                const wrap = document.getElementById('showcase-achievements');
+                if (!wrap) return;
+                wrap.innerHTML = '';
+                const unlocked = this.achievementsData.filter(a => (this.state.achievements.includes(a.id) || a.progress(this.state) >= a.target));
+                const toShow = (this.state.showcase && this.state.showcase.length ? this.state.showcase : unlocked.slice(0,3).map(a=>a.id)).slice(0,3);
+                toShow.forEach(id => {
+                    const a = this.achievementsData.find(x => x.id === id);
+                    if (!a) return;
+                    const div = document.createElement('div');
+                    div.className = 'p-2 bg-gray-800 rounded text-center';
+                    div.innerHTML = `<i class=\"fas ${a.icon} text-indigo-400\"></i>`;
+                    wrap.appendChild(div);
+                });
+            },
             
             renderWorkoutPage() {
                 const today = new Date().getDay();
@@ -383,6 +635,143 @@
                 } else {
                     gateContainer.classList.add('hidden');
                 }
+                // Periodically spawn gates
+                if (!this._gateSpawnTimer) {
+                    this._gateSpawnTimer = setInterval(() => this.generateGate(), 60 * 1000);
+                }
+            },
+
+            // Gates Page Rendering and timers
+            renderGatesPage() {
+                const list = document.getElementById('gates-list');
+                if (!list) return;
+                const now = Date.now();
+                const gates = (this.state.gates || []).filter(g => g.expiresAt > now);
+                list.innerHTML = '';
+                if (!gates.length) {
+                    list.innerHTML = '<p class="text-gray-400">No active gates. Check back later.</p>';
+                    return;
+                }
+                gates.forEach(g => {
+                    const timeLeft = Math.max(0, g.expiresAt - Date.now());
+                    const card = document.createElement('div');
+                    card.className = 'p-4 bg-gray-800 rounded border border-gray-700';
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="font-semibold">[${g.rank}-Rank] Gate</p>
+                            <span class="text-xs px-2 py-1 rounded bg-gray-700" data-gate-ttl="${g.id}"></span>
+                        </div>
+                        <p class="text-sm text-gray-300 mb-3">${g.description}</p>
+                        <button class="btn-primary py-1 px-3 rounded" data-action="gates:open" data-gate-id="${g.id}">Open</button>
+                    `;
+                    list.appendChild(card);
+                    this._updateGateTtl(g.id, timeLeft);
+                });
+                if (!this._gateTimer) {
+                    this._gateTimer = setInterval(() => {
+                        (this.state.gates || []).forEach(g => this._updateGateTtl(g.id, Math.max(0, g.expiresAt - Date.now())));
+                        // Clean and rerender when any expired
+                        const before = (this.state.gates || []).length;
+                        this.state.gates = (this.state.gates || []).filter(g => g.expiresAt > Date.now());
+                        if (before !== this.state.gates.length) this.renderGatesPage();
+                    }, 1000);
+                }
+            },
+            _updateGateTtl(id, ms) {
+                const el = document.querySelector(`[data-gate-ttl="${id}"]`);
+                if (!el) return;
+                const s = Math.floor(ms/1000); const h = Math.floor(s/3600); const m = Math.floor((s%3600)/60); const sec = s%60;
+                el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+            },
+
+            // --- MODAL SYSTEM ---
+            showModal({ title = '', html = '', actions = [] } = {}) {
+                const overlay = document.getElementById('modal-overlay');
+                const titleEl = document.getElementById('modal-title');
+                const bodyEl = document.getElementById('modal-body');
+                const actionsEl = document.getElementById('modal-actions');
+                titleEl.textContent = title;
+                bodyEl.innerHTML = html;
+                actionsEl.innerHTML = '';
+                actions.forEach(a => {
+                    const btn = document.createElement('button');
+                    btn.className = `modal-btn ${a.primary ? 'primary' : ''} text-white py-2 px-4 rounded`;
+                    btn.textContent = a.label;
+                    btn.addEventListener('click', () => { if (a.onClick) a.onClick(); });
+                    actionsEl.appendChild(btn);
+                });
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                const close = () => { overlay.classList.add('hidden'); overlay.classList.remove('flex'); };
+                document.getElementById('modal-close').onclick = close;
+                return { close };
+            },
+
+            modalAlert(message, title = 'Notice') {
+                return new Promise((resolve) => {
+                    const instance = this.showModal({
+                        title,
+                        html: `<p class=\"text-gray-200\">${message}</p>`,
+                        actions: [{ label: 'OK', primary: true, onClick: () => { instance.close(); resolve(); } }]
+                    });
+                });
+            },
+
+            modalConfirm(message, title = 'Confirm') {
+                return new Promise((resolve) => {
+                    const instance = this.showModal({
+                        title,
+                        html: `<p class=\"text-gray-200\">${message}</p>`,
+                        actions: [
+                            { label: 'Cancel', onClick: () => { instance.close(); resolve(false); } },
+                            { label: 'Confirm', primary: true, onClick: () => { instance.close(); resolve(true); } }
+                        ]
+                    });
+                });
+            },
+
+            modalPrompt({ title = 'Input Required', message = '', placeholder = '' }) {
+                return new Promise((resolve) => {
+                    const id = `prompt-${Date.now()}`;
+                    const instance = this.showModal({
+                        title,
+                        html: `<p class=\"text-gray-300 mb-3\">${message}</p><input id=\"${id}\" class=\"w-full p-2 bg-gray-800 rounded border border-gray-700 focus:border-indigo-500 focus:ring-0\" placeholder=\"${placeholder}\">`,
+                        actions: [
+                            { label: 'Cancel', onClick: () => { instance.close(); resolve(null); } },
+                            { label: 'Submit', primary: true, onClick: () => { const val = document.getElementById(id).value; instance.close(); resolve(val); } }
+                        ]
+                    });
+                });
+            },
+
+            renderAchievementsPage() {
+                const grid = document.querySelector('#achievements-page #achievements-grid');
+                if (!grid) return;
+                grid.innerHTML = '';
+
+                this.achievementsData.forEach((ach) => {
+                    const current = Math.max(0, Number(ach.progress(this.state) || 0));
+                    const target = Math.max(1, Number(ach.target || 1));
+                    const percentage = Math.min(100, Math.round((current / target) * 100));
+                    const unlocked = this.state.achievements.includes(ach.id) || current >= target;
+
+                    const card = document.createElement('div');
+                    card.className = `p-4 bg-gray-800 rounded-lg ${unlocked ? '' : 'achievement-locked'}`;
+                    const unit = ach.id.startsWith('squat_') || ach.id.startsWith('bench_') || ach.id.startsWith('deadlift_') ? 'kg' : '';
+
+                    card.innerHTML = `
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fas ${ach.icon} text-2xl ${unlocked ? 'text-indigo-400' : 'text-gray-500'}"></i>
+                            <div>
+                                <p class="font-semibold">${ach.name}</p>
+                                <p class="text-sm text-gray-400">${unlocked ? ach.description : 'Locked'}</p>
+                            </div>
+                        </div>
+                        <div class="progress-bar mb-2"><div class="progress-bar-inner" style="width:${percentage}%;"></div></div>
+                        <p class="text-sm text-gray-300">${current} / ${target} ${unit}</p>
+                    `;
+                    grid.appendChild(card);
+                });
             },
 
             showPage(pageId) {
@@ -392,16 +781,38 @@
                 document.querySelector(`.nav-btn[data-page="${pageId}"]`).classList.add('active');
                 document.getElementById('header-title').textContent = pageId.charAt(0).toUpperCase() + pageId.slice(1);
                 if(pageId === 'architect') this.populateExerciseDropdown();
+                if(pageId === 'achievements') this.renderAchievementsPage();
+                if(pageId === 'gates') this.renderGatesPage();
             },
             
             // --- ACTION HANDLERS ---
             editPlayerName() {
-                const newName = prompt("Enter your new name:", this.state.playerName);
-                if (newName && newName.trim() !== "") {
-                    this.state.playerName = newName.trim();
+                this.modalPrompt({ title: 'Edit Name', message: 'Enter your new name:', placeholder: this.state.playerName }).then((val) => {
+                    if (val && val.trim() !== '') {
+                        this.state.playerName = val.trim();
                     this.saveData();
                     this.renderDashboard();
                 }
+                });
+            },
+            openShowcaseSelector() {
+                const unlocked = this.achievementsData.filter(a => (this.state.achievements.includes(a.id) || a.progress(this.state) >= a.target));
+                const id = `sc-${Date.now()}`;
+                const grid = unlocked.map(a => `<label class=\"flex items-center gap-2 p-2 bg-gray-800 rounded\"><input type=\"checkbox\" value=\"${a.id}\" class=\"sc-cb\"><i class=\"fas ${a.icon} text-indigo-400\"></i><span>${a.name}</span></label>`).join('');
+                const instance = this.showModal({
+                    title: 'Select Showcase (max 3)',
+                    html: `<div id=\"${id}\" class=\"space-y-2 max-h-64 overflow-auto\">${grid}</div>`,
+                    actions: [
+                        { label: 'Cancel', onClick: () => instance.close() },
+                        { label: 'Save', primary: true, onClick: () => {
+                            const selected = Array.from(document.querySelectorAll('#'+id+' .sc-cb:checked')).map(cb => cb.value).slice(0,3);
+                            app.state.showcase = selected;
+                            app.saveData();
+                            app.renderShowcase();
+                            instance.close();
+                        } }
+                    ]
+                });
             },
 
             handleAvatarUpload(event) {
@@ -467,7 +878,7 @@
             saveCurrentRoutine() {
                 this.state.savedRoutines.push(this.state.currentCustomWorkout);
                 this.saveData();
-                alert(`Routine "${this.state.currentCustomWorkout.name}" saved!`);
+                this.modalAlert(`Routine "${this.state.currentCustomWorkout.name}" saved!`, 'Routine Saved');
                 this.state.currentCustomWorkout = { name: '', exercises: [] };
                 document.getElementById('architect-routine-name').value = '';
                 document.getElementById('architect-exercise-section').classList.add('hidden');
@@ -475,18 +886,19 @@
             },
             
             confirmDeleteAccount() {
-                const confirmation = prompt(`This action is permanent. To delete your account, please type your name: "${this.state.playerName}"`);
-                if (confirmation === this.state.playerName) {
+                this.modalPrompt({ title: 'Confirm Deletion', message: `This action is permanent. Type your name to confirm: "${this.state.playerName}"`, placeholder: this.state.playerName }).then((val) => {
+                    if (val === this.state.playerName) {
                     deleteDoc(doc(db, "users", this.state.user.uid)).then(() => {
-                        alert("Account deleted successfully.");
+                            this.modalAlert("Account deleted successfully.");
                         auth.signOut();
                     }).catch(error => {
                         console.error("Error deleting account:", error);
-                        alert("Could not delete account. Please try again.");
+                            this.modalAlert("Could not delete account. Please try again.");
                     });
-                } else {
-                    alert("Name does not match. Deletion cancelled.");
+                    } else if (val !== null) {
+                        this.modalAlert("Name does not match. Deletion cancelled.");
                 }
+                });
             },
             
             // --- WORKOUT & GATE FLOW ---
@@ -500,31 +912,77 @@
 
                 return this.workoutProgram.find(w => w.phase === phase && w.type === dayType);
             },
+            getExerciseDescription(name) {
+                const desc = {
+                    'Bench Press': 'Builds raw pushing strength and chest mass.',
+                    'Overhead Press': 'Develops shoulder strength and stability.',
+                    'Incline DB Press': 'Targets upper chest for hypertrophy.',
+                    'Barbell Row': 'Builds back thickness and pulling power.',
+                    'Lat Pulldown': 'Targets lats for width and strength.',
+                    'Bicep Curl': 'Isolates the biceps for size.',
+                    'Deadlift': 'Full-body pull to develop posterior chain strength.',
+                    'Romanian Deadlift': 'Emphasizes hamstrings and glutes.',
+                    'Squat': 'Foundation lift for total-leg strength.',
+                    'Leg Press': 'Quad-dominant lower-body volume.',
+                    'Hamstring Curl': 'Hamstring isolation for balance.',
+                    'Box Jump': 'Power development and explosiveness.'
+                };
+                return desc[name] || 'Train with focus and perfect form.';
+            },
+            getExerciseMuscleImg(name) {
+                const group = {
+                    'Bench Press': 'Chest',
+                    'Incline DB Press': 'Chest',
+                    'Overhead Press': 'Shoulders',
+                    'Barbell Row': 'Back',
+                    'Lat Pulldown': 'Back',
+                    'Bicep Curl': 'Arms',
+                    'Deadlift': 'Posterior',
+                    'Romanian Deadlift': 'Posterior',
+                    'Squat': 'Legs',
+                    'Leg Press': 'Legs',
+                    'Hamstring Curl': 'Legs',
+                    'Box Jump': 'Legs'
+                };
+                const label = encodeURIComponent(group[name] || 'Muscle');
+                return `https://placehold.co/150x100/1c1917/e7e5e4?text=${label}`;
+            },
 
             previewQuest() {
                 const workout = this.getCurrentWorkout();
                 if (!workout) return;
-                
-                let previewHtml = `<h3 class="text-xl font-bold mb-4">${workout.type} Day - Phase ${workout.phase}</h3>`;
-                previewHtml += '<ul class="text-left space-y-2">';
+                let html = `<div class="space-y-3">
+                    <p class="text-indigo-400 font-semibold">${workout.type} Day - Phase ${workout.phase}</p>
+                    <div class="space-y-2">`;
                 workout.exercises.forEach(ex => {
-                    previewHtml += `<li><strong>${ex.name}:</strong> ${ex.sets} sets of ${ex.reps} reps</li>`;
+                    const w = this.state.lifts[ex.name] ? this.state.lifts[ex.name].weight : 'N/A';
+                    html += `<div class=\"p-3 bg-gray-800 rounded\">
+                        <div class=\"flex items-center justify-between\">
+                            <span class=\"font-semibold\">${ex.name}</span>
+                            <span class=\"text-sm text-gray-300\">${ex.sets} x ${ex.reps} @ ${w} kg</span>
+                        </div>
+                    </div>`;
                 });
-                previewHtml += '</ul>';
-                
-                alert(previewHtml); // Simple alert for preview
+                html += `</div></div>`;
+                const instance = this.showModal({
+                    title: 'Quest Preview',
+                    html,
+                    actions: [
+                        { label: 'Close', onClick: () => instance.close() },
+                        { label: 'Begin Quest', primary: true, onClick: () => { instance.close(); this.beginQuest(); } }
+                    ]
+                });
             },
 
             beginQuest() {
-                if (!confirm("The Dungeon awaits. Will you proceed with the quest now?")) return;
-                
                 const workout = this.getCurrentWorkout();
                 if (!workout) return;
 
                 this.state.dungeon.isActive = true;
                 this.state.dungeon.currentExerciseIndex = 0;
-                this.state.dungeon.exercises = workout.exercises;
+                this.state.dungeon.exercises = workout.exercises.map(ex => ({...ex, description: this.getExerciseDescription(ex.name), muscleImg: this.getExerciseMuscleImg(ex.name)}));
                 
+                // Show full-page dungeon overlay
                 this.renderDungeon();
                 document.getElementById('dungeon-overlay').classList.remove('hidden');
                 document.getElementById('dungeon-overlay').classList.add('flex');
@@ -542,13 +1000,18 @@
 
                 if (index >= exercises.length) {
                     content.innerHTML = `
+                        <div class="text-center">
                         <h2 class="text-3xl font-bold text-green-400 mb-4">Quest Complete!</h2>
                         <p class="mb-6">You have cleared the dungeon. Return to base to claim your rewards.</p>
                         <button id="return-to-base-btn" class="btn-primary py-2 px-4 rounded">Return to Base</button>
+                        </div>
                     `;
                     document.getElementById('return-to-base-btn').addEventListener('click', () => this.completeDungeon());
                 } else {
                     const ex = exercises[index];
+                    const lift = this.state.lifts[ex.name];
+                    const weight = lift ? lift.weight : 'N/A';
+                    const imgUrl = ex.muscleImg;
                     let setsHtml = '';
                     for (let i = 1; i <= ex.sets; i++) {
                         setsHtml += `<div class="flex items-center justify-between p-2 bg-gray-900 rounded-md mb-2">
@@ -558,15 +1021,33 @@
                     }
 
                     content.innerHTML = `
-                        <p class="text-sm text-gray-400">Task ${index + 1} / ${exercises.length}</p>
-                        <h2 class="text-3xl font-bold mb-2">${ex.name}</h2>
-                        <p class="text-xl text-indigo-400 mb-4">${ex.sets} sets of ${ex.reps} reps</p>
-                        <div class="space-y-2 mb-6">${setsHtml}</div>
-                        <div class="flex gap-4 justify-center">
+                        <div class="mb-2 text-sm text-gray-400">Task ${index + 1} / ${exercises.length}</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <img src="${imgUrl}" alt="${ex.name}" class="w-full rounded-md border border-gray-700 mb-3">
+                                <div class="p-3 bg-gray-800 rounded">
+                                    <h2 class="text-2xl font-bold mb-1">${ex.name}</h2>
+                                    <p class="text-indigo-400">${ex.sets} sets of ${ex.reps} reps @ ${weight} kg</p>
+                                    <p class="text-sm text-gray-300 mt-2">${ex.description}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold mb-2">Sets</h3>
+                                <div class="space-y-2 mb-4">${setsHtml}</div>
+                                <div class="flex gap-4">
                             <button id="cancel-quest-btn" class="bg-red-600 hover:bg-red-500 py-2 px-4 rounded">Cancel Quest</button>
-                            <button id="next-task-btn" class="btn-primary py-2 px-6 rounded">Next Task</button>
+                                    <button id="next-task-btn" class="btn-primary py-2 px-6 rounded" disabled>Next Task</button>
+                                </div>
+                            </div>
                         </div>
                     `;
+                    const nextBtn = document.getElementById('next-task-btn');
+                    const checkIfComplete = () => {
+                        const all = Array.from(document.querySelectorAll('.set-checkbox'));
+                        nextBtn.disabled = !all.every(cb => cb.checked);
+                    };
+                    document.querySelectorAll('.set-checkbox').forEach(cb => cb.addEventListener('change', checkIfComplete));
+                    checkIfComplete();
                     document.getElementById('next-task-btn').addEventListener('click', () => this.nextDungeonTask());
                     document.getElementById('cancel-quest-btn').addEventListener('click', () => this.cancelDungeon());
                 }
@@ -578,38 +1059,149 @@
             },
 
             completeDungeon() {
-                alert("Workout logged!");
                 this.state.dungeon.isActive = false;
                 document.getElementById('dungeon-overlay').classList.add('hidden');
                 document.getElementById('dungeon-overlay').classList.remove('flex');
+                // Calculate volume and apply progressive overload
+                const difficultyInc = { 'Easy': 1.25, 'Normal': 2.5, 'Hard': 5 }[this.state.difficulty] || 2.5;
+                const mainLifts = new Set(['Squat', 'Bench Press', 'Deadlift', 'Overhead Press', 'Barbell Row']);
+                let sessionVolume = 0;
+                this.state.dungeon.exercises.forEach(ex => {
+                    const lift = this.state.lifts[ex.name];
+                    const weight = lift ? lift.weight : 0;
+                    const repsNums = (ex.reps.match(/\d+/g) || []).map(n => parseInt(n));
+                    const reps = repsNums.length ? Math.max(...repsNums) : 8;
+                    sessionVolume += (ex.sets || 0) * reps * weight;
+                    if (mainLifts.has(ex.name) && lift) {
+                        lift.weight = Math.round((lift.weight + difficultyInc) * 100) / 100;
+                        // record history point
+                        const hist = this.state.liftHistory[ex.name] || [];
+                        hist.push({ date: new Date().toISOString(), weight: lift.weight });
+                        this.state.liftHistory[ex.name] = hist;
+                    }
+                });
+                this.state.stats.totalVolumeKg += Math.round(sessionVolume);
+
+                // Update stats and streak
+                this.state.stats.totalWorkouts++;
+                this.state.stats.dungeonsCleared++;
+                // XP and Mana
+                const xpGain = 50 + Math.round(sessionVolume / 500);
+                this.state.xp += xpGain;
+                this.state.mana += 50;
+                let leveledUp = false;
+                while (this.state.xp >= this.state.xpToNextLevel) {
+                    this.state.xp -= this.state.xpToNextLevel;
+                    this.state.level++;
+                    this.state.xpToNextLevel = Math.round(this.state.xpToNextLevel * 1.2);
+                    leveledUp = true;
+                }
+                const today = new Date().toISOString().split('T')[0];
+                if (!this.state.lastWorkoutDate) {
+                    this.state.streak = 1;
+                } else {
+                    const last = new Date(this.state.lastWorkoutDate);
+                    const now = new Date(today);
+                    const diffDays = Math.round((now - last) / (1000*60*60*24));
+                    if (diffDays === 1) this.state.streak++;
+                    else if (diffDays > 1) this.state.streak = 1;
+                }
+                this.state.lastWorkoutDate = today;
+                this.state.longestStreak = Math.max(this.state.longestStreak || 0, this.state.streak);
+
                 this.saveData();
+                // Refresh achievements view if open
+                if (document.getElementById('achievements-page').classList.contains('active')) this.renderAchievementsPage();
+                this.renderDashboard();
+                // Level up animation modal
+                if (leveledUp) {
+                    this.showModal({
+                        title: 'Level Up!',
+                        html: `<div class=\"text-center\"><div class=\"text-5xl font-black text-indigo-400 level-up\">Lv ${this.state.level}</div><p class=\"mt-2 text-gray-300\">Your power grows.</p></div>`,
+                        actions: [{ label: 'Continue', primary: true, onClick: () => {} }]
+                    });
+                } else {
+                    this.modalAlert("Workout logged!");
+                }
             },
 
             cancelDungeon() {
-                if(confirm("Are you sure you want to abandon the quest? Your progress will not be saved.")){
+                this.modalConfirm("Are you sure you want to abandon the quest? Your progress will not be saved.").then((ok) => {
+                    if (ok) {
                     this.state.dungeon.isActive = false;
                     document.getElementById('dungeon-overlay').classList.add('hidden');
                     document.getElementById('dungeon-overlay').classList.remove('flex');
                 }
+                });
             },
             
             generateGate() {
-                const today = new Date().toISOString().split('T')[0];
-                if (this.state.lastGateDate === today) return; // Only one gate per day
-
-                if (Math.random() < 0.5) { // 50% chance of a gate appearing
-                    this.state.activeGate = this.gatesData[Math.floor(Math.random() * this.gatesData.length)];
-                    this.state.lastGateDate = today;
-                    this.saveData();
+                // Randomly spawn multiple gates, each with timers
+                if (!Array.isArray(this.state.gates)) this.state.gates = [];
+                if (!Array.isArray(this.state.completedGates)) this.state.completedGates = [];
+                const now = Date.now();
+                // Remove expired
+                this.state.gates = this.state.gates.filter(g => g.expiresAt > now);
+                if (Math.random() < 0.5 && this.state.gates.length < 3) {
+                    // Filter out already active gates and recently completed gates
+                    const availableGates = this.gatesData.filter(gate => {
+                        const isActive = this.state.gates.some(active => active.rank === gate.rank);
+                        const wasCompleted = this.state.completedGates.includes(gate.rank);
+                        return !isActive && !wasCompleted;
+                    });
+                    
+                    if (availableGates.length > 0) {
+                        const base = availableGates[Math.floor(Math.random() * availableGates.length)];
+                        const durations = { 'S': 60*60*1000, 'A': 3*60*60*1000, 'B': 6*60*60*1000, 'C': 12*60*60*1000, 'D': 18*60*60*1000, 'E': 24*60*60*1000 };
+                        const expiresAt = now + (durations[base.rank] || 6*60*60*1000);
+                        const id = `gate_${now}_${Math.random().toString(36).slice(2,7)}`;
+                        this.state.gates.push({ id, ...base, createdAt: now, expiresAt });
+                        this.saveData();
+                    }
                 }
+                this.renderGatesPage();
             },
 
-            completeGate() {
-                alert(`Gate Cleared! You earned ${this.state.activeGate.reward} XP.`);
-                // In a real app, you'd add XP here: this.state.level += ...
-                this.state.activeGate = null;
-                this.saveData();
-                this.renderWorkoutPage();
+            completeGate(e, gateId) {
+                const g = gateId ? (this.state.gates || []).find(x => x.id === gateId) : this.state.activeGate;
+                const id = `gate-confirm-${Date.now()}`;
+                const instance = this.showModal({
+                    title: `${g.rank}-Rank Gate Confirmation`,
+                    html: `<p class=\"text-gray-200 mb-3\">${g.description}</p><label class=\"flex items-center gap-2 text-sm\"><input type=\"checkbox\" id=\"${id}\" class=\"h-4 w-4\"> I confirm I completed this challenge.</label>`,
+                    actions: [
+                        { label: 'Cancel', onClick: () => instance.close() },
+                        { label: 'Claim Reward', primary: true, onClick: () => {
+                            const cb = document.getElementById(id);
+                            if (!cb || !cb.checked) return;
+                            instance.close();
+                            this.modalAlert(`Gate Cleared! You earned ${g.reward} XP.`);
+                            this.state.stats.gatesCleared++;
+                            // Track rank-specific achievements
+                            if (g.rank === 'S') this.state.stats.sRanksCleared++;
+                            if (g.rank === 'C') this.state.stats.cRanksCleared++;
+                            if (g.rank === 'E') this.state.stats.eRanksCleared++;
+                            // Add to completed gates history
+                            if (!this.state.completedGates.includes(g.rank)) {
+                                this.state.completedGates.push(g.rank);
+                            }
+                            // grant XP and mana bonus
+                            this.state.xp += g.reward;
+                            this.state.mana += 25;
+                            while (this.state.xp >= this.state.xpToNextLevel) {
+                                this.state.xp -= this.state.xpToNextLevel;
+                                this.state.level++;
+                                this.state.xpToNextLevel = Math.round(this.state.xpToNextLevel * 1.2);
+                            }
+                            if (gateId) this.state.gates = (this.state.gates || []).filter(x => x.id !== gateId);
+                            else this.state.activeGate = null;
+                            this.saveData();
+                            this.renderWorkoutPage();
+                            this.renderDashboard();
+                            this.renderGatesPage();
+                            if (document.getElementById('achievements-page').classList.contains('active')) this.renderAchievementsPage();
+                        } }
+                    ]
+                });
             }
         };
 
@@ -624,11 +1216,18 @@
                 loginScreen.classList.add('hidden');
                 appContent.classList.remove('hidden');
                 app.init();
+                // init particles
+                if (window.particlesJS) {
+                    particlesJS('particles-dashboard', { particles: { number: { value: 40 }, color: { value: '#6366f1' }, shape: { type: 'circle' }, opacity: { value: 0.2 }, size: { value: 2 }, move: { enable: true, speed: 1 } }, interactivity: { events: { onhover: { enable: false } } }, retina_detect: true });
+                }
             } else {
                 console.log("User is signed out.");
                 loginScreen.classList.remove('hidden');
                 appContent.classList.add('hidden');
                 app.state.isInitialized = false;
+                if (window.particlesJS) {
+                    particlesJS('particles-login', { particles: { number: { value: 35 }, color: { value: '#4f46e5' }, shape: { type: 'circle' }, opacity: { value: 0.25 }, size: { value: 2 }, move: { enable: true, speed: 1 } }, interactivity: { events: { onhover: { enable: false } } }, retina_detect: true });
+                }
             }
         });
 
@@ -636,7 +1235,8 @@
         document.getElementById('login-btn').addEventListener('click', () => {
             signInWithPopup(auth, provider).catch((error) => {
                 console.error("Login failed:", error);
-                alert("Login failed. Please check your Firebase setup and authorized domains.");
+                if (app && app.modalAlert) app.modalAlert("Login failed. Please check your Firebase setup and authorized domains.");
+                else alert("Login failed. Please check your Firebase setup and authorized domains.");
             });
         });
 
