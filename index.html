@@ -34,7 +34,7 @@
         <header class="text-center mb-6 p-8 rounded-lg card-bg">
             <h1 id="header-title" class="text-4xl font-black uppercase text-indigo-400">Dashboard</h1>
         </header>
-
+      
         <nav class="flex justify-center gap-2 mb-6">
             <button data-page="dashboard" class="nav-btn active px-4 py-2 rounded-lg font-semibold">Dashboard</button>
             <button data-page="architect" class="nav-btn px-4 py-2 rounded-lg font-semibold">Architect</button>
@@ -155,11 +155,7 @@
             },
 
             masterExerciseList: [
-                'Squat', 'Bench Press', 'Deadlift', 'Overhead Press', 'Barbell Row',
-                'Romanian Deadlift', 'Front Squat', 'Hip Thrust', 'Dumbbell Bench Press',
-                'Incline DB Press', 'Dumbbell Row', 'Goblet Squat', 'Bulgarian Split Squat',
-                'Dumbbell Shoulder Press', 'Lateral Raise', 'Dumbbell Curl', 'Hammer Curl',
-                'Tricep Skullcrusher', 'Lat Pulldown', 'Cable Row', 'Tricep Pushdown',
+
                 'Leg Press', 'Leg Extension', 'Hamstring Curl', 'Calf Raise', 'Pull-up', 'Dip'
             ],
 
@@ -338,10 +334,7 @@
                 const repsInput = document.getElementById('architect-reps');
 
                 if (exerciseSelect.value && setsInput.value && repsInput.value) {
-                    this.state.currentCustomWorkout.exercises.push({
-                        name: exerciseSelect.value,
-                        sets: setsInput.value,
-                        reps: repsInput.value
+
                     });
                     this.renderArchitect();
                     // Clear inputs
