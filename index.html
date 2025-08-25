@@ -326,23 +326,71 @@
             ],
             
             workoutProgram: [
-                // Phase I: Foundational Strength (Weeks 1-12)
-                { phase: 1, type: 'Push', exercises: [{name: 'Bench Press', sets: 3, reps: '5-8'}, {name: 'Overhead Press', sets: 3, reps: '5-8'}, {name: 'Incline DB Press', sets: 3, reps: '8-12'}] },
-                { phase: 1, type: 'Pull', exercises: [{name: 'Barbell Row', sets: 3, reps: '5-8'}, {name: 'Lat Pulldown', sets: 3, reps: '8-12'}, {name: 'Bicep Curl', sets: 3, reps: '8-12'}] },
-                { phase: 1, type: 'Legs', exercises: [{name: 'Squat', sets: 3, reps: '5-8'}, {name: 'Romanian Deadlift', sets: 3, reps: '8-12'}, {name: 'Leg Press', sets: 3, reps: '8-12'}] },
-                // Phase II: Strength Hypertrophy (Weeks 13-24)
-                { phase: 2, type: 'Push', exercises: [{name: 'Bench Press', sets: 4, reps: '4-6'}, {name: 'Overhead Press', sets: 4, reps: '4-6'}, {name: 'Lateral Raise', sets: 4, reps: '10-15'}] },
-                { phase: 2, type: 'Pull', exercises: [{name: 'Deadlift', sets: 1, reps: '3-5'}, {name: 'Barbell Row', sets: 4, reps: '6-8'}, {name: 'Lat Pulldown', sets: 4, reps: '8-10'}] },
-                { phase: 2, type: 'Legs', exercises: [{name: 'Squat', sets: 4, reps: '4-6'}, {name: 'Leg Press', sets: 4, reps: '10-12'}, {name: 'Hamstring Curl', sets: 3, reps: '8-12'}] },
-                 // Phase III: Power & Athleticism (Weeks 25-36)
-                { phase: 3, type: 'Push', exercises: [{name: 'Bench Press', sets: 5, reps: '3-5'}, {name: 'Overhead Press', sets: 5, reps: '3-5'}, {name: 'Dip', sets: 3, reps: 'AMRAP'}] },
-                { phase: 3, type: 'Pull', exercises: [{name: 'Power Clean', sets: 5, reps: '3'}, {name: 'Pull-up', sets: 3, reps: 'AMRAP'}, {name: 'Barbell Row', sets: 3, reps: '8-10'}] },
-                { phase: 3, type: 'Legs', exercises: [{name: 'Squat', sets: 5, reps: '3-5'}, {name: 'Box Jump', sets: 5, reps: '5'}, {name: 'Calf Raise', sets: 4, reps: '15-20'}] },
-                 // Phase IV: Peak Strength (Weeks 37-48)
-                { phase: 4, type: 'Push', exercises: [{name: 'Bench Press', sets: 3, reps: '5/3/1'}, {name: 'Incline DB Press', sets: 4, reps: '6-10'}, {name: 'Tricep Pushdown', sets: 4, reps: '10-12'}] },
-                { phase: 4, type: 'Pull', exercises: [{name: 'Deadlift', sets: 3, reps: '5/3/1'}, {name: 'Lat Pulldown', sets: 4, reps: '8-12'}, {name: 'Bicep Curl', sets: 4, reps: '10-12'}] },
-                { phase: 4, type: 'Legs', exercises: [{name: 'Squat', sets: 3, reps: '5/3/1'}, {name: 'Romanian Deadlift', sets: 4, reps: '8-10'}, {name: 'Leg Press', sets: 4, reps: '10-15'}] },
-            ],
+    // Phase I: Foundational Strength (Weeks 1-12)
+    { phase: 1, type: 'Push', exercises: [
+        {name: 'Bench Press', sets: 3, reps: '5-8', instructions: ['Lie flat on the bench with your feet firmly on the floor.', 'Grip the bar slightly wider than shoulder-width.', 'Lower the bar to your mid-chest, keeping your elbows tucked at about a 45-degree angle.', 'Press the bar back up until your arms are fully extended.']},
+        {name: 'Overhead Press', sets: 3, reps: '5-8', instructions: ['Stand with the bar on your front shoulders, hands slightly wider than shoulder-width.', 'Keep your core tight and glutes squeezed.', 'Press the bar straight overhead until your arms are locked out.', 'Slowly lower the bar back to the starting position.']},
+        {name: 'Incline DB Press', sets: 3, reps: '8-12', instructions: ['Set an incline bench to 30-45 degrees.', 'Lie back with a dumbbell in each hand at shoulder level.', 'Press the dumbbells up until they meet above your chest.', 'Lower the dumbbells slowly and with control.']}
+    ]},
+    { phase: 1, type: 'Pull', exercises: [
+        {name: 'Barbell Row', sets: 3, reps: '5-8', instructions: ['Stand with your mid-foot under the barbell.', 'Bend at the hips and knees and grip the bar with a slightly wider than shoulder-width grip.', 'Keeping your back straight, pull the bar towards your lower chest.', 'Squeeze your back muscles at the top, then slowly lower the bar.']},
+        {name: 'Lat Pulldown', sets: 3, reps: '8-12', instructions: ['Grip the bar with a wide, overhand grip.', 'Sit down and secure your knees under the pads.', 'Pull the bar down to your upper chest, squeezing your lats.', 'Slowly return the bar to the starting position.']},
+        {name: 'Bicep Curl', sets: 3, reps: '8-12', instructions: ['Stand holding a dumbbell in each hand with an underhand grip.', 'Keeping your elbows at your sides, curl the weights up to shoulder level.', 'Squeeze your biceps at the top.', 'Slowly lower the weights back down.']}
+    ]},
+    { phase: 1, type: 'Legs', exercises: [
+        {name: 'Squat', sets: 3, reps: '5-8', instructions: ['Place the barbell on your upper back, not your neck.', 'Stand with your feet shoulder-width apart, toes slightly out.', 'Keep your chest up and back straight as you squat down until your thighs are at least parallel to the floor.', 'Drive through your heels to return to the starting position.']},
+        {name: 'Romanian Deadlift', sets: 3, reps: '8-12', instructions: ['Hold a barbell or dumbbells in front of your thighs.', 'Keeping your legs almost straight (a slight bend in the knees), hinge at your hips.', 'Lower the weight until you feel a deep stretch in your hamstrings.', 'Return to the starting position by squeezing your glutes.']},
+        {name: 'Leg Press', sets: 3, reps: '8-12', instructions: ['Sit on the machine with your feet shoulder-width apart on the platform.', 'Press the platform away from you until your legs are extended, but not locked.', 'Slowly lower the weight back to the starting position.']}
+    ]},
+    // Phase II: Strength Hypertrophy (Weeks 13-24)
+    { phase: 2, type: 'Push', exercises: [
+        {name: 'Bench Press', sets: 4, reps: '4-6', instructions: ['Lie flat on the bench with your feet firmly on the floor.', 'Grip the bar slightly wider than shoulder-width.', 'Lower the bar to your mid-chest, keeping your elbows tucked at about a 45-degree angle.', 'Press the bar back up until your arms are fully extended.']},
+        {name: 'Overhead Press', sets: 4, reps: '4-6', instructions: ['Stand with the bar on your front shoulders, hands slightly wider than shoulder-width.', 'Keep your core tight and glutes squeezed.', 'Press the bar straight overhead until your arms are locked out.', 'Slowly lower the bar back to the starting position.']},
+        {name: 'Lateral Raise', sets: 4, reps: '10-15', instructions: ['Stand with dumbbells at your sides, palms facing in.', 'Keeping a slight bend in your elbows, raise the weights out to your sides until they are at shoulder level.', 'Pause at the top, then slowly lower the weights back down.']}
+    ]},
+    { phase: 2, type: 'Pull', exercises: [
+        {name: 'Deadlift', sets: 1, reps: '3-5', instructions: ['Stand with your mid-foot under the bar.', 'Hinge at your hips and bend your knees to grip the bar.', 'Keep your back straight, chest up, and pull the weight off the floor by extending your hips and knees.', 'Lower the bar with control.']},
+        {name: 'Barbell Row', sets: 4, reps: '6-8', instructions: ['Stand with your mid-foot under the barbell.', 'Bend at the hips and knees and grip the bar with a slightly wider than shoulder-width grip.', 'Keeping your back straight, pull the bar towards your lower chest.', 'Squeeze your back muscles at the top, then slowly lower the bar.']},
+        {name: 'Lat Pulldown', sets: 4, reps: '8-10', instructions: ['Grip the bar with a wide, overhand grip.', 'Sit down and secure your knees under the pads.', 'Pull the bar down to your upper chest, squeezing your lats.', 'Slowly return the bar to the starting position.']}
+    ]},
+    { phase: 2, type: 'Legs', exercises: [
+        {name: 'Squat', sets: 4, reps: '4-6', instructions: ['Place the barbell on your upper back, not your neck.', 'Stand with your feet shoulder-width apart, toes slightly out.', 'Keep your chest up and back straight as you squat down until your thighs are at least parallel to the floor.', 'Drive through your heels to return to the starting position.']},
+        {name: 'Leg Press', sets: 4, reps: '10-12', instructions: ['Sit on the machine with your feet shoulder-width apart on the platform.', 'Press the platform away from you until your legs are extended, but not locked.', 'Slowly lower the weight back to the starting position.']},
+        {name: 'Hamstring Curl', sets: 3, reps: '8-12', instructions: ['Lie face down on the hamstring curl machine.', 'Position your Achilles tendon under the pad.', 'Curl your legs up towards your glutes.', 'Slowly lower the weight back down.']}
+    ]},
+     // Phase III: Power & Athleticism (Weeks 25-36)
+    { phase: 3, type: 'Push', exercises: [
+        {name: 'Bench Press', sets: 5, reps: '3-5', instructions: ['Lie flat on the bench with your feet firmly on the floor.', 'Grip the bar slightly wider than shoulder-width.', 'Lower the bar to your mid-chest, keeping your elbows tucked at about a 45-degree angle.', 'Press the bar back up until your arms are fully extended.']},
+        {name: 'Overhead Press', sets: 5, reps: '3-5', instructions: ['Stand with the bar on your front shoulders, hands slightly wider than shoulder-width.', 'Keep your core tight and glutes squeezed.', 'Press the bar straight overhead until your arms are locked out.', 'Slowly lower the bar back to the starting position.']},
+        {name: 'Dip', sets: 3, reps: 'AMRAP', instructions: ['Grip the parallel bars firmly.', 'Lower your body until your shoulders are below your elbows.', 'Press back up to the starting position.', 'AMRAP means As Many Reps As Possible.']}
+    ]},
+    { phase: 3, type: 'Pull', exercises: [
+        {name: 'Power Clean', sets: 5, reps: '3', instructions: ['Start with the barbell on the floor, similar to a deadlift.', 'Explosively pull the bar up, extending your hips and knees.', 'As the bar passes your thighs, shrug and pull yourself under it.', 'Catch the bar on your front shoulders in a squat position and stand up.']},
+        {name: 'Pull-up', sets: 3, reps: 'AMRAP', instructions: ['Grip the bar with an overhand grip, slightly wider than shoulder-width.', 'Pull your chest up to the bar.', 'Lower yourself back down with control.', 'AMRAP means As Many Reps As Possible.']},
+        {name: 'Barbell Row', sets: 3, reps: '8-10', instructions: ['Stand with your mid-foot under the barbell.', 'Bend at the hips and knees and grip the bar with a slightly wider than shoulder-width grip.', 'Keeping your back straight, pull the bar towards your lower chest.', 'Squeeze your back muscles at the top, then slowly lower the bar.']}
+    ]},
+    { phase: 3, type: 'Legs', exercises: [
+        {name: 'Squat', sets: 5, reps: '3-5', instructions: ['Place the barbell on your upper back, not your neck.', 'Stand with your feet shoulder-width apart, toes slightly out.', 'Keep your chest up and back straight as you squat down until your thighs are at least parallel to the floor.', 'Drive through your heels to return to the starting position.']},
+        {name: 'Box Jump', sets: 5, reps: '5', instructions: ['Stand in front of a sturdy box.', 'Dip into a quarter squat and explode up, swinging your arms.', 'Land softly on the box with your knees bent.', 'Step down, do not jump down.']},
+        {name: 'Calf Raise', sets: 4, reps: '15-20', instructions: ['Stand with the balls of your feet on an elevated surface.', 'Lower your heels as far as you can to feel a stretch.', 'Press up onto your toes as high as possible.', 'Squeeze your calves at the top.']}
+    ]},
+     // Phase IV: Peak Strength (Weeks 37-48)
+    { phase: 4, type: 'Push', exercises: [
+        {name: 'Bench Press', sets: 3, reps: '5/3/1', instructions: ['The 5/3/1 program involves different rep schemes each week.', 'Week 1: 3x5, Week 2: 3x3, Week 3: 1x5, 1x3, 1x1.', 'Perform warm-up sets before your main working sets.', 'Focus on lifting heavy with good form.']},
+        {name: 'Incline DB Press', sets: 4, reps: '6-10', instructions: ['Set an incline bench to 30-45 degrees.', 'Lie back with a dumbbell in each hand at shoulder level.', 'Press the dumbbells up until they meet above your chest.', 'Lower the dumbbells slowly and with control.']},
+        {name: 'Tricep Pushdown', sets: 4, reps: '10-12', instructions: ['Attach a straight bar or rope to a high pulley.', 'Grip the attachment and press down until your arms are fully extended.', 'Keep your elbows close to your body.', 'Slowly return to the starting position.']}
+    ]},
+    { phase: 4, type: 'Pull', exercises: [
+        {name: 'Deadlift', sets: 3, reps: '5/3/1', instructions: ['The 5/3/1 program involves different rep schemes each week.', 'Week 1: 3x5, Week 2: 3x3, Week 3: 1x5, 1x3, 1x1.', 'Perform warm-up sets before your main working sets.', 'Maintain a flat back throughout the lift.']},
+        {name: 'Lat Pulldown', sets: 4, reps: '8-12', instructions: ['Grip the bar with a wide, overhand grip.', 'Sit down and secure your knees under the pads.', 'Pull the bar down to your upper chest, squeezing your lats.', 'Slowly return the bar to the starting position.']},
+        {name: 'Bicep Curl', sets: 4, reps: '10-12', instructions: ['Stand holding a dumbbell in each hand with an underhand grip.', 'Keeping your elbows at your sides, curl the weights up to shoulder level.', 'Squeeze your biceps at the top.', 'Slowly lower the weights back down.']}
+    ]},
+    { phase: 4, type: 'Legs', exercises: [
+        {name: 'Squat', sets: 3, reps: '5/3/1', instructions: ['The 5/3/1 program involves different rep schemes each week.', 'Week 1: 3x5, Week 2: 3x3, Week 3: 1x5, 1x3, 1x1.', 'Perform warm-up sets before your main working sets.', 'Focus on depth and control on every rep.']},
+        {name: 'Romanian Deadlift', sets: 4, reps: '8-10', instructions: ['Hold a barbell or dumbbells in front of your thighs.', 'Keeping your legs almost straight (a slight bend in the knees), hinge at your hips.', 'Lower the weight until you feel a deep stretch in your hamstrings.', 'Return to the starting position by squeezing your glutes.']},
+        {name: 'Leg Press', sets: 4, reps: '10-15', instructions: ['Sit on the machine with your feet shoulder-width apart on the platform.', 'Press the platform away from you until your legs are extended, but not locked.', 'Slowly lower the weight back to the starting position.']}
+    ]},
+],
             
             gatesData: [
                 { rank: 'E', description: 'Active Recovery: Perform 15 minutes of light stretching or foam rolling.', reward: 10 },
@@ -590,7 +638,10 @@
                 'gate:complete': () => app.completeGate(),
                 'gates:open': (e, el) => app.completeGate(e, el.getAttribute('data-gate-id')),
                 'settings:delete': () => app.confirmDeleteAccount(),
-                'settings:diff': (e, el) => { app.state.difficulty = el.value; app.saveData(); }
+                'settings:diff': (e, el) => { app.state.difficulty = el.value; app.saveData(); },
+                'nextDungeonTask': () => app.nextDungeonTask(),
+                'cancelDungeon': () => app.cancelDungeon(),
+                'completeDungeon': () => app.completeDungeon()
             },
 
             // --- UI & RENDERING ---
@@ -1110,7 +1161,7 @@
                     content.innerHTML = '';
                     return;
                 }
-                
+
                 const index = this.state.dungeon.currentExerciseIndex;
                 const exercises = this.state.dungeon.exercises;
 
@@ -1119,53 +1170,66 @@
                         <div class="text-center">
                         <h2 class="text-3xl font-bold text-green-400 mb-4">Quest Complete!</h2>
                         <p class="mb-6">You have cleared the dungeon. Return to base to claim your rewards.</p>
-                        <button id="return-to-base-btn" class="btn-primary py-2 px-4 rounded">Return to Base</button>
+                        <button data-action="completeDungeon" class="btn-primary py-2 px-4 rounded">Return to Base</button>
                         </div>
                     `;
-                    document.getElementById('return-to-base-btn').addEventListener('click', () => this.completeDungeon());
                 } else {
                     const ex = exercises[index];
                     const lift = this.state.lifts[ex.name];
                     const weight = lift ? lift.weight : 'N/A';
-                    const imgUrl = ex.muscleImg;
+
                     let setsHtml = '';
                     for (let i = 1; i <= ex.sets; i++) {
-                        setsHtml += `<div class="flex items-center justify-between p-2 bg-gray-900 rounded-md mb-2">
-                            <span class="font-semibold">Set ${i}</span>
-                            <input type="checkbox" class="set-checkbox w-6 h-6 bg-gray-700 rounded text-indigo-500">
+                        setsHtml += `<div class="flex items-center p-2 bg-stone-800 rounded-md">
+                            <input id="set-${i}" type="checkbox" class="set-checkbox w-5 h-5 bg-stone-700 rounded text-indigo-500 focus:ring-0">
+                            <label for="set-${i}" class="ml-3 font-semibold">Set ${i} Completed</label>
                         </div>`;
                     }
 
                     content.innerHTML = `
-                        <div class="mb-2 text-sm text-gray-400">Task ${index + 1} / ${exercises.length}</div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <img src="${imgUrl}" alt="${ex.name}" class="w-full rounded-md border border-gray-700 mb-3">
-                                <div class="p-3 bg-gray-800 rounded">
-                                    <h2 class="text-2xl font-bold mb-1">${ex.name}</h2>
-                                    <p class="text-indigo-400">${ex.sets} sets of ${ex.reps} reps @ ${weight} kg</p>
-                                    <p class="text-sm text-gray-300 mt-2">${ex.description}</p>
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <!-- Left Side: Image and Description -->
+                            <div class="flex-1 text-center">
+                                <div class="w-full h-48 bg-stone-900 rounded-lg flex items-center justify-center mb-4">
+                                    <!-- Placeholder for muscle group image -->
+                                    <p class="text-stone-500 text-2xl">[${ex.name} Image]</p>
                                 </div>
+                                <p class="text-stone-300">${ex.instructions[0]}</p> <!-- Show first instruction as a summary -->
                             </div>
-                            <div>
-                                <h3 class="font-semibold mb-2">Sets</h3>
-                                <div class="space-y-2 mb-4">${setsHtml}</div>
-                                <div class="flex gap-4">
-                            <button id="cancel-quest-btn" class="bg-red-600 hover:bg-red-500 py-2 px-4 rounded">Cancel Quest</button>
-                                    <button id="next-task-btn" class="btn-primary py-2 px-6 rounded" disabled>Next Task</button>
+
+                            <!-- Right Side: Task Details and Actions -->
+                            <div class="flex-1">
+                                <p class="text-sm text-stone-400">Task ${index + 1} / ${exercises.length}</p>
+                                <h2 class="text-3xl font-bold mb-2">${ex.name}</h2>
+                                <p class="text-xl text-indigo-400 mb-4">${ex.sets} sets of ${ex.reps} reps @ ${weight} kg</p>
+
+                                <!-- Collapsible Instructions Section -->
+                                <details class="mb-4">
+                                    <summary class="cursor-pointer text-indigo-400">View Full Instructions</summary>
+                                    <ul class="list-disc list-inside text-left space-y-1 mt-2 text-stone-300">
+                                        ${ex.instructions.map(step => `<li>${step}</li>`).join('')}
+                                    </ul>
+                                </details>
+
+                                <div class="space-y-2 mb-6">
+                                    ${setsHtml}
+                                </div>
+
+                                <div class="flex gap-4 justify-center">
+                                    <button data-action="cancelDungeon" class="bg-red-600 hover:bg-red-500 py-2 px-4 rounded">Cancel Quest</button>
+                                    <button data-action="nextDungeonTask" class="btn-primary py-2 px-6 rounded" disabled>Next Task</button>
                                 </div>
                             </div>
                         </div>
                     `;
-                    const nextBtn = document.getElementById('next-task-btn');
+
+                    const nextBtn = document.querySelector('[data-action="nextDungeonTask"]');
                     const checkIfComplete = () => {
                         const all = Array.from(document.querySelectorAll('.set-checkbox'));
-                        nextBtn.disabled = !all.every(cb => cb.checked);
+                        if (nextBtn) nextBtn.disabled = !all.every(cb => cb.checked);
                     };
                     document.querySelectorAll('.set-checkbox').forEach(cb => cb.addEventListener('change', checkIfComplete));
                     checkIfComplete();
-                    document.getElementById('next-task-btn').addEventListener('click', () => this.nextDungeonTask());
-                    document.getElementById('cancel-quest-btn').addEventListener('click', () => this.cancelDungeon());
                 }
             },
             
