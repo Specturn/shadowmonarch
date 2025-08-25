@@ -307,7 +307,7 @@
                 lastGateDate: null,
                 lastWorkoutDate: null,
                 streak: 0,
-                stats: { dungeonsCleared: 0, gatesCleared: 0, sRanksCleared: 0, eRanksCleared: 0, cRanksCleared: 0, totalWorkouts: 0, totalVolumeKg: 0 },
+                stats: { dungeonsCleared: 0, gatesCleared: 0, sRanksCleared: 0, aRanksCleared: 0, bRanksCleared: 0, cRanksCleared: 0, dRanksCleared: 0, eRanksCleared: 0, totalWorkouts: 0, totalVolumeKg: 0, maxVolumeInSession: 0 },
                 liftHistory: { 'Squat': [], 'Bench Press': [], 'Deadlift': [], 'Overhead Press': [] },
                 longestStreak: 0,
                 showcase: [],
@@ -355,40 +355,156 @@
 
             achievementsData: [
                 // Level Milestones
-                { id: 'level_10', name: 'Hunter Rank C', description: 'Reach Level 10.', icon: 'fa-user-shield', target: 10, progress: (s) => s.level },
+                { id: 'level_5', name: 'Hunter Rank E', description: 'Reach Level 5.', icon: 'fa-user-shield', target: 5, progress: (s) => s.level },
+                { id: 'level_10', name: 'Hunter Rank D', description: 'Reach Level 10.', icon: 'fa-user-shield', target: 10, progress: (s) => s.level },
+                { id: 'level_15', name: 'Hunter Rank C', description: 'Reach Level 15.', icon: 'fa-user-ninja', target: 15, progress: (s) => s.level },
                 { id: 'level_25', name: 'Hunter Rank B', description: 'Reach Level 25.', icon: 'fa-user-ninja', target: 25, progress: (s) => s.level },
+                { id: 'level_35', name: 'Hunter Rank B+', description: 'Reach Level 35.', icon: 'fa-user-astronaut', target: 35, progress: (s) => s.level },
                 { id: 'level_50', name: 'Hunter Rank A', description: 'Reach Level 50.', icon: 'fa-user-astronaut', target: 50, progress: (s) => s.level },
+                { id: 'level_60', name: 'Hunter Rank A+', description: 'Reach Level 60.', icon: 'fa-crown', target: 60, progress: (s) => s.level },
                 { id: 'level_75', name: 'Hunter Rank S', description: 'Reach Level 75.', icon: 'fa-crown', target: 75, progress: (s) => s.level },
-                { id: 'level_100', name: 'National Level Hunter', description: 'Reach Level 100.', icon: 'fa-shield-halved', target: 100, progress: (s) => s.level },
+                { id: 'level_80', name: 'Hunter Rank S+', description: 'Reach Level 80.', icon: 'fa-shield-halved', target: 80, progress: (s) => s.level },
+                { id: 'level_90', name: 'National Level Hunter', description: 'Reach Level 90.', icon: 'fa-shield-halved', target: 90, progress: (s) => s.level },
+                { id: 'level_100', name: 'Monarch', description: 'Reach Level 100.', icon: 'fa-king', target: 100, progress: (s) => s.level },
 
                 // Strength Plateaus (KG)
-                { id: 'squat_100', name: 'The Foundation', description: 'Squat 100kg.', icon: 'fa-mountain', target: 100, progress: (s) => s.lifts['Squat'].weight },
-                { id: 'squat_140', name: 'Beast of the Deep', description: 'Squat 140kg.', icon: 'fa-gavel', target: 140, progress: (s) => s.lifts['Squat'].weight },
-                { id: 'squat_180', name: 'Earthshaker', description: 'Squat 180kg.', icon: 'fa-meteor', target: 180, progress: (s) => s.lifts['Squat'].weight },
-                { id: 'bench_100', name: 'The Centurion', description: 'Bench Press 100kg.', icon: 'fa-gem', target: 100, progress: (s) => s.lifts['Bench Press'].weight },
-                { id: 'bench_120', name: 'Titan\'s Chest', description: 'Bench Press 120kg.', icon: 'fa-dumbbell', target: 120, progress: (s) => s.lifts['Bench Press'].weight },
-                { id: 'deadlift_180', name: 'World Breaker', description: 'Deadlift 180kg.', icon: 'fa-rocket', target: 180, progress: (s) => s.lifts['Deadlift'].weight },
-                { id: 'deadlift_220', name: 'The Unmovable', description: 'Deadlift 220kg.', icon: 'fa-anchor', target: 220, progress: (s) => s.lifts['Deadlift'].weight },
-                { id: 'ohp_80', name: 'Skyward Press', description: 'Overhead Press 80kg.', icon: 'fa-arrow-up', target: 80, progress: (s) => s.lifts['Overhead Press'].weight },
+                { id: 'squat_60', name: 'First Steps', description: 'Squat 60kg.', icon: 'fa-shoe-prints', target: 60, progress: (s) => s.lifts['Squat'] ? s.lifts['Squat'].weight : 0 },
+                { id: 'squat_80', name: 'Solid Ground', description: 'Squat 80kg.', icon: 'fa-mountain', target: 80, progress: (s) => s.lifts['Squat'] ? s.lifts['Squat'].weight : 0 },
+                { id: 'squat_100', name: 'The Foundation', description: 'Squat 100kg.', icon: 'fa-mountain', target: 100, progress: (s) => s.lifts['Squat'] ? s.lifts['Squat'].weight : 0 },
+                { id: 'squat_120', name: 'Heavy Hitter', description: 'Squat 120kg.', icon: 'fa-gavel', target: 120, progress: (s) => s.lifts['Squat'] ? s.lifts['Squat'].weight : 0 },
+                { id: 'squat_140', name: 'Beast of the Deep', description: 'Squat 140kg.', icon: 'fa-gavel', target: 140, progress: (s) => s.lifts['Squat'] ? s.lifts['Squat'].weight : 0 },
+                { id: 'squat_160', name: 'Mountain Mover', description: 'Squat 160kg.', icon: 'fa-meteor', target: 160, progress: (s) => s.lifts['Squat'] ? s.lifts['Squat'].weight : 0 },
+                { id: 'squat_180', name: 'Earthshaker', description: 'Squat 180kg.', icon: 'fa-meteor', target: 180, progress: (s) => s.lifts['Squat'] ? s.lifts['Squat'].weight : 0 },
+                { id: 'squat_200', name: 'Atlas', description: 'Squat 200kg.', icon: 'fa-globe-americas', target: 200, progress: (s) => s.lifts['Squat'] ? s.lifts['Squat'].weight : 0 },
+
+                { id: 'bench_60', name: 'Getting Started', description: 'Bench Press 60kg.', icon: 'fa-gem', target: 60, progress: (s) => s.lifts['Bench Press'] ? s.lifts['Bench Press'].weight : 0 },
+                { id: 'bench_80', name: 'Serious Presser', description: 'Bench Press 80kg.', icon: 'fa-dumbbell', target: 80, progress: (s) => s.lifts['Bench Press'] ? s.lifts['Bench Press'].weight : 0 },
+                { id: 'bench_100', name: 'The Centurion', description: 'Bench Press 100kg.', icon: 'fa-gem', target: 100, progress: (s) => s.lifts['Bench Press'] ? s.lifts['Bench Press'].weight : 0 },
+                { id: 'bench_120', name: 'Titan\'s Chest', description: 'Bench Press 120kg.', icon: 'fa-dumbbell', target: 120, progress: (s) => s.lifts['Bench Press'] ? s.lifts['Bench Press'].weight : 0 },
+                { id: 'bench_140', name: 'Forge Breaker', description: 'Bench Press 140kg.', icon: 'fa-hammer', target: 140, progress: (s) => s.lifts['Bench Press'] ? s.lifts['Bench Press'].weight : 0 },
+
+                { id: 'deadlift_100', name: 'Ground Breaker', description: 'Deadlift 100kg.', icon: 'fa-rocket', target: 100, progress: (s) => s.lifts['Deadlift'] ? s.lifts['Deadlift'].weight : 0 },
+                { id: 'deadlift_140', name: 'Gravity\'s Foe', description: 'Deadlift 140kg.', icon: 'fa-anchor', target: 140, progress: (s) => s.lifts['Deadlift'] ? s.lifts['Deadlift'].weight : 0 },
+                { id: 'deadlift_180', name: 'World Breaker', description: 'Deadlift 180kg.', icon: 'fa-rocket', target: 180, progress: (s) => s.lifts['Deadlift'] ? s.lifts['Deadlift'].weight : 0 },
+                { id: 'deadlift_200', name: 'The Unmovable', description: 'Deadlift 200kg.', icon: 'fa-anchor', target: 200, progress: (s) => s.lifts['Deadlift'] ? s.lifts['Deadlift'].weight : 0 },
+                { id: 'deadlift_220', name: 'Anti-Gravity', description: 'Deadlift 220kg.', icon: 'fa-rocket', target: 220, progress: (s) => s.lifts['Deadlift'] ? s.lifts['Deadlift'].weight : 0 },
+                { id: 'deadlift_250', name: 'Quake Starter', description: 'Deadlift 250kg.', icon: 'fa-volcano', target: 250, progress: (s) => s.lifts['Deadlift'] ? s.lifts['Deadlift'].weight : 0 },
+
+                { id: 'ohp_40', name: 'Shoulder Boulder', description: 'Overhead Press 40kg.', icon: 'fa-arrow-up', target: 40, progress: (s) => s.lifts['Overhead Press'] ? s.lifts['Overhead Press'].weight : 0 },
+                { id: 'ohp_60', name: 'Skyward Press', description: 'Overhead Press 60kg.', icon: 'fa-arrow-up', target: 60, progress: (s) => s.lifts['Overhead Press'] ? s.lifts['Overhead Press'].weight : 0 },
+                { id: 'ohp_80', name: 'Cloud Piercer', description: 'Overhead Press 80kg.', icon: 'fa-cloud-upload-alt', target: 80, progress: (s) => s.lifts['Overhead Press'] ? s.lifts['Overhead Press'].weight : 0 },
+                { id: 'ohp_100', name: 'Star Destroyer', description: 'Overhead Press 100kg.', icon: 'fa-star', target: 100, progress: (s) => s.lifts['Overhead Press'] ? s.lifts['Overhead Press'].weight : 0 },
+
+                { id: 'row_60', name: 'First Pulls', description: 'Barbell Row 60kg.', icon: 'fa-water', target: 60, progress: (s) => s.lifts['Barbell Row'] ? s.lifts['Barbell Row'].weight : 0 },
+                { id: 'row_80', name: 'Strong Back', description: 'Barbell Row 80kg.', icon: 'fa-water', target: 80, progress: (s) => s.lifts['Barbell Row'] ? s.lifts['Barbell Row'].weight : 0 },
+                { id: 'row_100', name: 'Cobra Back', description: 'Barbell Row 100kg.', icon: 'fa-staff-snake', target: 100, progress: (s) => s.lifts['Barbell Row'] ? s.lifts['Barbell Row'].weight : 0 },
+
+                { id: 'legpress_100', name: 'Leg Press Novice', description: 'Leg Press 100kg.', icon: 'fa-person-booth', target: 100, progress: (s) => s.lifts['Leg Press'] ? s.lifts['Leg Press'].weight : 0 },
+                { id: 'legpress_150', name: 'Leg Press Apprentice', description: 'Leg Press 150kg.', icon: 'fa-person-booth', target: 150, progress: (s) => s.lifts['Leg Press'] ? s.lifts['Leg Press'].weight : 0 },
+                { id: 'legpress_200', name: 'Leg Press Journeyman', description: 'Leg Press 200kg.', icon: 'fa-person-booth', target: 200, progress: (s) => s.lifts['Leg Press'] ? s.lifts['Leg Press'].weight : 0 },
+                { id: 'legpress_250', name: 'Leg Press Master', description: 'Leg Press 250kg.', icon: 'fa-person-booth', target: 250, progress: (s) => s.lifts['Leg Press'] ? s.lifts['Leg Press'].weight : 0 },
+
+                { id: 'latpulldown_50', name: 'Wing Sprouter', description: 'Lat Pulldown 50kg.', icon: 'fa-feather', target: 50, progress: (s) => s.lifts['Lat Pulldown'] ? s.lifts['Lat Pulldown'].weight : 0 },
+                { id: 'latpulldown_70', name: 'Getting Wide', description: 'Lat Pulldown 70kg.', icon: 'fa-feather-alt', target: 70, progress: (s) => s.lifts['Lat Pulldown'] ? s.lifts['Lat Pulldown'].weight : 0 },
+                { id: 'latpulldown_90', name: 'Demon Back', description: 'Lat Pulldown 90kg.', icon: 'fa-dragon', target: 90, progress: (s) => s.lifts['Lat Pulldown'] ? s.lifts['Lat Pulldown'].weight : 0 },
+
+                { id: 'curl_15', name: 'Curl Novice', description: 'Dumbbell Curl 15kg.', icon: 'fa-child', target: 15, progress: (s) => s.lifts['Bicep Curl'] ? s.lifts['Bicep Curl'].weight : 0 },
+                { id: 'curl_20', name: 'Python Arms', description: 'Dumbbell Curl 20kg.', icon: 'fa-child-reaching', target: 20, progress: (s) => s.lifts['Bicep Curl'] ? s.lifts['Bicep Curl'].weight : 0 },
+                { id: 'curl_25', name: 'Mountain Peaks', description: 'Dumbbell Curl 25kg.', icon: 'fa-mountain-city', target: 25, progress: (s) => s.lifts['Bicep Curl'] ? s.lifts['Bicep Curl'].weight : 0 },
+
+                { id: 'pclean_50', name: 'Explosive Start', description: 'Power Clean 50kg.', icon: 'fa-bolt', target: 50, progress: (s) => s.lifts['Power Clean'] ? s.lifts['Power Clean'].weight : 0 },
+                { id: 'pclean_70', name: 'Powerhouse', description: 'Power Clean 70kg.', icon: 'fa-bolt-lightning', target: 70, progress: (s) => s.lifts['Power Clean'] ? s.lifts['Power Clean'].weight : 0 },
+                { id: 'pclean_90', name: 'Human Catapult', description: 'Power Clean 90kg.', icon: 'fa-bomb', target: 90, progress: (s) => s.lifts['Power Clean'] ? s.lifts['Power Clean'].weight : 0 },
 
                 // Dungeon & Gate Milestones
+                { id: 'dungeons_5', name: 'Dungeon Explorer', description: 'Clear 5 Dungeons.', icon: 'fa-dungeon', target: 5, progress: (s) => s.stats.dungeonsCleared },
                 { id: 'dungeons_10', name: 'Dungeon Crawler', description: 'Clear 10 Dungeons.', icon: 'fa-dungeon', target: 10, progress: (s) => s.stats.dungeonsCleared },
+                { id: 'dungeons_25', name: 'Dungeon Veteran', description: 'Clear 25 Dungeons.', icon: 'fa-chess-king', target: 25, progress: (s) => s.stats.dungeonsCleared },
                 { id: 'dungeons_50', name: 'Dungeon Conqueror', description: 'Clear 50 Dungeons.', icon: 'fa-chess-king', target: 50, progress: (s) => s.stats.dungeonsCleared },
+                { id: 'dungeons_75', name: 'Dungeon Legend', description: 'Clear 75 Dungeons.', icon: 'fa-crown', target: 75, progress: (s) => s.stats.dungeonsCleared },
                 { id: 'dungeons_100', name: 'Dungeon Master', description: 'Clear 100 Dungeons.', icon: 'fa-crown', target: 100, progress: (s) => s.stats.dungeonsCleared },
+                { id: 'dungeons_150', name: 'Dungeon God', description: 'Clear 150 Dungeons.', icon: 'fa-hat-wizard', target: 150, progress: (s) => s.stats.dungeonsCleared },
+                { id: 'dungeons_200', name: 'Living Anomaly', description: 'Clear 200 Dungeons.', icon: 'fa-infinity', target: 200, progress: (s) => s.stats.dungeonsCleared },
+
+                { id: 'gates_5', name: 'Gate Runner', description: 'Clear 5 Gates.', icon: 'fa-door-open', target: 5, progress: (s) => s.stats.gatesCleared },
+                { id: 'gates_10', name: 'Gate Breaker', description: 'Clear 10 Gates.', icon: 'fa-door-open', target: 10, progress: (s) => s.stats.gatesCleared },
                 { id: 'gates_25', name: 'Gatekeeper', description: 'Clear 25 Gates.', icon: 'fa-door-open', target: 25, progress: (s) => s.stats.gatesCleared },
-                { id: 'gates_100', name: 'Gate Warden', description: 'Clear 100 Gates.', icon: 'fa-door-closed', target: 100, progress: (s) => s.stats.gatesCleared },
-                { id: 's_rank_gate', name: 'S-Rank Hunter', description: 'Clear your first S-Rank Gate.', icon: 'fa-skull-crossbones', target: 1, progress: (s) => s.stats.sRanksCleared },
+                { id: 'gates_50', name: 'Gate Warden', description: 'Clear 50 Gates.', icon: 'fa-door-closed', target: 50, progress: (s) => s.stats.gatesCleared },
+                { id: 'gates_75', name: 'Gate Sentinel', description: 'Clear 75 Gates.', icon: 'fa-shield-halberd', target: 75, progress: (s) => s.stats.gatesCleared },
+                { id: 'gates_100', name: 'Master of the Rift', description: 'Clear 100 Gates.', icon: 'fa-torii-gate', target: 100, progress: (s) => s.stats.gatesCleared },
+                { id: 'gates_150', name: 'Dimension Walker', description: 'Clear 150 Gates.', icon: 'fa-satellite', target: 150, progress: (s) => s.stats.gatesCleared },
+
                 { id: 'gate_e_rank', name: 'Gate Novice', description: 'Clear your first E-Rank Gate.', icon: 'fa-dungeon', target: 1, progress: (s) => s.stats.eRanksCleared },
-                { id: 'gate_c_rank', name: 'Gate Specialist', description: 'Clear your first C-Rank Gate.', icon: 'fa-door-open', target: 1, progress: (s) => s.stats.cRanksCleared },
-                { id: 'gates_cleared_25', name: 'Gatekeeper', description: 'Clear a total of 25 Gates.', icon: 'fa-shield-halberd', target: 25, progress: (s) => s.stats.gatesCleared },
+                { id: 'gate_e_rank_5', name: 'E-Rank Specialist', description: 'Clear 5 E-Rank Gates.', icon: 'fa-dungeon', target: 5, progress: (s) => s.stats.eRanksCleared },
+                { id: 'gate_e_rank_10', name: 'E-Rank Master', description: 'Clear 10 E-Rank Gates.', icon: 'fa-dungeon', target: 10, progress: (s) => s.stats.eRanksCleared },
+                { id: 'gate_d_rank', name: 'D-Rank Hunter', description: 'Clear your first D-Rank Gate.', icon: 'fa-door-open', target: 1, progress: (s) => s.stats.dRanksCleared },
+                { id: 'gate_d_rank_5', name: 'D-Rank Specialist', description: 'Clear 5 D-Rank Gates.', icon: 'fa-door-open', target: 5, progress: (s) => s.stats.dRanksCleared },
+                { id: 'gate_d_rank_10', name: 'D-Rank Master', description: 'Clear 10 D-Rank Gates.', icon: 'fa-door-open', target: 10, progress: (s) => s.stats.dRanksCleared },
+                { id: 'gate_c_rank', name: 'C-Rank Hunter', description: 'Clear your first C-Rank Gate.', icon: 'fa-door-open', target: 1, progress: (s) => s.stats.cRanksCleared },
+                { id: 'gate_c_rank_5', name: 'C-Rank Specialist', description: 'Clear 5 C-Rank Gates.', icon: 'fa-door-open', target: 5, progress: (s) => s.stats.cRanksCleared },
+                { id: 'gate_c_rank_10', name: 'C-Rank Master', description: 'Clear 10 C-Rank Gates.', icon: 'fa-door-open', target: 10, progress: (s) => s.stats.cRanksCleared },
+                { id: 'gate_b_rank', name: 'B-Rank Hunter', description: 'Clear your first B-Rank Gate.', icon: 'fa-shield-halberd', target: 1, progress: (s) => s.stats.bRanksCleared },
+                { id: 'gate_b_rank_5', name: 'B-Rank Specialist', description: 'Clear 5 B-Rank Gates.', icon: 'fa-shield-halberd', target: 5, progress: (s) => s.stats.bRanksCleared },
+                { id: 'gate_b_rank_10', name: 'B-Rank Master', description: 'Clear 10 B-Rank Gates.', icon: 'fa-shield-halberd', target: 10, progress: (s) => s.stats.bRanksCleared },
+                { id: 'gate_a_rank', name: 'A-Rank Hunter', description: 'Clear your first A-Rank Gate.', icon: 'fa-skull', target: 1, progress: (s) => s.stats.aRanksCleared },
+                { id: 'gate_a_rank_5', name: 'A-Rank Specialist', description: 'Clear 5 A-Rank Gates.', icon: 'fa-skull', target: 5, progress: (s) => s.stats.aRanksCleared },
+                { id: 'gate_a_rank_10', name: 'A-Rank Master', description: 'Clear 10 A-Rank Gates.', icon: 'fa-skull', target: 10, progress: (s) => s.stats.aRanksCleared },
+                { id: 's_rank_gate', name: 'S-Rank Hunter', description: 'Clear your first S-Rank Gate.', icon: 'fa-skull-crossbones', target: 1, progress: (s) => s.stats.sRanksCleared },
+                { id: 's_rank_3', name: 'S-Rank Veteran', description: 'Clear 3 S-Rank Gates.', icon: 'fa-skull-crossbones', target: 3, progress: (s) => s.stats.sRanksCleared },
+                { id: 's_rank_5', name: 'S-Rank Elite', description: 'Clear 5 S-Rank Gates.', icon: 'fa-skull-crossbones', target: 5, progress: (s) => s.stats.sRanksCleared },
                 { id: 's_rank_10', name: 'National Level', description: 'Clear 10 S-Rank Gates.', icon: 'fa-skull', target: 10, progress: (s) => s.stats.sRanksCleared },
 
                 // Consistency & Volume
+                { id: 'streak_7', name: 'Weekly Warrior', description: 'Maintain a 7-day workout streak.', icon: 'fa-fire', target: 7, progress: (s) => s.streak },
+                { id: 'streak_14', name: 'Fortnightly Fighter', description: 'Maintain a 14-day workout streak.', icon: 'fa-fire', target: 14, progress: (s) => s.streak },
                 { id: 'streak_30', name: 'Iron Will', description: 'Maintain a 30-day workout streak.', icon: 'fa-fire', target: 30, progress: (s) => s.streak },
+                { id: 'streak_60', name: 'Two-Month Titan', description: 'Maintain a 60-day workout streak.', icon: 'fa-fire-alt', target: 60, progress: (s) => s.streak },
+                { id: 'streak_90', name: 'Quarterly King', description: 'Maintain a 90-day workout streak.', icon: 'fa-fire-alt', target: 90, progress: (s) => s.streak },
                 { id: 'streak_100', name: 'Unbreakable', description: 'Maintain a 100-day workout streak.', icon: 'fa-fire-flame-curved', target: 100, progress: (s) => s.streak },
-                { id: 'workouts_100', name: 'Veteran Hunter', description: 'Complete 100 total workouts.', icon: 'fa-medal', target: 100, progress: (s) => s.stats.totalWorkouts },
-                { id: 'workouts_500', name: 'Shadow General', description: 'Complete 500 total workouts.', icon: 'fa-trophy', target: 500, progress: (s) => s.stats.totalWorkouts },
+                { id: 'streak_180', name: 'Half-Year Hero', description: 'Maintain a 180-day workout streak.', icon: 'fa-fire-flame-curved', target: 180, progress: (s) => s.streak },
+                { id: 'streak_365', name: 'Monarch of Consistency', description: 'Maintain a 365-day workout streak.', icon: 'fa-calendar-check', target: 365, progress: (s) => s.streak },
+
+                { id: 'workouts_10', name: 'Getting Started', description: 'Complete 10 total workouts.', icon: 'fa-medal', target: 10, progress: (s) => s.stats.totalWorkouts },
+                { id: 'workouts_25', name: 'Regular', description: 'Complete 25 total workouts.', icon: 'fa-medal', target: 25, progress: (s) => s.stats.totalWorkouts },
+                { id: 'workouts_50', name: 'Habitual', description: 'Complete 50 total workouts.', icon: 'fa-medal', target: 50, progress: (s) => s.stats.totalWorkouts },
+                { id: 'workouts_75', name: 'Committed', description: 'Complete 75 total workouts.', icon: 'fa-trophy', target: 75, progress: (s) => s.stats.totalWorkouts },
+                { id: 'workouts_100', name: 'Veteran Hunter', description: 'Complete 100 total workouts.', icon: 'fa-trophy', target: 100, progress: (s) => s.stats.totalWorkouts },
+                { id: 'workouts_150', name: 'Elite Hunter', description: 'Complete 150 total workouts.', icon: 'fa-trophy', target: 150, progress: (s) => s.stats.totalWorkouts },
+                { id: 'workouts_250', name: 'Master Hunter', description: 'Complete 250 total workouts.', icon: 'fa-award', target: 250, progress: (s) => s.stats.totalWorkouts },
+                { id: 'workouts_350', name: 'Grandmaster Hunter', description: 'Complete 350 total workouts.', icon: 'fa-award', target: 350, progress: (s) => s.stats.totalWorkouts },
+                { id: 'workouts_500', name: 'Shadow General', description: 'Complete 500 total workouts.', icon: 'fa-star-of-life', target: 500, progress: (s) => s.stats.totalWorkouts },
+
+                { id: 'phase1_complete', name: 'Foundations Built', description: 'Complete Phase 1 of the program (12 weeks).', icon: 'fa-university', target: 12, progress: (s) => s.week },
+                { id: 'phase2_complete', name: 'Hypertrophy Honed', description: 'Complete Phase 2 of the program (24 weeks).', icon: 'fa-building-columns', target: 24, progress: (s) => s.week },
+                { id: 'phase3_complete', name: 'Power Unleashed', description: 'Complete Phase 3 of the program (36 weeks).', icon: 'fa-bolt-lightning', target: 36, progress: (s) => s.week },
+                { id: 'phase4_complete', name: 'Peak Performer', description: 'Complete Phase 4 of the program (48 weeks).', icon: 'fa-rocket', target: 48, progress: (s) => s.week },
+
+                { id: 'volume_100k', name: 'Hundred Thousand Kilos', description: 'Lift a total of 100,000 kg.', icon: 'fa-weight-hanging', target: 100000, progress: (s) => s.stats.totalVolumeKg },
+                { id: 'volume_250k', name: 'Quarter Million Kilos', description: 'Lift a total of 250,000 kg.', icon: 'fa-weight-hanging', target: 250000, progress: (s) => s.stats.totalVolumeKg },
+                { id: 'volume_500k', name: 'Half Million Kilos', description: 'Lift a total of 500,000 kg.', icon: 'fa-weight-hanging', target: 500000, progress: (s) => s.stats.totalVolumeKg },
+                { id: 'volume_750k', name: 'Three-Quarters Million Kilos', description: 'Lift a total of 750,000 kg.', icon: 'fa-weight-hanging', target: 750000, progress: (s) => s.stats.totalVolumeKg },
                 { id: 'volume_1M', name: 'One Million Kilos', description: 'Lift a total of 1,000,000 kg.', icon: 'fa-weight-hanging', target: 1000000, progress: (s) => s.stats.totalVolumeKg },
+                { id: 'volume_1.5M', name: '1.5 Million Kilos', description: 'Lift a total of 1,500,000 kg.', icon: 'fa-truck-moving', target: 1500000, progress: (s) => s.stats.totalVolumeKg },
+                { id: 'volume_2M', name: 'Two Million Kilos', description: 'Lift a total of 2,000,000 kg.', icon: 'fa-truck-moving', target: 2000000, progress: (s) => s.stats.totalVolumeKg },
+                { id: 'volume_5M', name: 'Five Million Kilos', description: 'Lift a total of 5,000,000 kg.', icon: 'fa-train', target: 5000000, progress: (s) => s.stats.totalVolumeKg },
+
+                { id: 'session_volume_5k', name: 'Productive Session', description: 'Lift 5,000kg in a single session.', icon: 'fa-battery-half', target: 5000, progress: (s) => s.stats.maxVolumeInSession },
+                { id: 'session_volume_10k', name: 'Hard Worker', description: 'Lift 10,000kg in a single session.', icon: 'fa-battery-full', target: 10000, progress: (s) => s.stats.maxVolumeInSession },
+                { id: 'session_volume_15k', name: 'True Monarch', description: 'Lift 15,000kg in a single session.', icon: 'fa-battery-bolt', target: 15000, progress: (s) => s.stats.maxVolumeInSession },
+
+                // Architect & Customization
+                { id: 'avatar_set', name: 'The Real Me', description: 'Set a custom avatar.', icon: 'fa-camera', target: 1, progress: (s) => s.customAvatar ? 1 : 0 },
+                { id: 'name_changed', name: 'What\'s in a Name?', description: 'Change your player name.', icon: 'fa-pencil-alt', target: 1, progress: (s) => s.playerName !== 'Player' ? 1 : 0 },
+                { id: 'routine_created', name: 'My First Blueprint', description: 'Create your first custom routine.', icon: 'fa-ruler-combined', target: 1, progress: (s) => s.savedRoutines.length },
+                { id: 'routine_5', name: 'Well-Oiled Machine', description: 'Save 5 custom routines.', icon: 'fa-cogs', target: 5, progress: (s) => s.savedRoutines.length },
+                { id: 'routine_10', name: 'Master Architect', description: 'Save 10 custom routines.', icon: 'fa-drafting-compass', target: 10, progress: (s) => s.savedRoutines.length },
+
+                // Collection & Completion
+                { id: 'all_gates', name: 'Gate Collector', description: 'Clear one of every rank of gate (E-S).', icon: 'fa-gem', target: 6, progress: (s) => (s.stats.eRanksCleared > 0) + (s.stats.dRanksCleared > 0) + (s.stats.cRanksCleared > 0) + (s.stats.bRanksCleared > 0) + (s.stats.aRanksCleared > 0) + (s.stats.sRanksCleared > 0) },
+                { id: 'strength_novice', name: 'Strength Novice', description: 'Reach 60kg on Squat, Bench, and Deadlift.', icon: 'fa-seedling', target: 3, progress: (s) => ((s.lifts['Squat'] ? s.lifts['Squat'].weight : 0) >= 60) + ((s.lifts['Bench Press'] ? s.lifts['Bench Press'].weight : 0) >= 60) + ((s.lifts['Deadlift'] ? s.lifts['Deadlift'].weight : 0) >= 60) },
+                { id: 'strength_journeyman', name: 'Strength Journeyman', description: 'Reach 100kg Squat, 80kg Bench, 140kg Deadlift.', icon: 'fa-hammer', target: 3, progress: (s) => ((s.lifts['Squat'] ? s.lifts['Squat'].weight : 0) >= 100) + ((s.lifts['Bench Press'] ? s.lifts['Bench Press'].weight : 0) >= 80) + ((s.lifts['Deadlift'] ? s.lifts['Deadlift'].weight : 0) >= 140) },
+                { id: 'strength_master', name: 'Strength Master', description: 'Reach 140kg Squat, 100kg Bench, 180kg Deadlift.', icon: 'fa-crown', target: 3, progress: (s) => ((s.lifts['Squat'] ? s.lifts['Squat'].weight : 0) >= 140) + ((s.lifts['Bench Press'] ? s.lifts['Bench Press'].weight : 0) >= 100) + ((s.lifts['Deadlift'] ? s.lifts['Deadlift'].weight : 0) >= 180) },
+                { id: '1000lb_club', name: 'The 1000lb Club', description: 'Total of Squat, Bench, and Deadlift exceeds 453.6kg.', icon: 'fa-weight-scale', target: 453.6, progress: (s) => (s.lifts['Squat'] ? s.lifts['Squat'].weight : 0) + (s.lifts['Bench Press'] ? s.lifts['Bench Press'].weight : 0) + (s.lifts['Deadlift'] ? s.lifts['Deadlift'].weight : 0) },
             ],
 
             // --- CORE LIFECYCLE ---
@@ -1178,7 +1294,10 @@
                             this.state.stats.gatesCleared++;
                             // Track rank-specific achievements
                             if (g.rank === 'S') this.state.stats.sRanksCleared++;
+                            if (g.rank === 'A') this.state.stats.aRanksCleared++;
+                            if (g.rank === 'B') this.state.stats.bRanksCleared++;
                             if (g.rank === 'C') this.state.stats.cRanksCleared++;
+                            if (g.rank === 'D') this.state.stats.dRanksCleared++;
                             if (g.rank === 'E') this.state.stats.eRanksCleared++;
                             // Add to completed gates history
                             if (!this.state.completedGates.includes(g.rank)) {
