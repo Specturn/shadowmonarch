@@ -141,14 +141,18 @@
                         </div>
                     </div>
                     <div class="md:col-span-3 card-bg p-6 rounded-lg mt-6">
-                        <h3 class="text-xl font-bold mb-4">Activity Log</h3>
-                        <div class="flex gap-3">
-                            <div class="flex flex-col justify-between text-xs text-stone-400 py-1">
-                                <span>Mon</span>
-                                <span>Wed</span>
-                                <span>Fri</span>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold">Activity Log</h3>
+                            <div class="flex gap-2">
+                                <select id="month-select" class="bg-stone-800 border border-stone-600 rounded px-2 py-1"></select>
+                                <select id="year-select" class="bg-stone-800 border border-stone-600 rounded px-2 py-1"></select>
                             </div>
-                            <div id="activity-calendar-grid" class="grid grid-rows-7 grid-flow-col gap-1.5 grow">
+                        </div>
+                        <div id="calendar-container">
+                            <div id="calendar-header" class="grid grid-cols-7 text-center text-xs text-stone-400 mb-2">
+                                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                            </div>
+                            <div id="calendar-grid" class="grid grid-cols-7 gap-1.5">
                                 <!-- Calendar squares will be rendered here by JavaScript -->
                             </div>
                         </div>
@@ -327,6 +331,9 @@
                 gates: [],
                 completedGates: [],
                 activityLog: [],
+                calendar: {
+                    viewDate: new Date()
+                },
             },
 
             masterExerciseList: [
@@ -634,6 +641,20 @@
                 document.getElementById('avatar-container').addEventListener('click', () => document.getElementById('avatar-upload-input').click());
                 document.getElementById('avatar-upload-input').addEventListener('change', (e) => this.handleAvatarUpload(e));
                 document.getElementById('architect-routine-name').addEventListener('input', (e) => this.handleRoutineNameInput(e));
+
+                document.getElementById('month-select').addEventListener('change', (e) => {
+                    const newDate = new Date(this.state.calendar.viewDate);
+                    newDate.setMonth(parseInt(e.target.value));
+                    this.state.calendar.viewDate = newDate;
+                    this.renderActivityCalendar();
+                });
+                document.getElementById('year-select').addEventListener('change', (e) => {
+                    const newDate = new Date(this.state.calendar.viewDate);
+                    newDate.setFullYear(parseInt(e.target.value));
+                    this.state.calendar.viewDate = newDate;
+                    this.renderActivityCalendar();
+                });
+
                 const diffSel = document.getElementById('difficulty-select');
                 if (diffSel) diffSel.value = this.state.difficulty || 'Normal';
                 console.log("Delegated events ready.");
@@ -721,60 +742,55 @@
             },
 
             renderActivityCalendar() {
-                const grid = document.getElementById('activity-calendar-grid');
-                if (!grid) return;
-                grid.innerHTML = ''; // Clear previous content
+                const grid = document.getElementById('calendar-grid');
+                const monthSelect = document.getElementById('month-select');
+                const yearSelect = document.getElementById('year-select');
+                if (!grid || !monthSelect || !yearSelect) return;
 
-                const today = new Date();
-                const activityMap = new Map();
-                (this.state.activityLog || []).forEach(log => {
-                    const date = log.date;
-                    if (!activityMap.has(date)) {
-                        activityMap.set(date, []);
-                    }
-                    activityMap.get(date).push(log.type);
-                });
+                const viewDate = new Date(this.state.calendar.viewDate);
+                const month = viewDate.getMonth();
+                const year = viewDate.getFullYear();
 
-                const startDate = new Date();
-                startDate.setDate(today.getDate() - 89);
+                // Populate dropdowns
+                const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                monthSelect.innerHTML = months.map((m, i) => `<option value="${i}" ${i === month ? 'selected' : ''}>${m}</option>`).join('');
 
-                // Add spacer divs to align the first day correctly
-                let dayOfWeek = startDate.getDay(); // 0=Sun, 1=Mon, ...
-                let spacers = (dayOfWeek === 0) ? 6 : dayOfWeek - 1; // Monday is 0
-
-                for (let i = 0; i < spacers; i++) {
-                    const spacer = document.createElement('div');
-                    grid.appendChild(spacer);
+                const currentYear = new Date().getFullYear();
+                yearSelect.innerHTML = '';
+                for (let y = currentYear; y >= currentYear - 5; y--) {
+                    yearSelect.innerHTML += `<option value="${y}" ${y === year ? 'selected' : ''}>${y}</option>`;
                 }
 
-                // Render the last 90 days
-                for (let i = 0; i < 90; i++) {
-                    const date = new Date(startDate);
-                    date.setDate(startDate.getDate() + i);
+                // Calendar grid logic
+                grid.innerHTML = '';
+                const firstDayOfMonth = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                // Add spacer divs for alignment
+                for (let i = 0; i < firstDayOfMonth; i++) {
+                    grid.appendChild(document.createElement('div'));
+                }
+
+                // Add day squares
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month, day);
                     const dateString = date.toISOString().split('T')[0];
 
                     const daySquare = document.createElement('div');
-                    daySquare.className = 'w-full aspect-square rounded bg-stone-700';
+                    daySquare.className = 'w-full aspect-square rounded bg-stone-700/50 p-1 flex flex-col items-start';
+                    daySquare.innerHTML = `<span class="text-xs text-stone-400">${day}</span>`;
 
-                    const activities = activityMap.get(dateString);
-                    if (activities) {
-                        let tooltipText = `${dateString}\n`;
-                        if (activities.includes('workout')) {
-                            daySquare.classList.remove('bg-stone-700');
-                            daySquare.classList.add('bg-indigo-500');
-                            tooltipText += '- Daily Quest Cleared\n';
+                    const activities = this.state.activityLog.filter(log => log.date === dateString);
+                    if (activities.length > 0) {
+                        const activityIndicator = document.createElement('div');
+                        activityIndicator.className = 'w-full h-full flex items-center justify-center';
+                        if (activities.some(a => a.type === 'workout')) {
+                            activityIndicator.innerHTML += '<i class="fas fa-dumbbell text-indigo-400 text-xs"></i>';
                         }
-                        if (activities.includes('gate')) {
-                            daySquare.classList.remove('bg-stone-700');
-                            daySquare.classList.add('bg-amber-500');
-                            tooltipText += '- Gate Cleared\n';
+                        if (activities.some(a => a.type === 'gate')) {
+                            activityIndicator.innerHTML += '<i class="fas fa-door-open text-amber-400 text-xs ml-1"></i>';
                         }
-                        if (activities.includes('workout') && activities.includes('gate')) {
-                             daySquare.className = 'w-full aspect-square rounded bg-gradient-to-br from-indigo-500 to-amber-500';
-                        }
-                        daySquare.title = tooltipText.trim();
-                    } else {
-                         daySquare.title = dateString;
+                        daySquare.appendChild(activityIndicator);
                     }
                     grid.appendChild(daySquare);
                 }
