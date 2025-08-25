@@ -549,20 +549,124 @@
 ],
 
             achievementsData: [
-                // Level Milestones
-                { id: 'level_5', name: 'Hunter Rank E', description: 'Reach Level 5.', icon: 'fa-user-shield', target: 5, progress: (s) => s.level },
-                { id: 'level_10', name: 'Hunter Rank D', description: 'Reach Level 10.', icon: 'fa-user-shield', target: 10, progress: (s) => s.level },
-                { id: 'level_15', name: 'Hunter Rank C', description: 'Reach Level 15.', icon: 'fa-user-ninja', target: 15, progress: (s) => s.level },
-                { id: 'level_25', name: 'Hunter Rank B', description: 'Reach Level 25.', icon: 'fa-user-ninja', target: 25, progress: (s) => s.level },
-                { id: 'level_35', name: 'Hunter Rank B+', description: 'Reach Level 35.', icon: 'fa-user-astronaut', target: 35, progress: (s) => s.level },
-                { id: 'level_50', name: 'Hunter Rank A', description: 'Reach Level 50.', icon: 'fa-user-astronaut', target: 50, progress: (s) => s.level },
-                { id: 'level_60', name: 'Hunter Rank A+', description: 'Reach Level 60.', icon: 'fa-crown', target: 60, progress: (s) => s.level },
-                { id: 'level_75', name: 'Hunter Rank S', description: 'Reach Level 75.', icon: 'fa-crown', target: 75, progress: (s) => s.level },
-                { id: 'level_80', name: 'Hunter Rank S+', description: 'Reach Level 80.', icon: 'fa-shield-halved', target: 80, progress: (s) => s.level },
-                { id: 'level_90', name: 'National Level Hunter', description: 'Reach Level 90.', icon: 'fa-shield-halved', target: 90, progress: (s) => s.level },
-                { id: 'level_100', name: 'Monarch', description: 'Reach Level 100.', icon: 'fa-king', target: 100, progress: (s) => s.level },
+                // Gate-Specific Achievements (105 Gates)
+                { id: 'gate_E01', name: 'First Steps', description: 'Clear E-Rank Gate: The Beginning', icon: 'fa-shoe-prints', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E02', name: 'Getting Stronger', description: 'Clear E-Rank Gate: Push-Up Progression', icon: 'fa-arrow-up', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E03', name: 'Foundation Builder', description: 'Clear E-Rank Gate: Squat Basics', icon: 'fa-mountain', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E04', name: 'Upper Body Focus', description: 'Clear E-Rank Gate: Pull-Up Prep', icon: 'fa-dumbbell', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E05', name: 'Core Strength', description: 'Clear E-Rank Gate: Plank Mastery', icon: 'fa-fire', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E06', name: 'Leg Day Warrior', description: 'Clear E-Rank Gate: Lunges & Steps', icon: 'fa-walking', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E07', name: 'Cardio Starter', description: 'Clear E-Rank Gate: Jump Rope Basics', icon: 'fa-running', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E08', name: 'Flexibility First', description: 'Clear E-Rank Gate: Stretching Routine', icon: 'fa-child-reaching', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E09', name: 'Balance Master', description: 'Clear E-Rank Gate: Single-Leg Work', icon: 'fa-balance-scale', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E10', name: 'Endurance Builder', description: 'Clear E-Rank Gate: Circuit Basics', icon: 'fa-battery-half', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E11', name: 'Strength Novice', description: 'Clear E-Rank Gate: Dumbbell Basics', icon: 'fa-dumbbell', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E12', name: 'Bodyweight Master', description: 'Clear E-Rank Gate: Calisthenics', icon: 'fa-user', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E13', name: 'Mobility Focus', description: 'Clear E-Rank Gate: Joint Health', icon: 'fa-heart', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E14', name: 'Recovery Expert', description: 'Clear E-Rank Gate: Active Recovery', icon: 'fa-leaf', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E15', name: 'Consistency King', description: 'Clear E-Rank Gate: Daily Habit', icon: 'fa-calendar-check', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E16', name: 'Form Perfection', description: 'Clear E-Rank Gate: Technique Focus', icon: 'fa-eye', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E17', name: 'Breathing Master', description: 'Clear E-Rank Gate: Breath Control', icon: 'fa-wind', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E18', name: 'Mind-Muscle Connection', description: 'Clear E-Rank Gate: Focus Training', icon: 'fa-brain', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E19', name: 'Progressive Overload', description: 'Clear E-Rank Gate: Weight Progression', icon: 'fa-chart-line', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E20', name: 'Rest Day Respect', description: 'Clear E-Rank Gate: Recovery Importance', icon: 'fa-bed', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E21', name: 'Nutrition Awareness', description: 'Clear E-Rank Gate: Fuel Your Body', icon: 'fa-apple-alt', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E22', name: 'Hydration Hero', description: 'Clear E-Rank Gate: Water Intake', icon: 'fa-tint', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E23', name: 'Sleep Optimizer', description: 'Clear E-Rank Gate: Rest Quality', icon: 'fa-moon', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E24', name: 'Stress Manager', description: 'Clear E-Rank Gate: Mental Health', icon: 'fa-om', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E25', name: 'Goal Setter', description: 'Clear E-Rank Gate: SMART Goals', icon: 'fa-bullseye', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E26', name: 'Progress Tracker', description: 'Clear E-Rank Gate: Log Your Work', icon: 'fa-clipboard-list', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E27', name: 'Community Builder', description: 'Clear E-Rank Gate: Find Your Tribe', icon: 'fa-users', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E28', name: 'Knowledge Seeker', description: 'Clear E-Rank Gate: Learn & Grow', icon: 'fa-book', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E29', name: 'Adaptability', description: 'Clear E-Rank Gate: Adjust & Overcome', icon: 'fa-random', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
+                { id: 'gate_E30', name: 'E-Rank Master', description: 'Clear E-Rank Gate: The Foundation', icon: 'fa-medal', target: 1, progress: (s) => s.stats.eRanksCleared, type: 'secret' },
 
-                // Strength Plateaus (KG)
+                // D-Rank Gate Achievements (25 Gates)
+                { id: 'gate_D01', name: 'D-Rank Initiate', description: 'Clear D-Rank Gate: Progressive Overload', icon: 'fa-arrow-up', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D02', name: 'Strength Builder', description: 'Clear D-Rank Gate: Compound Movements', icon: 'fa-dumbbell', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D03', name: 'Endurance Hunter', description: 'Clear D-Rank Gate: Cardio Progression', icon: 'fa-running', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D04', name: 'Flexibility Seeker', description: 'Clear D-Rank Gate: Mobility Work', icon: 'fa-child-reaching', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D05', name: 'Balance Master', description: 'Clear D-Rank Gate: Stability Training', icon: 'fa-balance-scale', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D06', name: 'Core Specialist', description: 'Clear D-Rank Gate: Abdominal Focus', icon: 'fa-fire', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D07', name: 'Upper Body Warrior', description: 'Clear D-Rank Gate: Push & Pull', icon: 'fa-dumbbell', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D08', name: 'Lower Body Power', description: 'Clear D-Rank Gate: Leg Strength', icon: 'fa-mountain', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D09', name: 'Cardio Warrior', description: 'Clear D-Rank Gate: Heart Health', icon: 'fa-heart', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D10', name: 'Recovery Expert', description: 'Clear D-Rank Gate: Rest & Repair', icon: 'fa-leaf', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D11', name: 'Nutrition Master', description: 'Clear D-Rank Gate: Fuel Strategy', icon: 'fa-apple-alt', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D12', name: 'Hydration Master', description: 'Clear D-Rank Gate: Water Strategy', icon: 'fa-tint', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D13', name: 'Sleep Optimizer', description: 'Clear D-Rank Gate: Rest Quality', icon: 'fa-moon', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D14', name: 'Stress Manager', description: 'Clear D-Rank Gate: Mental Health', icon: 'fa-om', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D15', name: 'Goal Achiever', description: 'Clear D-Rank Gate: SMART Goals', icon: 'fa-bullseye', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D16', name: 'Progress Tracker', description: 'Clear D-Rank Gate: Log Your Work', icon: 'fa-clipboard-list', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D17', name: 'Community Builder', description: 'Clear D-Rank Gate: Find Your Tribe', icon: 'fa-users', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D18', name: 'Knowledge Seeker', description: 'Clear D-Rank Gate: Learn & Grow', icon: 'fa-book', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D19', name: 'Adaptability Master', description: 'Clear D-Rank Gate: Adjust & Overcome', icon: 'fa-random', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D20', name: 'Consistency Master', description: 'Clear D-Rank Gate: Daily Habit', icon: 'fa-calendar-check', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D21', name: 'Form Master', description: 'Clear D-Rank Gate: Technique Focus', icon: 'fa-eye', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D22', name: 'Breathing Master', description: 'Clear D-Rank Gate: Breath Control', icon: 'fa-wind', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D23', name: 'Mind-Muscle Master', description: 'Clear D-Rank Gate: Focus Training', icon: 'fa-brain', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D24', name: 'Progressive Master', description: 'Clear D-Rank Gate: Weight Progression', icon: 'fa-chart-line', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_D25', name: 'D-Rank Master', description: 'Clear D-Rank Gate: The Foundation', icon: 'fa-medal', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+
+                // C-Rank Gate Achievements (20 Gates)
+                { id: 'gate_C01', name: 'C-Rank Initiate', description: 'Clear C-Rank Gate: Intermediate Training', icon: 'fa-arrow-up', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C02', name: 'Strength Hunter', description: 'Clear C-Rank Gate: Power Building', icon: 'fa-dumbbell', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C03', name: 'Endurance Master', description: 'Clear C-Rank Gate: Cardio Mastery', icon: 'fa-running', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C04', name: 'Flexibility Master', description: 'Clear C-Rank Gate: Mobility Mastery', icon: 'fa-child-reaching', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C05', name: 'Balance Master', description: 'Clear C-Rank Gate: Stability Mastery', icon: 'fa-balance-scale', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C06', name: 'Core Master', description: 'Clear C-Rank Gate: Abdominal Mastery', icon: 'fa-fire', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C07', name: 'Upper Body Master', description: 'Clear C-Rank Gate: Push & Pull Mastery', icon: 'fa-dumbbell', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C08', name: 'Lower Body Master', description: 'Clear C-Rank Gate: Leg Strength Mastery', icon: 'fa-mountain', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C09', name: 'Cardio Master', description: 'Clear C-Rank Gate: Heart Health Mastery', icon: 'fa-heart', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C10', name: 'Recovery Master', description: 'Clear C-Rank Gate: Rest & Repair Mastery', icon: 'fa-leaf', target: 1, progress: (s) => s.stats.dRanksCleared, type: 'secret' },
+                { id: 'gate_C11', name: 'Nutrition Master', description: 'Clear C-Rank Gate: Fuel Strategy Mastery', icon: 'fa-apple-alt', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C12', name: 'Hydration Master', description: 'Clear C-Rank Gate: Water Strategy Mastery', icon: 'fa-tint', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C13', name: 'Sleep Master', description: 'Clear C-Rank Gate: Rest Quality Mastery', icon: 'fa-moon', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C14', name: 'Stress Master', description: 'Clear C-Rank Gate: Mental Health Mastery', icon: 'fa-om', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C15', name: 'Goal Master', description: 'Clear C-Rank Gate: SMART Goals Mastery', icon: 'fa-bullseye', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C16', name: 'Progress Master', description: 'Clear C-Rank Gate: Log Your Work Mastery', icon: 'fa-clipboard-list', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C17', name: 'Community Master', description: 'Clear C-Rank Gate: Find Your Tribe Mastery', icon: 'fa-users', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C18', name: 'Knowledge Master', description: 'Clear C-Rank Gate: Learn & Grow Mastery', icon: 'fa-book', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C19', name: 'Adaptability Master', description: 'Clear C-Rank Gate: Adjust & Overcome Mastery', icon: 'fa-random', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+                { id: 'gate_C20', name: 'C-Rank Master', description: 'Clear C-Rank Gate: The Foundation', icon: 'fa-medal', target: 1, progress: (s) => s.stats.cRanksCleared, type: 'secret' },
+
+                // B-Rank Gate Achievements (15 Gates)
+                { id: 'gate_B01', name: 'B-Rank Initiate', description: 'Clear B-Rank Gate: Advanced Training', icon: 'fa-arrow-up', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B02', name: 'B-Rank Warrior', description: 'Clear B-Rank Gate: Power Building', icon: 'fa-dumbbell', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B03', name: 'B-Rank Master', description: 'Clear B-Rank Gate: Endurance Mastery', icon: 'fa-running', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B04', name: 'B-Rank Elite', description: 'Clear B-Rank Gate: Strength Mastery', icon: 'fa-mountain', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B05', name: 'B-Rank Champion', description: 'Clear B-Rank Gate: The Foundation', icon: 'fa-medal', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B06', name: 'B-Rank Elite', description: 'Clear B-Rank Gate: The Hundred', icon: 'fa-hundred-points', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B07', name: 'B-Rank Master', description: 'Clear B-Rank Gate: Circuit Master', icon: 'fa-sync', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B08', name: 'B-Rank Warrior', description: 'Clear B-Rank Gate: Tempo Training', icon: 'fa-clock', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B09', name: 'B-Rank Elite', description: 'Clear B-Rank Gate: Isometric Hold', icon: 'fa-pause', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B10', name: 'B-Rank Master', description: 'Clear B-Rank Gate: Negative Focus', icon: 'fa-arrow-down', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B11', name: 'B-Rank Warrior', description: 'Clear B-Rank Gate: Density Training', icon: 'fa-tachometer-alt', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B12', name: 'B-Rank Elite', description: 'Clear B-Rank Gate: The Grinder', icon: 'fa-cogs', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B13', name: 'B-Rank Master', description: 'Clear B-Rank Gate: Plyometric Power', icon: 'fa-bolt', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B14', name: 'B-Rank Warrior', description: 'Clear B-Rank Gate: Endurance Builder', icon: 'fa-battery-full', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+                { id: 'gate_B15', name: 'B-Rank Champion', description: 'Clear B-Rank Gate: Strength Stamina', icon: 'fa-dumbbell', target: 1, progress: (s) => s.stats.bRanksCleared, type: 'secret' },
+
+                // A-Rank Gate Achievements (10 Gates)
+                { id: 'gate_A01', name: 'A-Rank Initiate', description: 'Clear A-Rank Gate: Elite Training', icon: 'fa-arrow-up', target: 1, progress: (s) => s.stats.aRanksCleared, type: 'secret' },
+                { id: 'gate_A02', name: 'A-Rank Warrior', description: 'Clear A-Rank Gate: Power Mastery', icon: 'fa-dumbbell', target: 1, progress: (s) => s.stats.aRanksCleared, type: 'secret' },
+                { id: 'gate_A03', name: 'A-Rank Master', description: 'Clear A-Rank Gate: The Foundation', icon: 'fa-medal', target: 1, progress: (s) => s.stats.aRanksCleared, type: 'secret' },
+                { id: 'gate_A04', name: 'A-Rank Elite', description: 'Clear A-Rank Gate: The Destroyer', icon: 'fa-skull', target: 1, progress: (s) => s.stats.aRanksCleared, type: 'secret' },
+                { id: 'gate_A05', name: 'A-Rank Warrior', description: 'Clear A-Rank Gate: Time Attack', icon: 'fa-stopwatch', target: 1, progress: (s) => s.stats.aRanksCleared, type: 'secret' },
+                { id: 'gate_A06', name: 'A-Rank Master', description: 'Clear A-Rank Gate: The Marathon', icon: 'fa-route', target: 1, progress: (s) => s.stats.aRanksCleared, type: 'secret' },
+                { id: 'gate_A07', name: 'A-Rank Elite', description: 'Clear A-Rank Gate: Cluster Sets', icon: 'fa-layer-group', target: 1, progress: (s) => s.stats.aRanksCleared, type: 'secret' },
+                { id: 'gate_A08', name: 'A-Rank Warrior', description: 'Clear A-Rank Gate: The Punisher', icon: 'fa-hammer', target: 1, progress: (s) => s.stats.aRanksCleared, type: 'secret' },
+                { id: 'gate_A09', name: 'A-Rank Master', description: 'Clear A-Rank Gate: The Immortal', icon: 'fa-infinity', target: 1, progress: (s) => s.stats.aRanksCleared, type: 'secret' },
+                { id: 'gate_A10', name: 'A-Rank Champion', description: 'Clear A-Rank Gate: The Executioner', icon: 'fa-sword', target: 1, progress: (s) => s.stats.aRanksCleared, type: 'secret' },
+
+                // S-Rank Gate Achievements (5 Gates)
+                { id: 'gate_S01', name: 'S-Rank Initiate', description: 'Clear S-Rank Gate: Legendary Training', icon: 'fa-arrow-up', target: 1, progress: (s) => s.stats.sRanksCleared, type: 'secret' },
+                { id: 'gate_S02', name: 'S-Rank Warrior', description: 'Clear S-Rank Gate: Power Legend', icon: 'fa-dumbbell', target: 1, progress: (s) => s.stats.sRanksCleared, type: 'secret' },
+                { id: 'gate_S03', name: 'S-Rank Master', description: 'Clear S-Rank Gate: Endurance Legend', icon: 'fa-running', target: 1, progress: (s) => s.stats.sRanksCleared, type: 'secret' },
+                { id: 'gate_S04', name: 'S-Rank Elite', description: 'Clear S-Rank Gate: Strength Legend', icon: 'fa-mountain', target: 1, progress: (s) => s.stats.sRanksCleared, type: 'secret' },
+                { id: 'gate_S05', name: 'S-Rank Champion', description: 'Clear S-Rank Gate: The Foundation', icon: 'fa-medal', target: 1, progress: (s) => s.stats.sRanksCleared, type: 'secret' },
+
+                // Level Milestones
                 { id: 'squat_60', name: 'First Steps', description: 'Squat 60kg.', icon: 'fa-shoe-prints', target: 60, progress: (s) => s.lifts['Squat'] ? s.lifts['Squat'].weight : 0 },
                 { id: 'squat_80', name: 'Solid Ground', description: 'Squat 80kg.', icon: 'fa-mountain', target: 80, progress: (s) => s.lifts['Squat'] ? s.lifts['Squat'].weight : 0 },
                 { id: 'squat_100', name: 'The Foundation', description: 'Squat 100kg.', icon: 'fa-mountain', target: 100, progress: (s) => s.lifts['Squat'] ? s.lifts['Squat'].weight : 0 },
@@ -1202,31 +1306,46 @@
             },
 
             renderAchievementsPage() {
-                const grid = document.querySelector('#achievements-page #achievements-grid');
+                const grid = document.getElementById('achievements-grid');
                 if (!grid) return;
                 grid.innerHTML = '';
-
-                this.achievementsData.forEach((ach) => {
-                    const current = Math.max(0, Number(ach.progress(this.state) || 0));
-                    const target = Math.max(1, Number(ach.target || 1));
-                    const percentage = Math.min(100, Math.round((current / target) * 100));
-                    const unlocked = this.state.achievements.includes(ach.id) || current >= target;
-
+                
+                // **NEW LOGIC STARTS HERE**
+                const achievementsToShow = this.achievementsData.filter(ach => {
+                    // If the achievement is not secret, always show it.
+                    if (ach.type !== 'secret') {
+                        return true;
+                    }
+                    // If the achievement IS secret, only show it if the user has unlocked it.
+                    if (ach.type === 'secret' && this.state.achievements.includes(ach.id)) {
+                        return true;
+                    }
+                    // Otherwise, hide it.
+                    return false;
+                });
+                // **NEW LOGIC ENDS HERE**
+                
+                achievementsToShow.forEach(ach => {
+                    const isUnlocked = this.state.achievements.includes(ach.id);
+                    const progress = ach.progress ? ach.progress(this.state) : 0;
+                    const target = ach.target || 1;
+                    const progressPercentage = Math.min(100, (progress / target) * 100);
+                    
                     const card = document.createElement('div');
-                    card.className = `p-4 bg-gray-800 rounded-lg ${unlocked ? '' : 'achievement-locked'}`;
-                    const unit = ach.id.startsWith('squat_') || ach.id.startsWith('bench_') || ach.id.startsWith('deadlift_') ? 'kg' : '';
-
+                    card.className = `card-bg p-4 rounded-lg flex flex-col items-center text-center transition-all duration-300 ${!isUnlocked ? 'achievement-locked' : ''}`;
+                    
                     card.innerHTML = `
-                        <div class="flex items-center gap-3 mb-2">
-                            <i class="fas ${ach.icon} text-2xl ${unlocked ? 'text-indigo-400' : 'text-gray-500'}"></i>
-                            <div>
-                                <p class="font-semibold">${ach.name}</p>
-                                <p class="text-sm text-gray-400">${unlocked ? ach.description : 'Locked'}</p>
+                        <i class="fas ${ach.icon} text-4xl ${isUnlocked ? 'text-indigo-400' : 'text-stone-500'} mb-2"></i>
+                        <p class="font-bold text-base mb-1">${ach.name}</p>
+                        <p class="text-xs text-stone-400 mb-3">${ach.description}</p>
+                        ${!isUnlocked && ach.target ? `
+                            <div class="w-full bg-stone-600 rounded-full h-2.5">
+                                <div class="bg-indigo-500 h-2.5 rounded-full" style="width: ${progressPercentage}%"></div>
                             </div>
-                        </div>
-                        <div class="progress-bar mb-2"><div class="progress-bar-inner" style="width:${percentage}%;"></div></div>
-                        <p class="text-sm text-gray-300">${current} / ${target} ${unit}</p>
+                            <p class="text-xs text-stone-500 mt-1">${Math.floor(progress)} / ${target}</p>
+                        ` : ''}
                     `;
+                    
                     grid.appendChild(card);
                 });
             },
@@ -1656,6 +1775,15 @@
                             if (g.rank === 'C') this.state.stats.cRanksCleared++;
                             if (g.rank === 'D') this.state.stats.dRanksCleared++;
                             if (g.rank === 'E') this.state.stats.eRanksCleared++;
+                            
+                            // Achievement Unlock Logic
+                            const achievementId = `gate_${g.id}`;
+                            if (!this.state.achievements.includes(achievementId)) {
+                                this.state.achievements.push(achievementId);
+                                // Trigger visual notification for new achievement
+                                this.showAchievementNotification(achievementId);
+                            }
+                            
                             // Add to completed gates history to prevent it from appearing again.
                             if (!this.state.completedGates.includes(g.rank)) {
                                 this.state.completedGates.push(g.rank);
@@ -1679,6 +1807,43 @@
                         } }
                     ]
                 });
+            },
+
+            showAchievementNotification(achievementId) {
+                // Find the achievement data
+                const achievement = this.achievementsData.find(a => a.id === achievementId);
+                if (!achievement) return;
+                
+                // Create achievement notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-lg shadow-lg z-50 transform transition-all duration-500 ease-out';
+                notification.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <i class="fas ${achievement.icon} text-2xl text-yellow-300"></i>
+                        <div>
+                            <div class="font-bold text-lg">Achievement Unlocked!</div>
+                            <div class="text-sm opacity-90">${achievement.name}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add to page
+                document.body.appendChild(notification);
+                
+                // Animate in
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+                
+                // Remove after 5 seconds
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 500);
+                }, 5000);
             }
         };
 
