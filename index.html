@@ -32,6 +32,40 @@
         /* Level up animation */
         .level-up { animation: pulseGlow 1.2s ease-out 1; }
         @keyframes pulseGlow { 0% { transform: scale(0.9); box-shadow: 0 0 0px #4f46e5; } 50% { transform: scale(1.03); box-shadow: 0 0 30px #6366f180; } 100% { transform: scale(1); box-shadow: 0 0 0px transparent; } }
+
+        .custom-select-container {
+            position: relative;
+        }
+        .custom-select-value {
+            background-color: #27272a;
+            border: 1px solid #52525b;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .custom-select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #27272a;
+            border: 1px solid #52525b;
+            border-radius: 0.375rem;
+            margin-top: 0.25rem;
+            z-index: 10;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .custom-select-option {
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+        }
+        .custom-select-option:hover {
+            background-color: #4f46e5;
+        }
     </style>
     <!-- Chart.js and particles.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -140,23 +174,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="md:col-span-3 card-bg p-6 rounded-lg mt-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold">Activity Log</h3>
-                            <div class="flex gap-2">
-                                <select id="month-select" class="bg-stone-800 border border-stone-600 rounded px-2 py-1"></select>
-                                <select id="year-select" class="bg-stone-800 border border-stone-600 rounded px-2 py-1"></select>
-                            </div>
-                        </div>
-                        <div id="calendar-container">
-                            <div id="calendar-header" class="grid grid-cols-7 text-center text-xs text-stone-400 mb-2">
-                                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                            </div>
-                            <div id="calendar-grid" class="grid grid-cols-7 gap-1.5">
-                                <!-- Calendar squares will be rendered here by JavaScript -->
-                            </div>
-                        </div>
-                    </div>
+                    <div id="activity-calendar-container" class="md:col-span-3 card-bg p-6 rounded-lg mt-6"></div>
                 </div>
             </div>
 
@@ -190,7 +208,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end">
                                 <div class="sm:col-span-2">
                                     <label class="text-sm text-gray-400">Add Exercise</label>
-                                    <select id="architect-exercise-select" class="w-full p-2 bg-gray-800 rounded border border-gray-700 focus:border-indigo-500 focus:ring-0"></select>
+                                    <div id="architect-exercise-dropdown-container"></div>
                                 </div>
                                 <div>
                                     <label class="text-sm text-gray-400">Sets</label>
@@ -235,11 +253,7 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm text-gray-400 mb-1">Difficulty</label>
-                            <select id="difficulty-select" data-change="settings:diff" class="w-full p-2 bg-gray-800 rounded border border-gray-700 focus:border-indigo-500 focus:ring-0">
-                                <option value="Easy">Easy</option>
-                                <option value="Normal" selected>Normal</option>
-                                <option value="Hard">Hard</option>
-                            </select>
+                            <div id="difficulty-dropdown-container"></div>
                             <p class="text-xs text-gray-500 mt-1">Easy: +1.25 kg, Normal: +2.5 kg, Hard: +5 kg</p>
                         </div>
                         <h3 class="text-lg font-semibold text-red-500">Danger Zone</h3>
@@ -300,6 +314,7 @@
                 isInitialized: false,
                 playerName: 'Player',
                 customAvatar: null,
+                currentArchitectExercise: null,
                 currentCustomWorkout: { name: '', exercises: [] },
                 savedRoutines: [],
                 achievements: [],
@@ -625,38 +640,18 @@
                     const action = target.getAttribute('data-action');
                     if (this.actions[action]) {
                         e.preventDefault();
-                        this.actions[action](e, target);
-                    }
-                });
-                // Global change delegation (for selects etc.)
-                document.body.addEventListener('change', (e) => {
-                    const target = e.target.closest('[data-change]');
-                    if (!target) return;
-                    const action = target.getAttribute('data-change');
-                    if (this.actions[action]) {
-                        this.actions[action](e, target);
+                        const value = target.getAttribute('data-value');
+                        if (value !== null) {
+                            this.actions[action](value);
+                        } else {
+                            this.actions[action](e, target);
+                        }
                     }
                 });
                 // Direct inputs
                 document.getElementById('avatar-container').addEventListener('click', () => document.getElementById('avatar-upload-input').click());
                 document.getElementById('avatar-upload-input').addEventListener('change', (e) => this.handleAvatarUpload(e));
                 document.getElementById('architect-routine-name').addEventListener('input', (e) => this.handleRoutineNameInput(e));
-
-                document.getElementById('month-select').addEventListener('change', (e) => {
-                    const newDate = new Date(this.state.calendar.viewDate);
-                    newDate.setMonth(parseInt(e.target.value));
-                    this.state.calendar.viewDate = newDate;
-                    this.renderActivityCalendar();
-                });
-                document.getElementById('year-select').addEventListener('change', (e) => {
-                    const newDate = new Date(this.state.calendar.viewDate);
-                    newDate.setFullYear(parseInt(e.target.value));
-                    this.state.calendar.viewDate = newDate;
-                    this.renderActivityCalendar();
-                });
-
-                const diffSel = document.getElementById('difficulty-select');
-                if (diffSel) diffSel.value = this.state.difficulty || 'Normal';
                 console.log("Delegated events ready.");
             },
             actions: {
@@ -673,10 +668,59 @@
                 'gate:complete': () => app.completeGate(),
                 'gates:open': (e, el) => app.completeGate(e, el.getAttribute('data-gate-id')),
                 'settings:delete': () => app.confirmDeleteAccount(),
-                'settings:diff': (e, el) => { app.state.difficulty = el.value; app.saveData(); },
                 'nextDungeonTask': () => app.nextDungeonTask(),
                 'cancelDungeon': () => app.cancelDungeon(),
-                'completeDungeon': () => app.completeDungeon()
+                'completeDungeon': () => app.completeDungeon(),
+                selectDifficulty(difficulty) {
+                    this.state.difficulty = difficulty;
+                    this.saveData();
+                    document.getElementById('difficulty-options').classList.add('hidden');
+                    this.renderSettingsPage();
+                },
+                selectArchitectExercise(exercise) {
+                    this.state.currentArchitectExercise = exercise;
+                    document.getElementById('architect-exercise-options').classList.add('hidden');
+                    this.populateExerciseDropdown();
+                },
+                toggleDropdown(optionsId) {
+                    document.getElementById(optionsId).classList.toggle('hidden');
+                },
+                selectMonth(monthIndex) {
+                    const newDate = new Date(this.state.calendar.viewDate);
+                    newDate.setMonth(parseInt(monthIndex));
+                    this.state.calendar.viewDate = newDate;
+                    document.getElementById('month-options').classList.add('hidden');
+                    this.renderActivityCalendar();
+                },
+                selectYear(year) {
+                    const newDate = new Date(this.state.calendar.viewDate);
+                    newDate.setFullYear(parseInt(year));
+                    this.state.calendar.viewDate = newDate;
+                    document.getElementById('year-options').classList.add('hidden');
+                    this.renderActivityCalendar();
+                },
+            },
+
+            createCustomDropdown({ containerSelector, currentValue, options, actionName, optionsId, widthClass = 'w-full' }) {
+                const container = document.querySelector(containerSelector);
+                if (!container) return;
+
+                let optionsHtml = options.map(opt =>
+                    `<div class="custom-select-option" data-action="${actionName}" data-value="${opt.value}">${opt.label}</div>`
+                ).join('');
+
+                const currentOption = options.find(opt => opt.value == currentValue);
+                const currentLabel = currentOption ? currentOption.label : 'Select...';
+
+                container.innerHTML = `
+                    <div class="custom-select-container ${widthClass}">
+                        <div class="custom-select-value" data-action="toggleDropdown" data-value="${optionsId}">
+                            <span>${currentLabel}</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                        <div id="${optionsId}" class="custom-select-options hidden">${optionsHtml}</div>
+                    </div>
+                `;
             },
 
             // --- UI & RENDERING ---
@@ -686,6 +730,22 @@
                 this.renderWorkoutPage();
                 this.renderAchievementsPage();
                 this.renderGatesPage();
+                this.renderSettingsPage();
+            },
+
+            renderSettingsPage() {
+                const difficultyOptions = [
+                    { value: 'Easy', label: 'Easy' },
+                    { value: 'Normal', label: 'Normal' },
+                    { value: 'Hard', label: 'Hard' }
+                ];
+                this.createCustomDropdown({
+                    containerSelector: '#difficulty-dropdown-container',
+                    currentValue: this.state.difficulty,
+                    options: difficultyOptions,
+                    actionName: 'selectDifficulty',
+                    optionsId: 'difficulty-options'
+                });
             },
 
             renderDashboard() {
@@ -742,55 +802,73 @@
             },
 
             renderActivityCalendar() {
-                const grid = document.getElementById('calendar-grid');
-                const monthSelect = document.getElementById('month-select');
-                const yearSelect = document.getElementById('year-select');
-                if (!grid || !monthSelect || !yearSelect) return;
+                const container = document.getElementById('activity-calendar-container');
+                if (!container) return;
+
+                // Main container structure
+                container.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold">Activity Log</h3>
+                        <div class="flex gap-2">
+                            <div id="month-dropdown-container"></div>
+                            <div id="year-dropdown-container"></div>
+                        </div>
+                    </div>
+                    <div id="calendar-header" class="grid grid-cols-7 text-center text-xs text-stone-400 mb-2">
+                        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-1.5"></div>
+                `;
 
                 const viewDate = new Date(this.state.calendar.viewDate);
                 const month = viewDate.getMonth();
                 const year = viewDate.getFullYear();
 
-                // Populate dropdowns
+                // Create month dropdown
                 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                monthSelect.innerHTML = months.map((m, i) => `<option value="${i}" ${i === month ? 'selected' : ''}>${m}</option>`).join('');
+                const monthOptions = months.map((m, i) => ({ value: i, label: m }));
+                this.createCustomDropdown({
+                    containerSelector: '#month-dropdown-container',
+                    currentValue: month,
+                    options: monthOptions,
+                    actionName: 'selectMonth',
+                    optionsId: 'month-options',
+                    widthClass: 'w-32'
+                });
 
+                // Create year dropdown
                 const currentYear = new Date().getFullYear();
-                yearSelect.innerHTML = '';
+                const yearOptions = [];
                 for (let y = currentYear; y >= currentYear - 5; y--) {
-                    yearSelect.innerHTML += `<option value="${y}" ${y === year ? 'selected' : ''}>${y}</option>`;
+                    yearOptions.push({ value: y, label: y });
                 }
+                this.createCustomDropdown({
+                    containerSelector: '#year-dropdown-container',
+                    currentValue: year,
+                    options: yearOptions,
+                    actionName: 'selectYear',
+                    optionsId: 'year-options',
+                    widthClass: 'w-24'
+                });
 
-                // Calendar grid logic
-                grid.innerHTML = '';
+                // Calendar grid rendering logic
+                const grid = document.getElementById('calendar-grid');
                 const firstDayOfMonth = new Date(year, month, 1).getDay();
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-                // Add spacer divs for alignment
-                for (let i = 0; i < firstDayOfMonth; i++) {
-                    grid.appendChild(document.createElement('div'));
-                }
-
-                // Add day squares
+                for (let i = 0; i < firstDayOfMonth; i++) { grid.appendChild(document.createElement('div')); }
                 for (let day = 1; day <= daysInMonth; day++) {
                     const date = new Date(year, month, day);
                     const dateString = date.toISOString().split('T')[0];
-
                     const daySquare = document.createElement('div');
                     daySquare.className = 'w-full aspect-square rounded bg-stone-700/50 p-1 flex flex-col items-start';
                     daySquare.innerHTML = `<span class="text-xs text-stone-400">${day}</span>`;
-
                     const activities = this.state.activityLog.filter(log => log.date === dateString);
                     if (activities.length > 0) {
-                        const activityIndicator = document.createElement('div');
-                        activityIndicator.className = 'w-full h-full flex items-center justify-center';
-                        if (activities.some(a => a.type === 'workout')) {
-                            activityIndicator.innerHTML += '<i class="fas fa-dumbbell text-indigo-400 text-xs"></i>';
-                        }
-                        if (activities.some(a => a.type === 'gate')) {
-                            activityIndicator.innerHTML += '<i class="fas fa-door-open text-amber-400 text-xs ml-1"></i>';
-                        }
-                        daySquare.appendChild(activityIndicator);
+                        const indicator = document.createElement('div');
+                        indicator.className = 'w-full h-full flex items-center justify-center';
+                        if (activities.some(a => a.type === 'workout')) indicator.innerHTML += '<i class="fas fa-dumbbell text-indigo-400 text-xs"></i>';
+                        if (activities.some(a => a.type === 'gate')) indicator.innerHTML += '<i class="fas fa-door-open text-amber-400 text-xs ml-1"></i>';
+                        daySquare.appendChild(indicator);
                     }
                     grid.appendChild(daySquare);
                 }
@@ -1098,29 +1176,29 @@
             },
             
             populateExerciseDropdown() {
-                const selectEl = document.getElementById('architect-exercise-select');
-                selectEl.innerHTML = '<option value="" disabled selected>Select an exercise...</option>';
-                this.masterExerciseList.forEach(exercise => {
-                    const option = document.createElement('option');
-                    option.value = exercise;
-                    option.textContent = exercise;
-                    selectEl.appendChild(option);
+                const exerciseOptions = this.masterExerciseList.map(ex => ({ value: ex, label: ex }));
+                this.createCustomDropdown({
+                    containerSelector: '#architect-exercise-dropdown-container',
+                    currentValue: this.state.currentArchitectExercise,
+                    options: exerciseOptions,
+                    actionName: 'selectArchitectExercise',
+                    optionsId: 'architect-exercise-options'
                 });
             },
 
             addExerciseToRoutine() {
-                const exerciseSelect = document.getElementById('architect-exercise-select');
                 const setsInput = document.getElementById('architect-sets');
                 const repsInput = document.getElementById('architect-reps');
 
-                if (exerciseSelect.value && setsInput.value && repsInput.value) {
+                if (this.state.currentArchitectExercise && setsInput.value && repsInput.value) {
                     this.state.currentCustomWorkout.exercises.push({ 
-                        name: exerciseSelect.value, 
+                        name: this.state.currentArchitectExercise,
                         sets: setsInput.value, 
                         reps: repsInput.value 
                     });
-                    this.renderArchitect();
-                    exerciseSelect.value = '';
+                    this.state.currentArchitectExercise = null; // Reset
+                    this.populateExerciseDropdown(); // Re-render dropdown
+                    this.renderArchitect(); // Re-render routine preview
                     setsInput.value = '';
                     repsInput.value = '';
                 } else {
