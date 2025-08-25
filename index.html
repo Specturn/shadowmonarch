@@ -140,6 +140,12 @@
                             </div>
                         </div>
                     </div>
+                    <div class="md:col-span-3 card-bg p-6 rounded-lg mt-6">
+                        <h3 class="text-xl font-bold mb-4">Activity Log</h3>
+                        <div id="activity-calendar-grid" class="grid grid-cols-7 gap-1.5">
+                            <!-- Calendar squares will be rendered here by JavaScript -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -313,6 +319,7 @@
                 showcase: [],
                 gates: [],
                 completedGates: [],
+                activityLog: [],
             },
 
             masterExerciseList: [
@@ -703,6 +710,52 @@
                 this.renderRadarChart();
                 // Showcase
                 this.renderShowcase();
+                this.renderActivityCalendar();
+            },
+
+            renderActivityCalendar() {
+                const grid = document.getElementById('activity-calendar-grid');
+                if (!grid) return;
+                grid.innerHTML = '';
+
+                const today = new Date();
+                const activityMap = new Map();
+                this.state.activityLog.forEach(log => {
+                    const date = log.date;
+                    if (!activityMap.has(date)) {
+                        activityMap.set(date, []);
+                    }
+                    activityMap.get(date).push(log.type);
+                });
+
+                for (let i = 89; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(today.getDate() - i);
+                    const dateString = date.toISOString().split('T')[0];
+
+                    const daySquare = document.createElement('div');
+                    daySquare.className = 'w-full aspect-square rounded bg-stone-700';
+
+                    const activities = activityMap.get(dateString);
+                    if (activities) {
+                        let tooltipText = `${dateString}\n`;
+                        if (activities.includes('workout')) {
+                            daySquare.classList.add('bg-indigo-500');
+                            tooltipText += '- Daily Quest Cleared\n';
+                        }
+                        if (activities.includes('gate')) {
+                            daySquare.classList.add('bg-amber-500');
+                            tooltipText += '- Gate Cleared\n';
+                        }
+                        if (activities.includes('workout') && activities.includes('gate')) {
+                             daySquare.className = 'w-full aspect-square rounded bg-gradient-to-br from-indigo-500 to-amber-500';
+                        }
+                        daySquare.title = tooltipText.trim();
+                    } else {
+                         daySquare.title = dateString;
+                    }
+                    grid.appendChild(daySquare);
+                }
             },
             
             renderArchitect() {
@@ -1289,6 +1342,7 @@
                 this.state.lastWorkoutDate = today;
                 this.state.longestStreak = Math.max(this.state.longestStreak || 0, this.state.streak);
 
+                this.state.activityLog.push({ date: new Date().toISOString().split('T')[0], type: 'workout' });
                 this.saveData();
                 // Refresh achievements view if open
                 if (document.getElementById('achievements-page').classList.contains('active')) this.renderAchievementsPage();
@@ -1377,6 +1431,7 @@
                             }
                             if (gateId) this.state.gates = (this.state.gates || []).filter(x => x.id !== gateId);
                             else this.state.activeGate = null;
+                            this.state.activityLog.push({ date: new Date().toISOString().split('T')[0], type: 'gate' });
                             this.saveData();
                             this.renderWorkoutPage();
                             this.renderDashboard();
