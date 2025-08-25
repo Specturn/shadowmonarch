@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Monarch 3.0</title>
+    <title>Project Monarch 4.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -16,6 +16,8 @@
         .page { display: none; }
         .page.active { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #dungeon-overlay { background-color: rgba(0,0,0,0.9); }
+        .gate-card { border-left: 4px solid #f59e0b; }
     </style>
 </head>
 <body class="text-white">
@@ -34,9 +36,10 @@
         <header class="text-center mb-6 p-8 rounded-lg card-bg">
             <h1 id="header-title" class="text-4xl font-black uppercase text-indigo-400">Dashboard</h1>
         </header>
-      
+        
         <nav class="flex justify-center gap-2 mb-6">
             <button data-page="dashboard" class="nav-btn active px-4 py-2 rounded-lg font-semibold">Dashboard</button>
+            <button data-page="workout" class="nav-btn px-4 py-2 rounded-lg font-semibold">Workout</button>
             <button data-page="architect" class="nav-btn px-4 py-2 rounded-lg font-semibold">Architect</button>
             <button data-page="settings" class="nav-btn px-4 py-2 rounded-lg font-semibold">Settings</button>
         </nav>
@@ -60,11 +63,30 @@
                         <button id="edit-name-btn" class="text-sm text-gray-400 hover:text-white"><i class="fas fa-pencil-alt mr-1"></i> Edit Name</button>
                     </div>
                     <div class="md:col-span-2 card-bg p-6 rounded-lg">
-                        <h3 class="text-xl font-bold mb-4">Strength Stats</h3>
-                        <div id="stats-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            <!-- Stats will be rendered here -->
-                             <p class="text-gray-400 col-span-full">Your workout stats will appear here once you start training.</p>
+                        <h3 class="text-xl font-bold mb-4">Achievements</h3>
+                        <div id="achievements-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                             <p class="text-gray-400 col-span-full">Your legend has yet to be written. Complete quests to earn achievements.</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workout Page -->
+            <div id="workout-page" class="page">
+                <div class="card-bg p-6 rounded-lg text-center mb-6">
+                    <h2 class="text-2xl font-bold mb-2">Daily Quest</h2>
+                    <p id="workout-day-title" class="text-indigo-400 font-semibold mb-4">Loading mission...</p>
+                    <div id="quest-buttons" class="flex gap-4 justify-center">
+                        <button id="preview-quest-btn" class="btn-primary py-2 px-4 rounded">Preview Quest</button>
+                        <button id="begin-quest-btn" class="bg-green-600 hover:bg-green-500 py-2 px-4 rounded">Begin Quest</button>
+                    </div>
+                     <p id="rest-day-message" class="text-gray-400 hidden">Rest is when you grow stronger. Recover well.</p>
+                </div>
+                <div id="gate-container" class="hidden">
+                    <div class="card-bg p-6 rounded-lg text-center gate-card">
+                        <h2 class="text-2xl font-bold mb-2 text-amber-400">Warning: Gate Detected!</h2>
+                        <p id="gate-description" class="text-gray-300 mb-4"></p>
+                        <button id="complete-gate-btn" class="bg-amber-500 hover:bg-amber-400 py-2 px-4 rounded">Complete Gate Challenge</button>
                     </div>
                 </div>
             </div>
@@ -97,44 +119,43 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- Settings Page -->
             <div id="settings-page" class="page">
                  <div class="card-bg p-6 rounded-lg">
                     <h2 class="text-2xl font-bold mb-4">Settings</h2>
-                    <p class="text-gray-400">App settings will be available here in a future update.</p>
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-red-500">Danger Zone</h3>
+                        <p class="text-gray-400 text-sm">This action is irreversible. All your progress will be lost.</p>
+                        <button id="delete-account-btn" class="bg-red-600 hover:bg-red-500 py-2 px-4 rounded">Delete Account</button>
+                    </div>
                 </div>
             </div>
         </main>
+    </div>
+    
+    <!-- Dungeon Overlay -->
+    <div id="dungeon-overlay" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div id="dungeon-content" class="card-bg p-8 rounded-lg w-full max-w-md text-center">
+            <!-- Dungeon content will be injected here -->
+        </div>
     </div>
 
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ===================================================================================
-        // --- IMPORTANT: FIX FOR LOGIN ERROR ---
-        // To fix the "Login failed" error, you need to replace the placeholder
-        // values below with your actual Firebase project configuration.
-        //
-        // HOW TO GET YOUR CONFIG:
-        // 1. Go to your Firebase project console.
-        // 2. Click the gear icon (Project settings) in the top left.
-        // 3. In the "General" tab, scroll down to the "Your apps" section.
-        // 4. Find your web app and click on the "SDK setup and configuration" section.
-        // 5. Select "Config".
-        // 6. Copy the entire 'firebaseConfig' object and paste it here, replacing
-        //    the placeholder object below.
-        // ===================================================================================
+        // --- Your web app's Firebase configuration ---
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyAK5DS4dixAQWwJ8kms2JiKr738PPKFdA4",
+            authDomain: "shadowmonarch-f4a17.firebaseapp.com",
+            projectId: "shadowmonarch-f4a17",
+            storageBucket: "shadowmonarch-f4a17.appspot.com",
+            messagingSenderId: "524012291883",
+            appId: "1:524012291883:web:be243162b1c0912090276e",
+            measurementId: "G-6EVHJ6EDPJ"
         };
 
         // --- FIREBASE INITIALIZATION ---
@@ -152,11 +173,64 @@
                 customAvatar: null,
                 currentCustomWorkout: { name: '', exercises: [] },
                 savedRoutines: [],
+                achievements: [],
+                level: 1,
+                week: 1,
+                lifts: {
+                    'Squat': 20, 'Bench Press': 20, 'Deadlift': 30, 'Overhead Press': 20, 'Barbell Row': 20,
+                    'Incline DB Press': 10, 'Tricep Pushdown': 15, 'Lateral Raise': 5, 'Lat Pulldown': 30,
+                    'Bicep Curl': 10, 'Romanian Deadlift': 40, 'Leg Press': 50, 'Calf Raise': 40,
+                    'Power Clean': 20, 'Box Jump': 0
+                },
+                dungeon: {
+                    isActive: false,
+                    currentExerciseIndex: 0,
+                    exercises: []
+                },
+                activeGate: null,
+                lastGateDate: null,
             },
 
             masterExerciseList: [
+                'Squat', 'Bench Press', 'Deadlift', 'Overhead Press', 'Barbell Row', 
+                'Romanian Deadlift', 'Front Squat', 'Hip Thrust', 'Dumbbell Bench Press', 
+                'Incline DB Press', 'Dumbbell Row', 'Goblet Squat', 'Bulgarian Split Squat', 
+                'Dumbbell Shoulder Press', 'Lateral Raise', 'Dumbbell Curl', 'Hammer Curl', 
+                'Tricep Skullcrusher', 'Lat Pulldown', 'Cable Row', 'Tricep Pushdown', 
+                'Leg Press', 'Leg Extension', 'Hamstring Curl', 'Calf Raise', 'Pull-up', 'Dip',
+                'Power Clean', 'Box Jump'
+            ],
+            
+            workoutProgram: [
+                // Phase I: Foundational Strength (Weeks 1-12)
+                { phase: 1, type: 'Push', exercises: [{name: 'Bench Press', sets: 3, reps: '5-8'}, {name: 'Overhead Press', sets: 3, reps: '5-8'}, {name: 'Incline DB Press', sets: 3, reps: '8-12'}] },
+                { phase: 1, type: 'Pull', exercises: [{name: 'Barbell Row', sets: 3, reps: '5-8'}, {name: 'Lat Pulldown', sets: 3, reps: '8-12'}, {name: 'Bicep Curl', sets: 3, reps: '8-12'}] },
+                { phase: 1, type: 'Legs', exercises: [{name: 'Squat', sets: 3, reps: '5-8'}, {name: 'Romanian Deadlift', sets: 3, reps: '8-12'}, {name: 'Leg Press', sets: 3, reps: '8-12'}] },
+                // Phase II: Strength Hypertrophy (Weeks 13-24)
+                { phase: 2, type: 'Push', exercises: [{name: 'Bench Press', sets: 4, reps: '4-6'}, {name: 'Overhead Press', sets: 4, reps: '4-6'}, {name: 'Lateral Raise', sets: 4, reps: '10-15'}] },
+                { phase: 2, type: 'Pull', exercises: [{name: 'Deadlift', sets: 1, reps: '3-5'}, {name: 'Barbell Row', sets: 4, reps: '6-8'}, {name: 'Lat Pulldown', sets: 4, reps: '8-10'}] },
+                { phase: 2, type: 'Legs', exercises: [{name: 'Squat', sets: 4, reps: '4-6'}, {name: 'Leg Press', sets: 4, reps: '10-12'}, {name: 'Hamstring Curl', sets: 3, reps: '8-12'}] },
+                 // Phase III: Power & Athleticism (Weeks 25-36)
+                { phase: 3, type: 'Push', exercises: [{name: 'Bench Press', sets: 5, reps: '3-5'}, {name: 'Overhead Press', sets: 5, reps: '3-5'}, {name: 'Dip', sets: 3, reps: 'AMRAP'}] },
+                { phase: 3, type: 'Pull', exercises: [{name: 'Power Clean', sets: 5, reps: '3'}, {name: 'Pull-up', sets: 3, reps: 'AMRAP'}, {name: 'Barbell Row', sets: 3, reps: '8-10'}] },
+                { phase: 3, type: 'Legs', exercises: [{name: 'Squat', sets: 5, reps: '3-5'}, {name: 'Box Jump', sets: 5, reps: '5'}, {name: 'Calf Raise', sets: 4, reps: '15-20'}] },
+                 // Phase IV: Peak Strength (Weeks 37-48)
+                { phase: 4, type: 'Push', exercises: [{name: 'Bench Press', sets: 3, reps: '5/3/1'}, {name: 'Incline DB Press', sets: 4, reps: '6-10'}, {name: 'Tricep Pushdown', sets: 4, reps: '10-12'}] },
+                { phase: 4, type: 'Pull', exercises: [{name: 'Deadlift', sets: 3, reps: '5/3/1'}, {name: 'Lat Pulldown', sets: 4, reps: '8-12'}, {name: 'Bicep Curl', sets: 4, reps: '10-12'}] },
+                { phase: 4, type: 'Legs', exercises: [{name: 'Squat', sets: 3, reps: '5/3/1'}, {name: 'Romanian Deadlift', sets: 4, reps: '8-10'}, {name: 'Leg Press', sets: 4, reps: '10-15'}] },
+            ],
+            
+            gatesData: [
+                { rank: 'E', description: 'Hydration Check: Drink 2L of water today.', reward: 10 },
+                { rank: 'D', description: 'Cardio Burst: Complete 10 minutes of high-intensity cardio.', reward: 25 },
+                { rank: 'C', description: 'Time Attack: Complete your first 3 exercises in under 20 minutes.', reward: 50 },
+                { rank: 'A', description: 'Red Gate: Perform your entire workout with no more than 60 seconds of rest between sets.', reward: 100 },
+                { rank: 'S', description: 'The Monarch\'s Shadow: Complete your workout, then perform 50 pull-ups.', reward: 250 },
+            ],
 
-                'Leg Press', 'Leg Extension', 'Hamstring Curl', 'Calf Raise', 'Pull-up', 'Dip'
+            achievementsData: [
+                { id: 'level_15', name: 'Elite Hunter', description: 'Reach Level 15.', condition: (s) => s.level >= 15, icon: 'fa-dragon' },
+                { id: 'level_40', name: 'Commander Class', description: 'Reach Level 40.', condition: (s) => s.level >= 40, icon: 'fa-chess-knight' },
             ],
 
             // --- CORE LIFECYCLE ---
@@ -164,6 +238,7 @@
                 if (this.state.isInitialized) return;
                 console.log("App Initializing...");
                 this.loadData().then(() => {
+                    this.generateGate();
                     this.render();
                     this.bindEvents();
                     this.state.isInitialized = true;
@@ -177,11 +252,9 @@
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     const data = userSnap.data();
-                    this.state.playerName = data.playerName || 'Player';
-                    this.state.customAvatar = data.customAvatar || null;
-                    this.state.savedRoutines = data.savedRoutines || [];
+                    Object.assign(this.state, data);
                 } else {
-                    await this.saveData(); // Create initial document for new user
+                    await this.saveData();
                 }
             },
 
@@ -189,11 +262,9 @@
                 if (!this.state.user) return;
                 const userRef = doc(db, "users", this.state.user.uid);
                 try {
-                    await setDoc(userRef, {
-                        playerName: this.state.playerName,
-                        customAvatar: this.state.customAvatar,
-                        savedRoutines: this.state.savedRoutines,
-                    }, { merge: true });
+                    const stateToSave = { ...this.state };
+                    delete stateToSave.user;
+                    await setDoc(userRef, stateToSave, { merge: true });
                     console.log("Data saved to Firestore.");
                 } catch (error) {
                     console.error("Error saving data:", error);
@@ -204,21 +275,19 @@
             // --- EVENT BINDING ---
             bindEvents() {
                 console.log("Binding all application events...");
-                // Navigation
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.addEventListener('click', () => this.showPage(btn.dataset.page));
                 });
-
-                // Dashboard
                 document.getElementById('edit-name-btn').addEventListener('click', () => this.editPlayerName());
                 document.getElementById('avatar-container').addEventListener('click', () => document.getElementById('avatar-upload-input').click());
                 document.getElementById('avatar-upload-input').addEventListener('change', (e) => this.handleAvatarUpload(e));
-
-                // Architect
                 document.getElementById('architect-routine-name').addEventListener('input', (e) => this.handleRoutineNameInput(e));
                 document.getElementById('architect-add-exercise-btn').addEventListener('click', () => this.addExerciseToRoutine());
                 document.getElementById('architect-save-routine-btn').addEventListener('click', () => this.saveCurrentRoutine());
-
+                document.getElementById('delete-account-btn').addEventListener('click', () => this.confirmDeleteAccount());
+                document.getElementById('preview-quest-btn').addEventListener('click', () => this.previewQuest());
+                document.getElementById('begin-quest-btn').addEventListener('click', () => this.beginQuest());
+                document.getElementById('complete-gate-btn').addEventListener('click', () => this.completeGate());
                 console.log("Event binding complete.");
             },
 
@@ -226,6 +295,7 @@
             render() {
                 this.renderDashboard();
                 this.renderArchitect();
+                this.renderWorkoutPage();
             },
 
             renderDashboard() {
@@ -240,8 +310,22 @@
                     avatarImg.classList.add('hidden');
                     avatarPlaceholder.classList.remove('hidden');
                 }
+                
+                const achievementsGrid = document.getElementById('achievements-grid');
+                achievementsGrid.innerHTML = '';
+                const unlocked = this.achievementsData.filter(ach => this.state.achievements.includes(ach.id));
+                if (unlocked.length > 0) {
+                    unlocked.forEach(ach => {
+                        const div = document.createElement('div');
+                        div.className = 'p-4 bg-gray-800 rounded-lg text-center';
+                        div.innerHTML = `<i class="fas ${ach.icon} text-3xl text-indigo-400 mb-2"></i><p class="font-semibold">${ach.name}</p>`;
+                        achievementsGrid.appendChild(div);
+                    });
+                } else {
+                    achievementsGrid.innerHTML = '<p class="text-gray-400 col-span-full">Your legend has yet to be written. Complete quests to earn achievements.</p>';
+                }
             },
-
+            
             renderArchitect() {
                 const previewContainer = document.getElementById('architect-routine-preview');
                 previewContainer.innerHTML = '';
@@ -257,8 +341,7 @@
                     p.innerHTML = `<span>${ex.name}: ${ex.sets} sets of ${ex.reps} reps</span><button data-index="${index}" class="remove-exercise-btn text-red-500 hover:text-red-400">✖</button>`;
                     previewContainer.appendChild(p);
                 });
-
-                // Add event listeners for new remove buttons
+                
                 document.querySelectorAll('.remove-exercise-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const index = parseInt(e.target.dataset.index);
@@ -273,6 +356,34 @@
                     saveBtn.classList.add('hidden');
                 }
             },
+            
+            renderWorkoutPage() {
+                const today = new Date().getDay();
+                const dayIndex = today === 0 ? 6 : today - 1;
+                const daySchedule = ['Push', 'Pull', 'Legs', 'Push', 'Pull', 'Legs', 'Rest'][dayIndex];
+                
+                const titleEl = document.getElementById('workout-day-title');
+                const questBtns = document.getElementById('quest-buttons');
+                const restMsg = document.getElementById('rest-day-message');
+
+                if (daySchedule === 'Rest') {
+                    titleEl.textContent = "Rest Day";
+                    questBtns.classList.add('hidden');
+                    restMsg.classList.remove('hidden');
+                } else {
+                    titleEl.textContent = `${daySchedule} Day`;
+                    questBtns.classList.remove('hidden');
+                    restMsg.classList.add('hidden');
+                }
+
+                const gateContainer = document.getElementById('gate-container');
+                if (this.state.activeGate) {
+                    document.getElementById('gate-description').textContent = `[${this.state.activeGate.rank}-Rank] ${this.state.activeGate.description}`;
+                    gateContainer.classList.remove('hidden');
+                } else {
+                    gateContainer.classList.add('hidden');
+                }
+            },
 
             showPage(pageId) {
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -282,7 +393,7 @@
                 document.getElementById('header-title').textContent = pageId.charAt(0).toUpperCase() + pageId.slice(1);
                 if(pageId === 'architect') this.populateExerciseDropdown();
             },
-
+            
             // --- ACTION HANDLERS ---
             editPlayerName() {
                 const newName = prompt("Enter your new name:", this.state.playerName);
@@ -304,7 +415,7 @@
                 };
                 reader.readAsDataURL(file);
             },
-
+            
             handleRoutineNameInput(event) {
                 const name = event.target.value.trim();
                 const exerciseSection = document.getElementById('architect-exercise-section');
@@ -316,7 +427,7 @@
                 }
                 this.renderArchitect();
             },
-
+            
             populateExerciseDropdown() {
                 const selectEl = document.getElementById('architect-exercise-select');
                 selectEl.innerHTML = '<option value="" disabled selected>Select an exercise...</option>';
@@ -334,10 +445,12 @@
                 const repsInput = document.getElementById('architect-reps');
 
                 if (exerciseSelect.value && setsInput.value && repsInput.value) {
-
+                    this.state.currentCustomWorkout.exercises.push({ 
+                        name: exerciseSelect.value, 
+                        sets: setsInput.value, 
+                        reps: repsInput.value 
                     });
                     this.renderArchitect();
-                    // Clear inputs
                     exerciseSelect.value = '';
                     setsInput.value = '';
                     repsInput.value = '';
@@ -355,11 +468,148 @@
                 this.state.savedRoutines.push(this.state.currentCustomWorkout);
                 this.saveData();
                 alert(`Routine "${this.state.currentCustomWorkout.name}" saved!`);
-                // Reset architect
                 this.state.currentCustomWorkout = { name: '', exercises: [] };
                 document.getElementById('architect-routine-name').value = '';
                 document.getElementById('architect-exercise-section').classList.add('hidden');
                 this.renderArchitect();
+            },
+            
+            confirmDeleteAccount() {
+                const confirmation = prompt(`This action is permanent. To delete your account, please type your name: "${this.state.playerName}"`);
+                if (confirmation === this.state.playerName) {
+                    deleteDoc(doc(db, "users", this.state.user.uid)).then(() => {
+                        alert("Account deleted successfully.");
+                        auth.signOut();
+                    }).catch(error => {
+                        console.error("Error deleting account:", error);
+                        alert("Could not delete account. Please try again.");
+                    });
+                } else {
+                    alert("Name does not match. Deletion cancelled.");
+                }
+            },
+            
+            // --- WORKOUT & GATE FLOW ---
+            getCurrentWorkout() {
+                const phase = Math.min(4, Math.floor((this.state.week - 1) / 12) + 1);
+                const today = new Date().getDay();
+                const dayIndex = today === 0 ? 6 : today - 1;
+                const dayType = ['Push', 'Pull', 'Legs', 'Push', 'Pull', 'Legs', 'Rest'][dayIndex];
+                
+                if (dayType === 'Rest') return null;
+
+                return this.workoutProgram.find(w => w.phase === phase && w.type === dayType);
+            },
+
+            previewQuest() {
+                const workout = this.getCurrentWorkout();
+                if (!workout) return;
+                
+                let previewHtml = `<h3 class="text-xl font-bold mb-4">${workout.type} Day - Phase ${workout.phase}</h3>`;
+                previewHtml += '<ul class="text-left space-y-2">';
+                workout.exercises.forEach(ex => {
+                    previewHtml += `<li><strong>${ex.name}:</strong> ${ex.sets} sets of ${ex.reps} reps</li>`;
+                });
+                previewHtml += '</ul>';
+                
+                alert(previewHtml); // Simple alert for preview
+            },
+
+            beginQuest() {
+                if (!confirm("The Dungeon awaits. Will you proceed with the quest now?")) return;
+                
+                const workout = this.getCurrentWorkout();
+                if (!workout) return;
+
+                this.state.dungeon.isActive = true;
+                this.state.dungeon.currentExerciseIndex = 0;
+                this.state.dungeon.exercises = workout.exercises;
+                
+                this.renderDungeon();
+                document.getElementById('dungeon-overlay').classList.remove('hidden');
+                document.getElementById('dungeon-overlay').classList.add('flex');
+            },
+            
+            renderDungeon() {
+                const content = document.getElementById('dungeon-content');
+                if (!this.state.dungeon.isActive) {
+                    content.innerHTML = '';
+                    return;
+                }
+                
+                const index = this.state.dungeon.currentExerciseIndex;
+                const exercises = this.state.dungeon.exercises;
+
+                if (index >= exercises.length) {
+                    content.innerHTML = `
+                        <h2 class="text-3xl font-bold text-green-400 mb-4">Quest Complete!</h2>
+                        <p class="mb-6">You have cleared the dungeon. Return to base to claim your rewards.</p>
+                        <button id="return-to-base-btn" class="btn-primary py-2 px-4 rounded">Return to Base</button>
+                    `;
+                    document.getElementById('return-to-base-btn').addEventListener('click', () => this.completeDungeon());
+                } else {
+                    const ex = exercises[index];
+                    let setsHtml = '';
+                    for (let i = 1; i <= ex.sets; i++) {
+                        setsHtml += `<div class="flex items-center justify-between p-2 bg-gray-900 rounded-md mb-2">
+                            <span class="font-semibold">Set ${i}</span>
+                            <input type="checkbox" class="set-checkbox w-6 h-6 bg-gray-700 rounded text-indigo-500">
+                        </div>`;
+                    }
+
+                    content.innerHTML = `
+                        <p class="text-sm text-gray-400">Task ${index + 1} / ${exercises.length}</p>
+                        <h2 class="text-3xl font-bold mb-2">${ex.name}</h2>
+                        <p class="text-xl text-indigo-400 mb-4">${ex.sets} sets of ${ex.reps} reps</p>
+                        <div class="space-y-2 mb-6">${setsHtml}</div>
+                        <div class="flex gap-4 justify-center">
+                            <button id="cancel-quest-btn" class="bg-red-600 hover:bg-red-500 py-2 px-4 rounded">Cancel Quest</button>
+                            <button id="next-task-btn" class="btn-primary py-2 px-6 rounded">Next Task</button>
+                        </div>
+                    `;
+                    document.getElementById('next-task-btn').addEventListener('click', () => this.nextDungeonTask());
+                    document.getElementById('cancel-quest-btn').addEventListener('click', () => this.cancelDungeon());
+                }
+            },
+            
+            nextDungeonTask() {
+                this.state.dungeon.currentExerciseIndex++;
+                this.renderDungeon();
+            },
+
+            completeDungeon() {
+                alert("Workout logged!");
+                this.state.dungeon.isActive = false;
+                document.getElementById('dungeon-overlay').classList.add('hidden');
+                document.getElementById('dungeon-overlay').classList.remove('flex');
+                this.saveData();
+            },
+
+            cancelDungeon() {
+                if(confirm("Are you sure you want to abandon the quest? Your progress will not be saved.")){
+                    this.state.dungeon.isActive = false;
+                    document.getElementById('dungeon-overlay').classList.add('hidden');
+                    document.getElementById('dungeon-overlay').classList.remove('flex');
+                }
+            },
+            
+            generateGate() {
+                const today = new Date().toISOString().split('T')[0];
+                if (this.state.lastGateDate === today) return; // Only one gate per day
+
+                if (Math.random() < 0.5) { // 50% chance of a gate appearing
+                    this.state.activeGate = this.gatesData[Math.floor(Math.random() * this.gatesData.length)];
+                    this.state.lastGateDate = today;
+                    this.saveData();
+                }
+            },
+
+            completeGate() {
+                alert(`Gate Cleared! You earned ${this.state.activeGate.reward} XP.`);
+                // In a real app, you'd add XP here: this.state.level += ...
+                this.state.activeGate = null;
+                this.saveData();
+                this.renderWorkoutPage();
             }
         };
 
@@ -373,12 +623,12 @@
                 app.state.user = user;
                 loginScreen.classList.add('hidden');
                 appContent.classList.remove('hidden');
-                app.init(); // Initialize app AFTER user is confirmed and UI is visible
+                app.init();
             } else {
                 console.log("User is signed out.");
                 loginScreen.classList.remove('hidden');
                 appContent.classList.add('hidden');
-                app.state.isInitialized = false; // Reset init flag on logout
+                app.state.isInitialized = false;
             }
         });
 
