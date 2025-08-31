@@ -78,7 +78,7 @@
         <div id="particles-login"></div>
         <h1 class="text-5xl font-black uppercase text-indigo-400 mb-2">Project Monarch</h1>
         <p class="text-gray-400 mb-8">Your path to unrivaled strength begins.</p>
-        <button id="login-btn" class="btn-primary text-white font-bold py-3 px-6 rounded-lg flex items-center">
+        <button id="login-btn" data-action="auth:login" class="btn-primary text-white font-bold py-3 px-6 rounded-lg flex items-center">
             <i class="fab fa-google mr-3"></i> Login with Google
         </button>
     </div>
@@ -104,7 +104,7 @@
             <div id="dashboard-page" class="page active">
                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
                     <div class="md:col-span-1 card-bg p-6 rounded-lg text-center">
-                        <div id="avatar-container" class="relative w-32 h-32 mx-auto mb-4 cursor-pointer group">
+                        <div id="avatar-container" data-action="player:changeAvatar" class="relative w-32 h-32 mx-auto mb-4 cursor-pointer group">
                              <div id="avatar-placeholder" class="w-full h-full rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center bg-gray-800">
                                 <i class="fas fa-user text-4xl text-gray-500"></i>
                             </div>
@@ -167,12 +167,7 @@
                             <canvas id="radar-chart" height="120"></canvas>
                         </div>
 
-                        <div class="card-bg p-6 rounded-lg">
-                        <h3 class="text-xl font-bold mb-4">Achievements</h3>
-                        <div id="achievements-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                             <p class="text-gray-400 col-span-full">Your legend has yet to be written. Complete quests to earn achievements.</p>
-                            </div>
-                        </div>
+
                     </div>
                     <div id="activity-calendar-container" class="md:col-span-3 card-bg p-6 rounded-lg mt-6"></div>
                 </div>
@@ -219,10 +214,10 @@
                                     <input id="architect-reps" type="text" placeholder="e.g., 5-8" class="w-full p-2 bg-gray-800 rounded border border-gray-700 focus:border-indigo-500 focus:ring-0">
                                 </div>
                             </div>
-                            <button id="architect-add-exercise-btn" class="w-full btn-primary mt-2 py-2 rounded">Add Exercise to Routine</button>
+                            <button id="architect-add-exercise-btn" data-action="architect:addExercise" class="w-full btn-primary mt-2 py-2 rounded">Add Exercise to Routine</button>
                         </div>
                         <div id="architect-routine-preview" class="mt-4 space-y-2"></div>
-                        <button id="architect-save-routine-btn" class="w-full bg-green-600 hover:bg-green-500 py-2 rounded mt-4 hidden">Save Routine</button>
+                        <button id="architect-save-routine-btn" data-action="architect:saveRoutine" class="w-full bg-green-600 hover:bg-green-500 py-2 rounded mt-4 hidden">Save Routine</button>
                     </div>
                 </div>
             </div>
@@ -277,7 +272,7 @@
         <div class="modal-card w-full max-w-lg p-6 rounded-xl">
             <div class="flex items-start justify-between mb-4">
                 <h3 id="modal-title" class="text-xl font-bold text-white">Modal</h3>
-                <button id="modal-close" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+                <button id="modal-close" data-action="modal:close" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
             <div id="modal-body" class="text-gray-200"></div>
             <div id="modal-actions" class="mt-6 flex gap-3 justify-end"></div>
@@ -857,20 +852,19 @@
                     const target = e.target.closest('[data-action]');
                     if (!target) return;
                     const action = target.getAttribute('data-action');
-                    if (this.actions[action]) {
+                    if (app.actions[action]) {
                         e.preventDefault();
                         const value = target.getAttribute('data-value');
                         if (value !== null) {
-                            this.actions[action](value);
+                            app.actions[action](value);
                         } else {
-                            this.actions[action](e, target);
+                            app.actions[action](e, target);
                         }
                     }
                 });
-                // Direct inputs
-                document.getElementById('avatar-container').addEventListener('click', () => document.getElementById('avatar-upload-input').click());
-                document.getElementById('avatar-upload-input').addEventListener('change', (e) => this.handleAvatarUpload(e));
-                document.getElementById('architect-routine-name').addEventListener('input', (e) => this.handleRoutineNameInput(e));
+                // Direct inputs (file inputs and input events don't bubble reliably)
+                document.getElementById('avatar-upload-input').addEventListener('change', (e) => app.handleAvatarUpload(e));
+                document.getElementById('architect-routine-name').addEventListener('input', (e) => app.handleRoutineNameInput(e));
                 console.log("Delegated events ready.");
             },
             actions: {
@@ -887,37 +881,57 @@
                 'gate:complete': () => app.completeGate(),
                 'gates:open': (e, el) => app.completeGate(e, el.getAttribute('data-gate-id')),
                 'settings:delete': () => app.confirmDeleteAccount(),
-                'nextDungeonTask': () => app.nextDungeonTask(),
-                'cancelDungeon': () => app.cancelDungeon(),
-                'completeDungeon': () => app.completeDungeon(),
-                selectDifficulty(difficulty) {
-                    this.state.difficulty = difficulty;
-                    this.saveData();
+                // These actions are now handled by the new dungeon: prefixed actions
+                'selectDifficulty': (difficulty) => {
+                    app.state.difficulty = difficulty;
+                    app.saveData();
                     document.getElementById('difficulty-options').classList.add('hidden');
-                    this.renderSettingsPage();
+                    app.renderSettingsPage();
                 },
-                selectArchitectExercise(exercise) {
-                    this.state.currentArchitectExercise = exercise;
+                'selectArchitectExercise': (exercise) => {
+                    app.state.currentArchitectExercise = exercise;
                     document.getElementById('architect-exercise-options').classList.add('hidden');
-                    this.populateExerciseDropdown();
+                    app.populateExerciseDropdown();
                 },
-                toggleDropdown(optionsId) {
+                'toggleDropdown': (optionsId) => {
                     document.getElementById(optionsId).classList.toggle('hidden');
                 },
-                selectMonth(monthIndex) {
-                    const newDate = new Date(this.state.calendar.viewDate);
+                'selectMonth': (monthIndex) => {
+                    const newDate = new Date(app.state.calendar.viewDate);
                     newDate.setMonth(parseInt(monthIndex));
-                    this.state.calendar.viewDate = newDate;
+                    app.state.calendar.viewDate = newDate;
                     document.getElementById('month-options').classList.add('hidden');
-                    this.renderActivityCalendar();
+                    app.renderActivityCalendar();
                 },
-                selectYear(year) {
-                    const newDate = new Date(this.state.calendar.viewDate);
+                'selectYear': (year) => {
+                    const newDate = new Date(app.state.calendar.viewDate);
                     newDate.setFullYear(parseInt(year));
-                    this.state.calendar.viewDate = newDate;
+                    app.state.calendar.viewDate = newDate;
                     document.getElementById('year-options').classList.add('hidden');
-                    this.renderActivityCalendar();
+                    app.renderActivityCalendar();
                 },
+                'architect:addExercise': () => app.addExerciseToRoutine(),
+                'architect:saveRoutine': () => app.saveCurrentRoutine(),
+                'architect:removeExercise': (e, target) => {
+                    const index = parseInt(target.getAttribute('data-index'));
+                    app.removeExerciseFromRoutine(index);
+                },
+                'player:changeAvatar': () => document.getElementById('avatar-upload-input').click(),
+                'modal:close': () => {
+                    const overlay = document.getElementById('modal-overlay');
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                },
+                'dungeon:complete': () => app.completeDungeon(),
+                'dungeon:cancel': () => app.cancelDungeon(),
+                'dungeon:next': () => app.nextDungeonTask(),
+                'auth:login': () => {
+                    signInWithPopup(auth, provider).catch((error) => {
+                        console.error("Login failed:", error);
+                        if (app && app.modalAlert) app.modalAlert("Login failed. Please check your Firebase setup and authorized domains.");
+                        else alert("Login failed. Please check your Firebase setup and authorized domains.");
+                    });
+                }
             },
 
             createCustomDropdown({ containerSelector, currentValue, options, actionName, optionsId, widthClass = 'w-full' }) {
@@ -980,19 +994,6 @@
                     avatarPlaceholder.classList.remove('hidden');
                 }
                 
-                const achievementsGrid = document.getElementById('achievements-grid');
-                achievementsGrid.innerHTML = '';
-                const unlocked = this.achievementsData.filter(ach => this.state.achievements.includes(ach.id));
-                if (unlocked.length > 0) {
-                    unlocked.forEach(ach => {
-                        const div = document.createElement('div');
-                        div.className = 'p-4 bg-gray-800 rounded-lg text-center';
-                        div.innerHTML = `<i class="fas ${ach.icon} text-3xl text-indigo-400 mb-2"></i><p class="font-semibold">${ach.name}</p>`;
-                        achievementsGrid.appendChild(div);
-                    });
-                } else {
-                    achievementsGrid.innerHTML = '<p class="text-gray-400 col-span-full">Your legend has yet to be written. Complete quests to earn achievements.</p>';
-                }
                 // Stats
                 const lvlEl = document.getElementById('stat-level');
                 const xpEl = document.getElementById('stat-xp');
@@ -1102,28 +1103,23 @@
             renderArchitect() {
                 const previewContainer = document.getElementById('architect-routine-preview');
                 previewContainer.innerHTML = '';
-                 if(this.state.currentCustomWorkout.exercises.length > 0){
+                 if(app.state.currentCustomWorkout.exercises.length > 0){
                     const title = document.createElement('h4');
                     title.textContent = "Routine Preview:";
                     title.className = "font-bold text-lg";
                     previewContainer.appendChild(title);
                 }
-                this.state.currentCustomWorkout.exercises.forEach((ex, index) => {
+                app.state.currentCustomWorkout.exercises.forEach((ex, index) => {
                     const p = document.createElement('div');
                     p.className = 'p-2 bg-gray-800 rounded flex justify-between items-center';
-                    p.innerHTML = `<span>${ex.name}: ${ex.sets} sets of ${ex.reps} reps</span><button data-index="${index}" class="remove-exercise-btn text-red-500 hover:text-red-400">✖</button>`;
+                    p.innerHTML = `<span>${ex.name}: ${ex.sets} sets of ${ex.reps} reps</span><button data-action="architect:removeExercise" data-index="${index}" class="remove-exercise-btn text-red-500 hover:text-red-400">✖</button>`;
                     previewContainer.appendChild(p);
                 });
                 
-                document.querySelectorAll('.remove-exercise-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const index = parseInt(e.target.dataset.index);
-                        this.removeExerciseFromRoutine(index);
-                    });
-                });
+                // Remove exercise buttons now use data-action="architect:removeExercise" with event delegation
 
                 const saveBtn = document.getElementById('architect-save-routine-btn');
-                if(this.state.currentCustomWorkout.name && this.state.currentCustomWorkout.exercises.length > 0){
+                if(app.state.currentCustomWorkout.name && app.state.currentCustomWorkout.exercises.length > 0){
                     saveBtn.classList.remove('hidden');
                 } else {
                     saveBtn.classList.add('hidden');
@@ -1158,10 +1154,10 @@
                 const wrap = document.getElementById('showcase-achievements');
                 if (!wrap) return;
                 wrap.innerHTML = '';
-                const unlocked = this.achievementsData.filter(a => (this.state.achievements.includes(a.id) || a.progress(this.state) >= a.target));
-                const toShow = (this.state.showcase && this.state.showcase.length ? this.state.showcase : unlocked.slice(0,3).map(a=>a.id)).slice(0,3);
+                const unlocked = app.achievementsData.filter(a => (app.state.achievements.includes(a.id) || a.progress(app.state) >= a.target));
+                const toShow = (app.state.showcase && app.state.showcase.length ? app.state.showcase : unlocked.slice(0,3).map(a=>a.id)).slice(0,3);
                 toShow.forEach(id => {
-                    const a = this.achievementsData.find(x => x.id === id);
+                    const a = app.achievementsData.find(x => x.id === id);
                     if (!a) return;
                     const div = document.createElement('div');
                     div.className = 'p-2 bg-gray-800 rounded text-center';
@@ -1305,49 +1301,68 @@
                 });
             },
 
+            templates: {
+                achievementCard(ach, isUnlocked) {
+                    const progress = ach.progress ? ach.progress(app.state) : 0;
+                    const target = ach.target || 1;
+                    const progressPercentage = Math.min(100, (progress / target) * 100);
+                    
+                    return `
+                        <div class="card-bg p-4 rounded-lg flex flex-col items-center text-center transition-all duration-300 ${!isUnlocked ? 'achievement-locked' : ''}">
+                                                    <i class="fas ${ach.icon} text-4xl ${isUnlocked ? 'text-indigo-400' : 'text-stone-500'} mb-2"></i>
+                        <p class="font-bold text-base mb-1">${ach.name}</p>
+                        <p class="text-xs text-stone-400 mb-3">${ach.description}</p>
+                            ${!isUnlocked && ach.target ? `
+                                <div class="w-full bg-stone-600 rounded-full h-2.5">
+                                    <div class="bg-indigo-500 h-2.5 rounded-full" style="width: ${progressPercentage}%"></div>
+                                </div>
+                                <p class="text-xs text-stone-500 mt-1">${Math.floor(progress)} / ${target}</p>
+                            ` : ''}
+                        </div>
+                    `;
+                },
+            },
+
             renderAchievementsPage() {
                 const grid = document.getElementById('achievements-grid');
                 if (!grid) return;
                 grid.innerHTML = '';
-                
-                // **NEW LOGIC STARTS HERE**
-                const achievementsToShow = this.achievementsData.filter(ach => {
-                    // If the achievement is not secret, always show it.
-                    if (ach.type !== 'secret') {
-                        return true;
+
+                const unlockedAchievements = [];
+                const lockedAchievements = [];
+
+                app.achievementsData.forEach(ach => {
+                    const isUnlocked = app.state.achievements.includes(ach.id);
+
+                    // **NEW LOGIC STARTS HERE**
+                    // If the achievement is secret and NOT unlocked, skip it entirely.
+                    if (ach.type === 'secret' && !isUnlocked) {
+                        return; 
                     }
-                    // If the achievement IS secret, only show it if the user has unlocked it.
-                    if (ach.type === 'secret' && this.state.achievements.includes(ach.id)) {
-                        return true;
+
+                    if (isUnlocked) {
+                        unlockedAchievements.push(ach);
+                    } else {
+                        lockedAchievements.push(ach);
                     }
-                    // Otherwise, hide it.
-                    return false;
+                    // **NEW LOGIC ENDS HERE**
                 });
-                // **NEW LOGIC ENDS HERE**
-                
-                achievementsToShow.forEach(ach => {
-                    const isUnlocked = this.state.achievements.includes(ach.id);
-                    const progress = ach.progress ? ach.progress(this.state) : 0;
-                    const target = ach.target || 1;
-                    const progressPercentage = Math.min(100, (progress / target) * 100);
-                    
-                    const card = document.createElement('div');
-                    card.className = `card-bg p-4 rounded-lg flex flex-col items-center text-center transition-all duration-300 ${!isUnlocked ? 'achievement-locked' : ''}`;
-                    
-                    card.innerHTML = `
-                        <i class="fas ${ach.icon} text-4xl ${isUnlocked ? 'text-indigo-400' : 'text-stone-500'} mb-2"></i>
-                        <p class="font-bold text-base mb-1">${ach.name}</p>
-                        <p class="text-xs text-stone-400 mb-3">${ach.description}</p>
-                        ${!isUnlocked && ach.target ? `
-                            <div class="w-full bg-stone-600 rounded-full h-2.5">
-                                <div class="bg-indigo-500 h-2.5 rounded-full" style="width: ${progressPercentage}%"></div>
-                            </div>
-                            <p class="text-xs text-stone-500 mt-1">${Math.floor(progress)} / ${target}</p>
-                        ` : ''}
-                    `;
-                    
-                    grid.appendChild(card);
-                });
+
+                // Render unlocked achievements first
+                if (unlockedAchievements.length > 0) {
+                    grid.innerHTML += '<h3 class="col-span-full text-xl font-bold text-indigo-400">Unlocked</h3>';
+                    unlockedAchievements.forEach(ach => {
+                        grid.innerHTML += app.templates.achievementCard(ach, true);
+                    });
+                }
+
+                // Render locked (but visible) achievements second
+                if (lockedAchievements.length > 0) {
+                    grid.innerHTML += '<h3 class="col-span-full text-xl font-bold text-stone-400 mt-6">In Progress</h3>';
+                    lockedAchievements.forEach(ach => {
+                        grid.innerHTML += app.templates.achievementCard(ach, false);
+                    });
+                }
             },
 
             showPage(pageId) {
@@ -1356,26 +1371,26 @@
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                 document.querySelector(`.nav-btn[data-page="${pageId}"]`).classList.add('active');
                 document.getElementById('header-title').textContent = pageId.charAt(0).toUpperCase() + pageId.slice(1);
-                if(pageId === 'architect') this.populateExerciseDropdown();
-                if(pageId === 'achievements') this.renderAchievementsPage();
-                if(pageId === 'gates') this.renderGatesPage();
+                if(pageId === 'architect') app.populateExerciseDropdown();
+                if(pageId === 'achievements') app.renderAchievementsPage();
+                if(pageId === 'gates') app.renderGatesPage();
             },
             
             // --- ACTION HANDLERS ---
             editPlayerName() {
-                this.modalPrompt({ title: 'Edit Name', message: 'Enter your new name:', placeholder: this.state.playerName }).then((val) => {
+                app.modalPrompt({ title: 'Edit Name', message: 'Enter your new name:', placeholder: app.state.playerName }).then((val) => {
                     if (val && val.trim() !== '') {
-                        this.state.playerName = val.trim();
-                    this.saveData();
-                    this.renderDashboard();
+                        app.state.playerName = val.trim();
+                    app.saveData();
+                    app.renderDashboard();
                 }
                 });
             },
             openShowcaseSelector() {
-                const unlocked = this.achievementsData.filter(a => (this.state.achievements.includes(a.id) || a.progress(this.state) >= a.target));
+                const unlocked = app.achievementsData.filter(a => (app.state.achievements.includes(a.id) || a.progress(app.state) >= a.target));
                 const id = `sc-${Date.now()}`;
                 const grid = unlocked.map(a => `<label class=\"flex items-center gap-2 p-2 bg-gray-800 rounded\"><input type=\"checkbox\" value=\"${a.id}\" class=\"sc-cb\"><i class=\"fas ${a.icon} text-indigo-400\"></i><span>${a.name}</span></label>`).join('');
-                const instance = this.showModal({
+                const instance = app.showModal({
                     title: 'Select Showcase (max 3)',
                     html: `<div id=\"${id}\" class=\"space-y-2 max-h-64 overflow-auto\">${grid}</div>`,
                     actions: [
@@ -1396,9 +1411,9 @@
                 if (!file) return;
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    this.state.customAvatar = e.target.result;
-                    this.saveData();
-                    this.renderDashboard();
+                    app.state.customAvatar = e.target.result;
+                    app.saveData();
+                    app.renderDashboard();
                 };
                 reader.readAsDataURL(file);
             },
@@ -1407,19 +1422,19 @@
                 const name = event.target.value.trim();
                 const exerciseSection = document.getElementById('architect-exercise-section');
                 if (name) {
-                    this.state.currentCustomWorkout.name = name;
+                    app.state.currentCustomWorkout.name = name;
                     exerciseSection.classList.remove('hidden');
                 } else {
                     exerciseSection.classList.add('hidden');
                 }
-                this.renderArchitect();
+                app.renderArchitect();
             },
             
             populateExerciseDropdown() {
-                const exerciseOptions = this.masterExerciseList.map(ex => ({ value: ex, label: ex }));
-                this.createCustomDropdown({
+                const exerciseOptions = app.masterExerciseList.map(ex => ({ value: ex, label: ex }));
+                app.createCustomDropdown({
                     containerSelector: '#architect-exercise-dropdown-container',
-                    currentValue: this.state.currentArchitectExercise,
+                    currentValue: app.state.currentArchitectExercise,
                     options: exerciseOptions,
                     actionName: 'selectArchitectExercise',
                     optionsId: 'architect-exercise-options'
@@ -1430,15 +1445,15 @@
                 const setsInput = document.getElementById('architect-sets');
                 const repsInput = document.getElementById('architect-reps');
 
-                if (this.state.currentArchitectExercise && setsInput.value && repsInput.value) {
-                    this.state.currentCustomWorkout.exercises.push({ 
-                        name: this.state.currentArchitectExercise,
+                if (app.state.currentArchitectExercise && setsInput.value && repsInput.value) {
+                    app.state.currentCustomWorkout.exercises.push({ 
+                        name: app.state.currentArchitectExercise,
                         sets: setsInput.value, 
                         reps: repsInput.value 
                     });
-                    this.state.currentArchitectExercise = null; // Reset
-                    this.populateExerciseDropdown(); // Re-render dropdown
-                    this.renderArchitect(); // Re-render routine preview
+                    app.state.currentArchitectExercise = null; // Reset
+                    app.populateExerciseDropdown(); // Re-render dropdown
+                    app.renderArchitect(); // Re-render routine preview
                     setsInput.value = '';
                     repsInput.value = '';
                 } else {
@@ -1447,46 +1462,46 @@
             },
 
             removeExerciseFromRoutine(index) {
-                this.state.currentCustomWorkout.exercises.splice(index, 1);
-                this.renderArchitect();
+                app.state.currentCustomWorkout.exercises.splice(index, 1);
+                app.renderArchitect();
             },
 
             saveCurrentRoutine() {
-                this.state.savedRoutines.push(this.state.currentCustomWorkout);
-                this.saveData();
-                this.modalAlert(`Routine "${this.state.currentCustomWorkout.name}" saved!`, 'Routine Saved');
-                this.state.currentCustomWorkout = { name: '', exercises: [] };
+                app.state.savedRoutines.push(app.state.currentCustomWorkout);
+                app.saveData();
+                app.modalAlert(`Routine "${app.state.currentCustomWorkout.name}" saved!`, 'Routine Saved');
+                app.state.currentCustomWorkout = { name: '', exercises: [] };
                 document.getElementById('architect-routine-name').value = '';
                 document.getElementById('architect-exercise-section').classList.add('hidden');
-                this.renderArchitect();
+                app.renderArchitect();
             },
             
             confirmDeleteAccount() {
-                this.modalPrompt({ title: 'Confirm Deletion', message: `This action is permanent. Type your name to confirm: "${this.state.playerName}"`, placeholder: this.state.playerName }).then((val) => {
-                    if (val === this.state.playerName) {
-                    deleteDoc(doc(db, "users", this.state.user.uid)).then(() => {
-                            this.modalAlert("Account deleted successfully.");
+                app.modalPrompt({ title: 'Confirm Deletion', message: `This action is permanent. Type your name to confirm: "${app.state.playerName}"`, placeholder: app.state.playerName }).then((val) => {
+                    if (val === app.state.playerName) {
+                    deleteDoc(doc(db, "users", app.state.user.uid)).then(() => {
+                            app.modalAlert("Account deleted successfully.");
                         auth.signOut();
                     }).catch(error => {
                         console.error("Error deleting account:", error);
-                            this.modalAlert("Could not delete account. Please try again.");
+                            app.modalAlert("Could not delete account. Please try again.");
                     });
                     } else if (val !== null) {
-                        this.modalAlert("Name does not match. Deletion cancelled.");
+                        app.modalAlert("Name does not match. Deletion cancelled.");
                 }
                 });
             },
             
             // --- WORKOUT & GATE FLOW ---
             getCurrentWorkout() {
-                const phase = Math.min(4, Math.floor((this.state.week - 1) / 12) + 1);
+                const phase = Math.min(4, Math.floor((app.state.week - 1) / 12) + 1);
                 const today = new Date().getDay();
                 const dayIndex = today === 0 ? 6 : today - 1;
                 const dayType = ['Push', 'Pull', 'Legs', 'Push', 'Pull', 'Legs', 'Rest'][dayIndex];
                 
                 if (dayType === 'Rest') return null;
 
-                return this.workoutProgram.find(w => w.phase === phase && w.type === dayType);
+                return app.workoutProgram.find(w => w.phase === phase && w.type === dayType);
             },
             getExerciseDescription(name) {
                 const desc = {
@@ -1579,7 +1594,7 @@
                         <div class="text-center">
                         <h2 class="text-3xl font-bold text-green-400 mb-4">Quest Complete!</h2>
                         <p class="mb-6">You have cleared the dungeon. Return to base to claim your rewards.</p>
-                        <button data-action="completeDungeon" class="btn-primary py-2 px-4 rounded">Return to Base</button>
+                        <button data-action="dungeon:complete" class="btn-primary py-2 px-4 rounded">Return to Base</button>
                         </div>
                     `;
                 } else {
@@ -1625,8 +1640,8 @@
                                 </div>
 
                                 <div class="flex gap-4 justify-center">
-                                    <button data-action="cancelDungeon" class="bg-red-600 hover:bg-red-500 py-2 px-4 rounded">Cancel Quest</button>
-                                    <button data-action="nextDungeonTask" class="btn-primary py-2 px-6 rounded" disabled>Next Task</button>
+                                    <button data-action="dungeon:cancel" class="bg-red-600 hover:bg-red-500 py-2 px-4 rounded">Cancel Quest</button>
+                                    <button data-action="dungeon:next" class="btn-primary py-2 px-6 rounded" disabled>Next Task</button>
                                 </div>
                             </div>
                         </div>
@@ -1873,14 +1888,7 @@
             }
         });
 
-        // --- LOGIN BUTTON ---
-        document.getElementById('login-btn').addEventListener('click', () => {
-            signInWithPopup(auth, provider).catch((error) => {
-                console.error("Login failed:", error);
-                if (app && app.modalAlert) app.modalAlert("Login failed. Please check your Firebase setup and authorized domains.");
-                else alert("Login failed. Please check your Firebase setup and authorized domains.");
-            });
-        });
+        // Login button now uses data-action="auth:login" with event delegation
 
     </script>
 </body>
