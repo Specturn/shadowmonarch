@@ -5,6 +5,7 @@ import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "https://www.gstati
 
 // Page modules
 import { initDashboard } from './pages/dashboard.js';
+import { initWorkout } from './pages/workout.js';
 import { initGates } from './pages/gates.js';
 import { initArchitect } from './pages/architect.js';
 import { initAchievements } from './pages/achievements.js';
@@ -184,7 +185,7 @@ class ProjectMonarch {
 
     initializePages() {
         this.pages.dashboard = initDashboard(this);
-        this.pages.workout = this.createWorkoutPage();
+        this.pages.workout = initWorkout(this);
         this.pages.gates = initGates(this);
         this.pages.architect = initArchitect(this);
         this.pages.achievements = initAchievements(this);
@@ -892,49 +893,6 @@ class ProjectMonarch {
 
     // Page creation methods
 
-    createWorkoutPage() {
-        const self = this;
-        return {
-            render: () => {
-                const workout = self.getCurrentWorkout();
-                const isRestDay = !workout;
-                
-                return `
-                    <div class="card-bg p-6 rounded-lg text-center mb-6">
-                        <h2 class="text-2xl font-bold mb-2">Daily Quest</h2>
-                        <p class="text-indigo-400 font-semibold mb-4">
-                            ${isRestDay ? 'Rest Day - Recovery Mode' : `${workout.type} Day - Phase ${workout.phase}`}
-                        </p>
-                        ${isRestDay ? `
-                            <p class="text-gray-400">Rest is when you grow stronger. Recover well.</p>
-                        ` : `
-                            <div class="flex gap-4 justify-center">
-                                <button id="preview-quest-btn" class="btn-primary py-2 px-4 rounded">Preview Quest</button>
-                                <button id="begin-quest-btn" class="bg-green-600 hover:bg-green-500 py-2 px-4 rounded">Begin Quest</button>
-                            </div>
-                        `}
-                    </div>
-                `;
-            },
-            init: () => {
-                const previewBtn = document.getElementById('preview-quest-btn');
-                const beginBtn = document.getElementById('begin-quest-btn');
-                
-                if (previewBtn) {
-                    previewBtn.addEventListener('click', () => {
-                        self.previewQuest();
-                    });
-                }
-                
-                if (beginBtn) {
-                    beginBtn.addEventListener('click', () => {
-                        self.beginQuest();
-                    });
-                }
-            }
-        };
-    }
-
     createGatesPage() {
         const self = this;
         return {
@@ -1048,74 +1006,7 @@ class ProjectMonarch {
         });
     }
 
-    getCurrentWorkout() {
-        const phase = Math.min(4, Math.floor((this.state.week - 1) / 12) + 1);
-        const today = new Date().getDay();
-        const dayIndex = today === 0 ? 6 : today - 1;
-        const dayType = ['Push', 'Pull', 'Legs', 'Push', 'Pull', 'Legs', 'Rest'][dayIndex];
 
-        if (dayType === 'Rest') return null;
-
-        const workoutProgram = [
-            {
-                phase: 1, type: 'Push', exercises: [
-                    { name: 'Bench Press', sets: 3, reps: '5-8' },
-                    { name: 'Overhead Press', sets: 3, reps: '5-8' },
-                    { name: 'Incline DB Press', sets: 3, reps: '8-12' }
-                ]
-            },
-            {
-                phase: 1, type: 'Pull', exercises: [
-                    { name: 'Barbell Row', sets: 3, reps: '5-8' },
-                    { name: 'Lat Pulldown', sets: 3, reps: '8-12' },
-                    { name: 'Bicep Curl', sets: 3, reps: '8-12' }
-                ]
-            },
-            {
-                phase: 1, type: 'Legs', exercises: [
-                    { name: 'Squat', sets: 3, reps: '5-8' },
-                    { name: 'Romanian Deadlift', sets: 3, reps: '8-12' },
-                    { name: 'Leg Press', sets: 3, reps: '12-15' }
-                ]
-            }
-        ];
-
-        return workoutProgram.find(w => w.phase === phase && w.type === dayType);
-    }
-
-    previewQuest() {
-        const workout = this.getCurrentWorkout();
-        if (!workout) return;
-        
-        let html = `<div class="space-y-3">
-            <p class="text-indigo-400 font-semibold">${workout.type} Day - Phase ${workout.phase}</p>
-            <div class="space-y-2">`;
-        
-        workout.exercises.forEach(ex => {
-            const weight = this.state.lifts[ex.name] ? this.state.lifts[ex.name].weight : 'N/A';
-            html += `<div class="p-3 bg-gray-800 rounded">
-                <div class="flex items-center justify-between">
-                    <span class="font-semibold">${ex.name}</span>
-                    <span class="text-sm text-gray-300">${ex.sets} x ${ex.reps} @ ${weight} kg</span>
-                </div>
-            </div>`;
-        });
-        
-        html += `</div></div>`;
-        
-        const instance = this.showModal({
-            title: 'Quest Preview',
-            html,
-            actions: [
-                { label: 'Close', onClick: () => instance.close() },
-                { label: 'Begin Quest', primary: true, onClick: () => { instance.close(); this.beginQuest(); } }
-            ]
-        });
-    }
-
-    beginQuest() {
-        this.modalAlert('Workout system coming soon!');
-    }
 
     // Achievements data
     getAchievementsData() {

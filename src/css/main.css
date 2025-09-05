@@ -445,4 +445,153 @@ Canvas Chart Background */
 /* Ensure chart container has proper background */
 .card-bg canvas {
     background-color: transparent !important;
+}/* Worko
+ut System Styles */
+.workout-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#workout-overlay {
+    backdrop-filter: blur(5px);
+}
+
+#rest-timer-overlay {
+    backdrop-filter: blur(10px);
+}
+
+.set-row {
+    transition: all 0.3s ease;
+}
+
+.set-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.weight-input, .reps-input {
+    transition: all 0.2s ease;
+}
+
+.weight-input:focus, .reps-input:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #6366f1;
+    border-color: #6366f1;
+}
+
+.set-complete-btn {
+    transition: all 0.2s ease;
+}
+
+.set-complete-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+.set-complete-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Progress Bar Animation */
+#progress-bar {
+    transition: width 0.5s ease-in-out;
+}
+
+/* Countdown Animation */
+#countdown-display {
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Rest Timer Styles */
+#rest-timer-display {
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    animation: timerPulse 2s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Workout Complete Animation */
+.level-up {
+    animation: levelUpBounce 0.6s ease-out;
+}
+
+@keyframes levelUpBounce {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Exercise Transition */
+.exercise-transition {
+    animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .workout-container {
+        padding: 0 1rem;
+    }
+    
+    #workout-overlay .flex-col {
+        height: 100vh;
+    }
+    
+    .set-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .set-row .flex {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .weight-input, .reps-input {
+        width: 100%;
+    }
+    
+    #rest-timer-display {
+        font-size: 4rem;
+    }
+}
+
+/* Working Set Highlight */
+.working-set {
+    border-color: #fbbf24 !important;
+    background-color: rgba(251, 191, 36, 0.1) !important;
+}
+
+.working-set .text-lg {
+    color: #fbbf24 !important;
+}
+
+/* Exercise Animation Placeholder */
+.exercise-animation {
+    background: linear-gradient(45deg, #1f2937, #374151);
+    border: 2px dashed #6b7280;
+}
+
+.exercise-animation:hover {
+    border-color: #9ca3af;
 }
