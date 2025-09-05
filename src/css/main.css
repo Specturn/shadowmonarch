@@ -1,0 +1,448 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    height: 100%;
+    overflow: hidden; /* Prevent any body scroll */
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #111827;
+    color: #f9fafb;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent any body scroll */
+    position: relative;
+}
+
+.card-bg {
+    background-color: #1f2937;
+    border: 1px solid #4b5563;
+}
+
+.btn-primary {
+    background-color: #4f46e5;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #6366f1;
+}
+
+.nav-btn.active {
+    background-color: #4f46e5;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#dungeon-overlay {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.gate-card {
+    border-left: 4px solid #f59e0b;
+}
+
+.achievement-locked {
+    opacity: 0.6;
+    filter: grayscale(80%);
+}
+
+.progress-bar {
+    height: 8px;
+    background-color: #374151;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.progress-bar-inner {
+    height: 100%;
+    background-color: #4f46e5;
+}
+
+#modal-overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-card {
+    background-color: #111827;
+    border: 1px solid #374151;
+}
+
+.modal-btn {
+    background-color: #374151;
+}
+
+.modal-btn.primary {
+    background-color: #4f46e5;
+}
+
+#particles-login,
+#particles-dashboard {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.with-particles {
+    position: relative;
+    z-index: 1;
+}
+
+/* Main App Layout - Full Height Flexbox Container */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Fixed Header */
+.app-header {
+    flex-shrink: 0;
+    margin-bottom: 1rem;
+}
+
+/* Fixed Navigation */
+.app-nav {
+    flex-shrink: 0;
+    margin-bottom: 1rem;
+}
+
+/* Scrollable Main Content Area */
+.app-main-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0; /* Critical for flex child to shrink */
+}
+
+/* Dashboard Specific Layout */
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 1.5rem;
+    min-height: 100%;
+}
+
+/* Fixed Player Card (Left Column) */
+.dashboard-player-card {
+    height: fit-content;
+    max-height: 100vh;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+}
+
+/* Scrollable Content Area (Right Column) */
+.dashboard-content-area {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-content-inner {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        min-height: auto;
+    }
+    
+    .dashboard-player-card {
+        position: static;
+        height: auto;
+        max-height: none;
+        overflow-y: visible;
+    }
+    
+    .dashboard-content-area {
+        overflow-y: visible;
+        display: block;
+    }
+    
+    .dashboard-content-inner {
+        display: block;
+    }
+    
+    .app-container {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    
+    .app-main-content {
+        overflow-y: visible;
+        flex: none;
+    }
+    
+    html, body {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+}
+
+.level-up {
+    animation: pulseGlow 1.2s ease-out 1;
+}
+
+@keyframes pulseGlow {
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0px #4f46e5;
+    }
+    50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 30px #6366f180;
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0px transparent;
+    }
+}
+
+.custom-select-container {
+    position: relative;
+}
+
+.custom-select-value {
+    background-color: #27272a;
+    border: 1px solid #52525b;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-select-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #27272a;
+    border: 1px solid #52525b;
+    border-radius: 0.375rem;
+    margin-top: 0.25rem;
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.custom-select-option {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+}
+
+.custom-select-option:hover {
+    background-color: #4f46e5;
+}
+
+/* Activity Graph Styles */
+.activity-graph-container {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+}
+
+.activity-main-grid {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.activity-weekdays {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-top: 20px;
+    font-size: 9px;
+    color: #9ca3af;
+    width: 24px;
+    text-align: right;
+    padding-right: 4px;
+}
+
+.activity-weekdays .weekday-label {
+    height: 11px;
+    line-height: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.activity-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.activity-months-row {
+    display: flex;
+    height: 16px;
+    margin-bottom: 4px;
+    font-size: 11px;
+    color: #9ca3af;
+    align-items: center;
+}
+
+.activity-month-label {
+    text-align: left;
+    white-space: nowrap;
+    font-size: 11px;
+    flex: 1;
+}
+
+.activity-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+    width: 100%;
+}
+
+.activity-week {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+}
+
+.activity-square {
+    width: 11px;
+    height: 11px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.activity-square:hover {
+    outline: 1px solid rgba(255, 255, 255, 0.4);
+    outline-offset: 1px;
+}
+
+.activity-square.no-activity {
+    background-color: #161b22;
+    border: 1px solid #21262d;
+}
+
+.activity-square.daily-quest {
+    background-color: #7c3aed;
+    border: 1px solid #8b5cf6;
+}
+
+.activity-square.gate-completed {
+    background-color: #ea580c;
+    border: 1px solid #f97316;
+}
+
+.activity-square.dual-activity {
+    background: linear-gradient(135deg, #7c3aed 0%, #7c3aed 50%, #ea580c 50%, #ea580c 100%);
+    border: 1px solid #8b5cf6;
+}
+
+.activity-legend {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #374151;
+}
+
+.activity-legend-items {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+}
+
+.activity-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #d1d5db;
+}
+
+.activity-legend-square {
+    width: 11px;
+    height: 11px;
+    border-radius: 2px;
+}
+/* Custom
+ Scrollbar Styling */
+.app-main-content::-webkit-scrollbar,
+.dashboard-content-area::-webkit-scrollbar,
+.dashboard-player-card::-webkit-scrollbar {
+    width: 6px;
+}
+
+.app-main-content::-webkit-scrollbar-track,
+.dashboard-content-area::-webkit-scrollbar-track,
+.dashboard-player-card::-webkit-scrollbar-track {
+    background: #374151;
+    border-radius: 3px;
+}
+
+.app-main-content::-webkit-scrollbar-thumb,
+.dashboard-content-area::-webkit-scrollbar-thumb,
+.dashboard-player-card::-webkit-scrollbar-thumb {
+    background: #6b7280;
+    border-radius: 3px;
+}
+
+.app-main-content::-webkit-scrollbar-thumb:hover,
+.dashboard-content-area::-webkit-scrollbar-thumb:hover,
+.dashboard-player-card::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Firefox Scrollbar */
+.app-main-content,
+.dashboard-content-area,
+.dashboard-player-card {
+    scrollbar-width: thin;
+    scrollbar-color: #6b7280 #374151;
+}/* Fix 
+Canvas Chart Background */
+#radar-chart {
+    background-color: transparent !important;
+    max-height: 300px;
+}
+
+/* Ensure chart container has proper background */
+.card-bg canvas {
+    background-color: transparent !important;
+}

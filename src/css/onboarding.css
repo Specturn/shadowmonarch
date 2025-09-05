@@ -1,0 +1,58 @@
+/* Onboarding Styles */
+.onboarding-step {
+    opacity: 0;
+    transform: translateX(100px);
+}
+
+.onboarding-step.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.gender-card.selected,
+.goal-card.selected,
+.focus-option.selected,
+.experience-option.selected {
+    border-color: #4f46e5 !important;
+    background-color: rgba(79, 70, 229, 0.1);
+}
+
+.gender-card:not(.selected),
+.goal-card:not(.selected),
+.focus-option:not(.selected),
+.experience-option:not(.selected) {
+    opacity: 1;
+}
+
+.gender-card.selected ~ .gender-card:not(.selected),
+.goal-card.selected ~ .goal-card:not(.selected),
+.focus-option.selected ~ .focus-option:not(.selected),
+.experience-option.selected ~ .experience-option:not(.selected) {
+    opacity: 0.6;
+}
+
+/* Custom slider styles */
+.slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #4f46e5;
+    cursor: pointer;
+    border: 2px solid #ffffff;
+}
+
+.slider::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #4f46e5;
+    cursor: pointer;
+    border: 2px solid #ffffff;
+}
+
+/* Body diagram highlighting */
+#body-diagram .highlight {
+    fill: #4f46e5 !important;
+    opacity: 0.8 !important;
+}
