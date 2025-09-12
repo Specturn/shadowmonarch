@@ -595,3 +595,14 @@ ut System Styles */
 .exercise-animation:hover {
     border-color: #9ca3af;
 }
+
+.activity-calendar {
+    display: grid;
+    grid-template-columns: repeat(53, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.activity-calendar-day {
+    aspect-ratio: 1 / 1;
+    border-radius: 2px;
+}

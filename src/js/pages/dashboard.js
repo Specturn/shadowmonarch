@@ -642,89 +642,109 @@ export function initDashboard(app) {
                         ${record.lastUpdated ? ` • ${new Date(record.lastUpdated).toLocaleDateString()}` : ''}
                     </div>
                 </div>
-            `).join('');
-
-            container.innerHTML = html;
+            `).join('')}
         },
-
         updateActivityCalendar() {
             const container = document.getElementById('activity-calendar');
             if (!container) return;
-
+        
             const activityLog = app.state.activityLog || [];
-            
+        
             if (activityLog.length === 0) {
                 container.innerHTML = `
                     <div class="text-center text-gray-400 py-8">
-                        <i class="fas fa-calendar text-4xl mb-3"></i>
-                        <div>No activity yet</div>
-                        <div class="text-sm text-gray-500 mt-1">Your workout and gate activity will appear here</div>
+                        <i class="fas fa-calendar-alt text-4xl mb-3"></i>
+                        <div>No activity yet.</div>
+                        <div class="text-sm text-gray-500 mt-1">Your workout and gate activity will appear here.</div>
                     </div>
                 `;
                 return;
             }
-
-            // Generate calendar for last 12 weeks
-            const calendar = this.generateActivityCalendar(activityLog);
-            
+        
+            const { months, days } = this.generateActivityCalendar(activityLog);
+        
+            // Add month labels
+            const monthLabels = months.map(month => `<div class="text-center text-gray-500 p-1 font-semibold" style="grid-column: span ${month.span}">${month.name}</div>`).join('');
+        
             container.innerHTML = `
-                <div class="grid grid-cols-7 gap-1 text-xs">
-                    ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => 
-                        `<div class="text-center text-gray-500 p-1 font-semibold">${day}</div>`
-                    ).join('')}
-                    ${calendar.map(day => `
-                        <div class="aspect-square p-1 rounded ${day.class}" title="${day.tooltip}">
-                            <div class="w-full h-full rounded ${day.bgClass}"></div>
-                        </div>
-                    `).join('')}
+                <div class="grid grid-cols-53 gap-1 text-xs" style="grid-template-rows: auto 1fr;">
+                    <div class="col-span-1"></div>
+                    ${monthLabels}
+                    <div class="grid grid-cols-1 gap-1 text-center text-gray-500 p-1 font-semibold">
+                        <div>Mon</div>
+                        <div>Wed</div>
+                        <div>Fri</div>
+                    </div>
+                    <div class="grid grid-cols-52 gap-1 text-xs">
+                        ${days.map(day => `
+                            <div class="aspect-square rounded ${day.bgClass}" title="${day.tooltip}"></div>
+                        `).join('')}
+                    </div>
                 </div>
             `;
         },
-
+        
         generateActivityCalendar(activityLog) {
-            const calendar = [];
             const today = new Date();
-            const startDate = new Date(today);
-            startDate.setDate(today.getDate() - 84); // 12 weeks ago
-            
-            // Start from the beginning of the week
-            startDate.setDate(startDate.getDate() - startDate.getDay());
-
-            for (let i = 0; i < 84; i++) {
-                const currentDate = new Date(startDate);
-                currentDate.setDate(startDate.getDate() + i);
-                
+            const endDate = new Date(today);
+            endDate.setDate(today.getDate() + (6 - today.getDay())); // Align to end of the week (Saturday)
+        
+            const days = [];
+            const months = [];
+            let lastMonth = -1;
+        
+            for (let i = 0; i < 365; i++) {
+                const currentDate = new Date(endDate);
+                currentDate.setDate(endDate.getDate() - i);
+        
                 const dayActivities = activityLog.filter(log => {
                     const logDate = new Date(log.timestamp);
                     return logDate.toDateString() === currentDate.toDateString();
                 });
-
+        
                 const hasWorkout = dayActivities.some(log => log.type === 'workout_completed');
                 const hasGate = dayActivities.some(log => log.type === 'gate_completed');
-                
+        
                 let bgClass = 'bg-gray-800';
                 let tooltip = currentDate.toDateString();
-                
+                let contributionLevel = 0;
+        
                 if (hasWorkout && hasGate) {
-                    bgClass = 'bg-blue-500';
+                    contributionLevel = 4;
+                    bgClass = 'bg-green-800';
                     tooltip += ' - Workout & Gate completed';
                 } else if (hasWorkout) {
-                    bgClass = 'bg-green-500';
+                    contributionLevel = 3;
+                    bgClass = 'bg-green-700';
                     tooltip += ' - Workout completed';
                 } else if (hasGate) {
-                    bgClass = 'bg-purple-500';
+                    contributionLevel = 2;
+                    bgClass = 'bg-green-600';
                     tooltip += ' - Gate completed';
+                } else {
+                    contributionLevel = 1;
+                    bgClass = 'bg-green-500';
                 }
-
-                calendar.push({
-                    date: currentDate.getDate(),
-                    class: currentDate > today ? 'opacity-30' : '',
+        
+                days.unshift({
+                    date: currentDate,
                     bgClass,
-                    tooltip
+                    tooltip,
+                    contributionLevel,
                 });
+        
+                const currentMonth = currentDate.getMonth();
+                if (currentMonth !== lastMonth) {
+                    months.unshift({ name: currentDate.toLocaleString('default', { month: 'short' }), span: 0 });
+                    lastMonth = currentMonth;
+                }
+                if (months.length > 0) {
+                    months[0].span++;
+                }
             }
-
-            return calendar;
+        
+            return { months, days };
         }
+        
     };
 }
