@@ -2,10 +2,35 @@
     box-sizing: border-box;
 }
 
+/* Force override any existing select styles */
+select {
+    all: unset !important;
+    display: block !important;
+    box-sizing: border-box !important;
+}
+
 html {
     scroll-behavior: smooth;
     height: 100%;
     overflow: hidden; /* Prevent any body scroll */
+}
+
+/* Scroll performance optimizations */
+* {
+    /* Enable hardware acceleration for smoother scrolling */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* Optimize scrollable containers */
+.overflow-y-auto, [style*="overflow-y: auto"] {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    will-change: scroll-position;
+    /* Reduce repaints during scroll */
+    contain: layout style paint;
 }
 
 body {
@@ -17,6 +42,1032 @@ body {
     padding: 0;
     overflow: hidden; /* Prevent any body scroll */
     position: relative;
+    transition: background 0.5s ease;
+}
+
+/* Page-specific backgrounds */
+body.page-dashboard {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e1b4b 100%);
+}
+
+body.page-workout {
+    background: linear-gradient(135deg, #7c2d12 0%, #1c1917 50%, #450a0a 100%);
+}
+
+body.page-gates {
+    background: linear-gradient(135deg, #581c87 0%, #1e1b4b 50%, #312e81 100%);
+}
+
+body.page-architect {
+    background: linear-gradient(135deg, #065f46 0%, #064e3b 50%, #022c22 100%);
+}
+
+body.page-achievements {
+    background: linear-gradient(135deg, #b45309 0%, #92400e 50%, #451a03 100%);
+}
+
+body.page-settings {
+    background: linear-gradient(135deg, #374151 0%, #1f2937 50%, #111827 100%);
+}
+
+body.page-login {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e1b4b 100%);
+}
+
+/* Add subtle overlay patterns for texture */
+body.page-dashboard::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+body.page-workout::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(245, 101, 101, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+body.page-gates::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 30% 40%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 70% 60%, rgba(124, 58, 237, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+body.page-architect::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 40% 30%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 60% 70%, rgba(5, 150, 105, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+body.page-achievements::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 50% 20%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 30% 80%, rgba(217, 119, 6, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+body.page-settings::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 60% 40%, rgba(107, 114, 128, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(75, 85, 99, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+body.page-login::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Page-specific card enhancements */
+body.page-dashboard .card-bg {
+    background: rgba(31, 41, 55, 0.8);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+body.page-workout .card-bg {
+    background: rgba(31, 41, 55, 0.8);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+body.page-gates .card-bg {
+    background: rgba(31, 41, 55, 0.8);
+    border: 1px solid rgba(147, 51, 234, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+body.page-architect .card-bg {
+    background: rgba(31, 41, 55, 0.8);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+body.page-achievements .card-bg {
+    background: rgba(31, 41, 55, 0.8);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+body.page-settings .card-bg {
+    background: rgba(31, 41, 55, 0.8);
+    border: 1px solid rgba(107, 114, 128, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+/* Page transition animations */
+.app-main-content {
+    animation: pageSlideIn 0.3s ease-out;
+}
+
+@keyframes pageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced hover effects for page-specific elements */
+body.page-dashboard .card-bg:hover {
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+body.page-workout .card-bg:hover {
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
+}
+
+body.page-gates .card-bg:hover {
+    border-color: rgba(147, 51, 234, 0.5);
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.1);
+}
+
+body.page-architect .card-bg:hover {
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+body.page-achievements .card-bg:hover {
+    border-color: rgba(245, 158, 11, 0.5);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+}
+
+body.page-settings .card-bg:hover {
+    border-color: rgba(107, 114, 128, 0.5);
+    box-shadow: 0 0 20px rgba(107, 114, 128, 0.1);
+}
+
+/* Floating elements for visual interest */
+body.page-dashboard::after {
+    content: '';
+    position: fixed;
+    top: 10%;
+    right: 10%;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+body.page-workout::after {
+    content: '';
+    position: fixed;
+    top: 20%;
+    left: 15%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: float 8s ease-in-out infinite reverse;
+    pointer-events: none;
+    z-index: -1;
+}
+
+body.page-gates::after {
+    content: '';
+    position: fixed;
+    bottom: 15%;
+    right: 20%;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(147, 51, 234, 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: float 7s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+body.page-architect::after {
+    content: '';
+    position: fixed;
+    top: 30%;
+    right: 25%;
+    width: 90px;
+    height: 90px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: float 9s ease-in-out infinite reverse;
+    pointer-events: none;
+    z-index: -1;
+}
+
+body.page-achievements::after {
+    content: '';
+    position: fixed;
+    bottom: 25%;
+    left: 10%;
+    width: 110px;
+    height: 110px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: float 5s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) translateX(0px);
+    }
+    25% {
+        transform: translateY(-10px) translateX(5px);
+    }
+    50% {
+        transform: translateY(-5px) translateX(-5px);
+    }
+    75% {
+        transform: translateY(-15px) translateX(3px);
+    }
+}
+
+/* ===== POLISHED DROPDOWN SYSTEM ===== */
+
+/* Base select styling - High specificity to override defaults */
+select,
+select.form-control,
+.form-select,
+select[class*="select"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%) !important;
+    border: 2px solid #4b5563 !important;
+    border-radius: 12px !important;
+    color: #f9fafb !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    padding: 12px 40px 12px 16px !important;
+    min-height: 48px !important;
+    width: 100% !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    box-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.1),
+        0 1px 2px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    
+    /* Custom dropdown arrow */
+    background-image: 
+        linear-gradient(45deg, transparent 50%, #9ca3af 50%),
+        linear-gradient(135deg, #9ca3af 50%, transparent 50%),
+        linear-gradient(135deg, #374151 0%, #1f2937 100%) !important;
+    background-position: 
+        calc(100% - 20px) calc(1em + 2px),
+        calc(100% - 15px) calc(1em + 2px),
+        0 0 !important;
+    background-size: 
+        5px 5px,
+        5px 5px,
+        100% 100% !important;
+    background-repeat: no-repeat !important;
+}
+
+/* Hover state - High specificity */
+select:hover,
+select.form-control:hover,
+.form-select:hover,
+select[class*="select"]:hover {
+    border-color: #6b7280 !important;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Focus state - High specificity */
+select:focus,
+select.form-control:focus,
+.form-select:focus,
+select[class*="select"]:focus {
+    outline: none !important;
+    border-color: #6366f1 !important;
+    box-shadow: 
+        0 0 0 3px rgba(99, 102, 241, 0.1),
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Active/Open state - High specificity */
+select:active,
+select.form-control:active,
+.form-select:active,
+select[class*="select"]:active {
+    transform: translateY(0) !important;
+    box-shadow: 
+        0 0 0 3px rgba(99, 102, 241, 0.1),
+        0 1px 3px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Page-specific dropdown theming */
+body.page-dashboard select {
+    border-color: rgba(99, 102, 241, 0.3);
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
+}
+
+body.page-dashboard select:hover {
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+body.page-dashboard select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+body.page-workout select {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
+}
+
+body.page-workout select:hover {
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
+}
+
+body.page-workout select:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+body.page-gates select {
+    border-color: rgba(147, 51, 234, 0.3);
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
+}
+
+body.page-gates select:hover {
+    border-color: rgba(147, 51, 234, 0.5);
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.1);
+}
+
+body.page-gates select:focus {
+    border-color: #9333ea;
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.2);
+}
+
+body.page-architect select {
+    border-color: rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
+}
+
+body.page-architect select:hover {
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+body.page-architect select:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+body.page-achievements select {
+    border-color: rgba(245, 158, 11, 0.3);
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
+}
+
+body.page-achievements select:hover {
+    border-color: rgba(245, 158, 11, 0.5);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+}
+
+body.page-achievements select:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+body.page-settings select {
+    border-color: rgba(107, 114, 128, 0.3);
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
+}
+
+body.page-settings select:hover {
+    border-color: rgba(107, 114, 128, 0.5);
+    box-shadow: 0 0 20px rgba(107, 114, 128, 0.1);
+}
+
+body.page-settings select:focus {
+    border-color: #6b7280;
+    box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
+}
+
+/* Simplified Dropdown Options Styling - Browser limitations apply */
+select option {
+    background-color: #1f2937;
+    color: #f9fafb;
+    padding: 8px 12px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Simplified page-specific option styling */
+body.page-architect select option:checked { background-color: #10b981; }
+body.page-workout select option:checked { background-color: #ef4444; }
+body.page-gates select option:checked { background-color: #9333ea; }
+body.page-achievements select option:checked { background-color: #f59e0b; }
+body.page-settings select option:checked { background-color: #6b7280; }
+body.page-dashboard select option:checked { background-color: #6366f1; }
+
+/* Optgroup styling for categorized dropdowns */
+select optgroup {
+    background-color: #374151;
+    color: #d1d5db;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 12px 4px 12px;
+    border-bottom: 1px solid #4b5563;
+}
+
+select optgroup option {
+    background-color: #1f2937;
+    color: #f9fafb;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: none;
+    letter-spacing: normal;
+    padding-left: 20px;
+}
+
+/* Page-specific optgroup styling */
+body.page-architect select optgroup {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-bottom-color: rgba(16, 185, 129, 0.3);
+}
+
+body.page-workout select optgroup {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-bottom-color: rgba(239, 68, 68, 0.3);
+}
+
+body.page-gates select optgroup {
+    background-color: rgba(147, 51, 234, 0.1);
+    color: #9333ea;
+    border-bottom-color: rgba(147, 51, 234, 0.3);
+}
+
+body.page-achievements select optgroup {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border-bottom-color: rgba(245, 158, 11, 0.3);
+}
+
+body.page-settings select optgroup {
+    background-color: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+    border-bottom-color: rgba(107, 114, 128, 0.3);
+}
+
+body.page-dashboard select optgroup {
+    background-color: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    border-bottom-color: rgba(99, 102, 241, 0.3);
+}
+
+/* ===== CUSTOM DROPDOWN COMPONENT ===== */
+
+.custom-dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.custom-dropdown-button {
+    appearance: none;
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    border: 2px solid #4b5563;
+    border-radius: 12px;
+    color: #f9fafb;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 40px 12px 16px;
+    min-height: 48px;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.1),
+        0 1px 2px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.custom-dropdown-button::after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #9ca3af;
+    transition: transform 0.2s ease;
+}
+
+.custom-dropdown-button:hover {
+    border-color: #6b7280;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.custom-dropdown-button:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 
+        0 0 0 3px rgba(99, 102, 241, 0.1),
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.custom-dropdown.open .custom-dropdown-button::after {
+    transform: rotate(180deg);
+}
+
+.custom-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    border: 2px solid #4b5563;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-dropdown.open .custom-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.custom-dropdown-option {
+    padding: 12px 16px;
+    color: #f9fafb;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+    display: flex;
+    align-items: center;
+}
+
+.custom-dropdown-option:last-child {
+    border-bottom: none;
+}
+
+.custom-dropdown-option:hover {
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    color: #ffffff;
+    transform: translateX(4px);
+    padding-left: 20px;
+}
+
+.custom-dropdown-option.selected {
+    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.5);
+}
+
+/* Page-specific custom dropdown theming */
+body.page-architect .custom-dropdown-button {
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+body.page-architect .custom-dropdown-button:hover {
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+body.page-architect .custom-dropdown-button:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+body.page-architect .custom-dropdown-option.selected {
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.5);
+}
+
+body.page-workout .custom-dropdown-button {
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+body.page-workout .custom-dropdown-button:hover {
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
+}
+
+body.page-workout .custom-dropdown-button:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+body.page-workout .custom-dropdown-option.selected {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.5);
+}
+
+/* Custom scrollbar for dropdown menu */
+.custom-dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-dropdown-menu::-webkit-scrollbar-track {
+    background: rgba(31, 41, 55, 0.5);
+    border-radius: 3px;
+}
+
+.custom-dropdown-menu::-webkit-scrollbar-thumb {
+    background: rgba(107, 114, 128, 0.5);
+    border-radius: 3px;
+}
+
+.custom-dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.7);
+}
+
+/* Small dropdown variant */
+select.select-sm {
+    padding: 8px 32px 8px 12px;
+    min-height: 36px;
+    font-size: 13px;
+    border-radius: 8px;
+    background-position: 
+        calc(100% - 16px) calc(1em + 1px),
+        calc(100% - 12px) calc(1em + 1px);
+    background-size: 
+        4px 4px,
+        4px 4px;
+}
+
+/* Large dropdown variant */
+select.select-lg {
+    padding: 16px 48px 16px 20px;
+    min-height: 56px;
+    font-size: 16px;
+    border-radius: 16px;
+    background-position: 
+        calc(100% - 24px) calc(1em + 3px),
+        calc(100% - 18px) calc(1em + 3px);
+    background-size: 
+        6px 6px,
+        6px 6px;
+}
+
+/* Disabled state */
+select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #374151;
+    border-color: #4b5563;
+}
+
+select:disabled:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: #4b5563;
+}
+
+/* Custom dropdown container for enhanced styling */
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.dropdown-container::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #9ca3af;
+    pointer-events: none;
+    transition: transform 0.2s ease;
+}
+
+.dropdown-container:hover::after {
+    border-top-color: #d1d5db;
+}
+
+.dropdown-container select:focus + .dropdown-container::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* Animated dropdown arrow */
+@keyframes dropdownArrowBounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(-50%);
+    }
+    40% {
+        transform: translateY(-60%);
+    }
+    60% {
+        transform: translateY(-55%);
+    }
+}
+
+.dropdown-container:hover::after {
+    animation: dropdownArrowBounce 0.6s ease-in-out;
+}
+
+/* Polished dropdown class - Apply this class to ensure styling */
+.polished-dropdown {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%) !important;
+    border: 2px solid #4b5563 !important;
+    border-radius: 12px !important;
+    color: #f9fafb !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    padding: 12px 40px 12px 16px !important;
+    min-height: 48px !important;
+    width: 100% !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    box-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.1),
+        0 1px 2px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    
+    /* Custom dropdown arrow */
+    background-image: 
+        linear-gradient(45deg, transparent 50%, #9ca3af 50%),
+        linear-gradient(135deg, #9ca3af 50%, transparent 50%),
+        linear-gradient(135deg, #374151 0%, #1f2937 100%) !important;
+    background-position: 
+        calc(100% - 20px) calc(1em + 2px),
+        calc(100% - 15px) calc(1em + 2px),
+        0 0 !important;
+    background-size: 
+        5px 5px,
+        5px 5px,
+        100% 100% !important;
+    background-repeat: no-repeat !important;
+}
+
+.polished-dropdown:hover {
+    border-color: #6b7280 !important;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
+
+.polished-dropdown:focus {
+    outline: none !important;
+    border-color: #6366f1 !important;
+    box-shadow: 
+        0 0 0 3px rgba(99, 102, 241, 0.1),
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ===== ENHANCED INPUT STYLING ===== */
+
+/* Base input styling to match dropdowns */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea {
+    appearance: none;
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    border: 2px solid #4b5563;
+    border-radius: 12px;
+    color: #f9fafb;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 16px;
+    min-height: 48px;
+    width: 100%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.1),
+        0 1px 2px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+input[type="text"]:hover,
+input[type="number"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+textarea:hover {
+    border-color: #6b7280;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 
+        0 0 0 3px rgba(99, 102, 241, 0.1),
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Placeholder styling */
+input::placeholder,
+textarea::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+}
+
+/* Small input variant */
+input.input-sm,
+textarea.input-sm {
+    padding: 8px 12px;
+    min-height: 36px;
+    font-size: 13px;
+    border-radius: 8px;
+}
+
+/* Large input variant */
+input.input-lg,
+textarea.input-lg {
+    padding: 16px 20px;
+    min-height: 56px;
+    font-size: 16px;
+    border-radius: 16px;
+}
+
+/* Textarea specific styling */
+textarea {
+    min-height: 96px;
+    resize: vertical;
+}
+
+/* Checkbox and radio button styling */
+input[type="checkbox"],
+input[type="radio"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #4b5563;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+input[type="radio"] {
+    border-radius: 50%;
+}
+
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border-color: #6366f1;
+}
+
+input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+input[type="checkbox"]:hover,
+input[type="radio"]:hover {
+    border-color: #6b7280;
+    transform: scale(1.05);
+}
+
+input[type="checkbox"]:focus,
+input[type="radio"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
 .card-bg {
@@ -273,15 +1324,57 @@ body {
     background-color: #4f46e5;
 }
 
-/* Activity Graph Styles */
+/* Clean GitHub-Style Activity Graph */
 .activity-graph-container {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.activity-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f0f6fc;
+    margin: 0;
+}
+
+.activity-settings {
+    position: relative;
+}
+
+.activity-dropdown {
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    color: #f0f6fc;
+    padding: 5px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 8px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 30px;
+}
+
+.activity-dropdown:hover {
+    border-color: #8b949e;
+    background-color: #30363d;
 }
 
 .activity-main-grid {
     display: flex;
     align-items: flex-start;
     gap: 10px;
+    margin-bottom: 16px;
 }
 
 .activity-weekdays {
@@ -290,7 +1383,7 @@ body {
     gap: 3px;
     padding-top: 20px;
     font-size: 9px;
-    color: #9ca3af;
+    color: #8b949e;
     width: 24px;
     text-align: right;
     padding-right: 4px;
@@ -315,7 +1408,7 @@ body {
     height: 16px;
     margin-bottom: 4px;
     font-size: 11px;
-    color: #9ca3af;
+    color: #8b949e;
     align-items: center;
 }
 
@@ -324,6 +1417,8 @@ body {
     white-space: nowrap;
     font-size: 11px;
     flex: 1;
+    min-width: 0;
+    font-weight: 500;
 }
 
 .activity-grid {
@@ -346,60 +1441,145 @@ body {
     border-radius: 2px;
     cursor: pointer;
     transition: all 0.15s ease;
+    position: relative;
+    border: 1px solid transparent;
 }
 
 .activity-square:hover {
-    outline: 1px solid rgba(255, 255, 255, 0.4);
+    outline: 1px solid rgba(255, 255, 255, 0.6);
     outline-offset: 1px;
+    transform: scale(1.1);
 }
 
+/* Clean contribution levels */
 .activity-square.no-activity {
     background-color: #161b22;
-    border: 1px solid #21262d;
+    border-color: #21262d;
 }
 
 .activity-square.daily-quest {
-    background-color: #7c3aed;
-    border: 1px solid #8b5cf6;
+    background-color: #0d4429;
+    border-color: #0d4429;
 }
 
 .activity-square.gate-completed {
-    background-color: #ea580c;
-    border: 1px solid #f97316;
+    background-color: #006d32;
+    border-color: #006d32;
 }
 
 .activity-square.dual-activity {
-    background: linear-gradient(135deg, #7c3aed 0%, #7c3aed 50%, #ea580c 50%, #ea580c 100%);
-    border: 1px solid #8b5cf6;
+    background: linear-gradient(135deg, #0d4429 0%, #0d4429 50%, #006d32 50%, #006d32 100%);
+    border-color: #0d4429;
+}
+
+/* Clean legend styles */
+.activity-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #30363d;
 }
 
 .activity-legend {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #374151;
+    gap: 8px;
+    font-size: 11px;
+    color: #8b949e;
 }
 
-.activity-legend-items {
+.legend-text {
+    font-size: 11px;
+    color: #8b949e;
+    font-weight: 500;
+}
+
+.legend-squares {
     display: flex;
-    align-items: center;
-    gap: 16px;
-    font-size: 12px;
+    gap: 2px;
 }
 
-.activity-legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #d1d5db;
-}
-
-.activity-legend-square {
+.legend-square {
     width: 11px;
     height: 11px;
     border-radius: 2px;
+    border: 1px solid transparent;
+}
+
+.legend-square.legend-0 {
+    background-color: #161b22;
+    border-color: #21262d;
+}
+
+.legend-square.legend-1 {
+    background-color: #0d4429;
+    border-color: #0d4429;
+}
+
+.legend-square.legend-2 {
+    background-color: #006d32;
+    border-color: #006d32;
+}
+
+.legend-square.legend-3 {
+    background-color: #26a641;
+    border-color: #26a641;
+}
+
+.legend-square.legend-4 {
+    background-color: #39d353;
+    border-color: #39d353;
+}
+
+.activity-footer-text {
+    font-size: 11px;
+}
+
+.footer-link {
+    color: #58a6ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+    color: #79c0ff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .activity-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .activity-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .activity-main-grid {
+        gap: 8px;
+    }
+    
+    .activity-weekdays {
+        width: 20px;
+        font-size: 8px;
+    }
+    
+    .activity-square {
+        width: 10px;
+        height: 10px;
+    }
+    
+    .legend-square {
+        width: 10px;
+        height: 10px;
+    }
 }
 /* Custom
  Scrollbar Styling */
@@ -605,4 +1785,1985 @@ ut System Styles */
 .activity-calendar-day {
     aspect-ratio: 1 / 1;
     border-radius: 2px;
+}
+
+/* Enhanced Settings Page Styles */
+.settings-container {
+    padding: 0 1rem;
+}
+
+.difficulty-option {
+    transition: all 0.2s ease;
+}
+
+.difficulty-option:hover .bg-gray-800\/30 {
+    background-color: rgba(31, 41, 55, 0.6);
+}
+
+.difficulty-option[data-value="Easy"]:hover div {
+    border-color: #10b981 !important;
+    background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+.difficulty-option[data-value="Normal"]:hover div {
+    border-color: #3b82f6 !important;
+    background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+.difficulty-option[data-value="Hard"]:hover div {
+    border-color: #ef4444 !important;
+    background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Custom Toggle Switch Styles */
+.peer:checked ~ .peer-checked\:bg-blue-600 {
+    background-color: #2563eb;
+}
+
+.peer:focus ~ .peer-focus\:outline-none {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+
+/* Enhanced Card Hover Effects */
+body.page-settings .card-bg {
+    transition: all 0.3s ease;
+}
+
+body.page-settings .card-bg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Animated Icons */
+.settings-container i {
+    transition: all 0.2s ease;
+}
+
+.settings-container .card-bg:hover i {
+    transform: scale(1.1);
+}
+
+/* Status Indicators */
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 768px) {
+    .settings-container {
+        padding: 0 0.5rem;
+    }
+    
+    .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    
+    .grid.grid-cols-1.md\:grid-cols-3 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+}
+
+/* Enhanced Button Styles */
+body.page-settings button {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+body.page-settings button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.page-settings button:active {
+    transform: translateY(0);
+}
+
+/* Danger Zone Special Effects */
+.bg-red-500\/5 {
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+.border-red-500\/30 {
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Account Info Cards Animation */
+.settings-container .bg-gray-800\/50 {
+    transition: all 0.2s ease;
+}
+
+.settings-container .bg-gray-800\/50:hover {
+    background-color: rgba(31, 41, 55, 0.7);
+    transform: translateY(-1px);
+}
+
+/* Loading State Animations */
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.loading-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+}/* Enhan
+ced Workout Preview Styles */
+.workout-preview-container {
+    max-width: 100%;
+    color: #f9fafb;
+}
+
+.preview-header {
+    background: linear-gradient(135deg, rgba(185, 28, 28, 0.3) 0%, rgba(194, 65, 12, 0.3) 100%);
+    backdrop-filter: blur(10px);
+}
+
+.exercise-card {
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.exercise-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+}
+
+.set-info {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(75, 85, 99, 0.5);
+    border: 1px solid rgba(107, 114, 128, 0.3);
+    border-radius: 12px;
+    font-size: 11px;
+    color: #d1d5db;
+    margin: 1px;
+    transition: all 0.2s ease;
+}
+
+.set-info.working-set {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+    font-weight: 600;
+}
+
+.exercise-list {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(239, 68, 68, 0.3) transparent;
+}
+
+.exercise-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.exercise-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.exercise-list::-webkit-scrollbar-thumb {
+    background: rgba(239, 68, 68, 0.3);
+    border-radius: 3px;
+}
+
+.exercise-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(239, 68, 68, 0.5);
+}
+
+.time-breakdown {
+    backdrop-filter: blur(10px);
+}
+
+/* Modal Enhancements for Workout Preview */
+body.page-workout .modal-content {
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+body.page-workout .modal-content.large {
+    max-width: 1000px;
+}
+
+/* Workout Page Specific Enhancements */
+body.page-workout .card-bg {
+    background: rgba(127, 29, 29, 0.8);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+body.page-workout .card-bg:hover {
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
+}
+
+/* Enhanced Button Styles for Workout Page */
+body.page-workout button {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+body.page-workout button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.page-workout button:active {
+    transform: translateY(0);
+}
+
+body.page-workout .btn-primary {
+    background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
+    border: none;
+}
+
+body.page-workout .btn-primary:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #c2410c 100%);
+}
+
+/* Animated Icons */
+.workout-preview-container i {
+    transition: all 0.2s ease;
+}
+
+.exercise-card:hover i {
+    transform: scale(1.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .workout-preview-container .grid-cols-2.md\\:grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    
+    .exercise-card {
+        padding: 1rem;
+    }
+    
+    .preview-header {
+        padding: 1rem;
+    }
+}
+
+/* Loading Animation for Preview */
+@keyframes workoutPreviewFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.workout-preview-container {
+    animation: workoutPreviewFadeIn 0.4s ease-out;
+}
+
+.exercise-card {
+    animation: workoutPreviewFadeIn 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.exercise-card:nth-child(1) { animation-delay: 0.1s; }
+.exercise-card:nth-child(2) { animation-delay: 0.2s; }
+.exercise-card:nth-child(3) { animation-delay: 0.3s; }
+.exercise-card:nth-child(4) { animation-delay: 0.4s; }
+.exercise-card:nth-child(5) { animation-delay: 0.5s; }
+.exercise-card:nth-child(6) { animation-delay: 0.6s; }/* Enh
+anced Modal Styles */
+.modal-content {
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.modal-content.small {
+    max-width: 400px;
+}
+
+.modal-content.medium {
+    max-width: 600px;
+}
+
+.modal-content.large {
+    max-width: 900px;
+    max-height: 90vh;
+}
+
+.modal-content.large #modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Modal Animation */
+#modal-overlay {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+#modal-overlay.flex {
+    opacity: 1;
+}
+
+.modal-content {
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+}
+
+#modal-overlay.flex .modal-content {
+    transform: scale(1);
+}
+
+/* Enhanced Modal Buttons */
+.modal-btn {
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.modal-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.modal-btn:active {
+    transform: translateY(0);
+}
+
+.modal-btn.primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.modal-btn.primary:hover {
+    background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+}
+
+/* Modal Close Button Enhancement */
+#modal-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#modal-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+/* Scrollbar for Modal Body */
+#modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+#modal-body::-webkit-scrollbar-track {
+    background: rgba(75, 85, 99, 0.2);
+    border-radius: 3px;
+}
+
+#modal-body::-webkit-scrollbar-thumb {
+    background: rgba(107, 114, 128, 0.5);
+    border-radius: 3px;
+}
+
+#modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.7);
+}
+
+/* Enhanced Architect Page Dropdown Styles */
+.custom-exercise-dropdown {
+    position: relative;
+}
+
+.exercise-dropdown-button {
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+}
+
+.exercise-dropdown-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+.exercise-dropdown-menu {
+    transition: all 0.15s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.muscle-group-header {
+    backdrop-filter: blur(5px);
+}
+
+.exercise-option {
+    transition: all 0.15s ease;
+}
+
+.exercise-option:hover {
+    background: linear-gradient(90deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+    border-left: 3px solid #22c55e;
+}
+
+.exercise-dropdown-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(34, 197, 94, 0.3) transparent;
+}
+
+.exercise-dropdown-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.exercise-dropdown-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.exercise-dropdown-content::-webkit-scrollbar-thumb {
+    background: rgba(34, 197, 94, 0.3);
+    border-radius: 3px;
+}
+
+.exercise-dropdown-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(34, 197, 94, 0.5);
+}
+
+/* Architect Page Specific Enhancements */
+body.page-architect .card-bg {
+    background: rgba(6, 95, 70, 0.8);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+body.page-architect .card-bg:hover {
+    border-color: rgba(34, 197, 94, 0.5);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
+}
+
+/* Enhanced Input Styles for Architect Page */
+body.page-architect input[type="text"],
+body.page-architect input[type="number"] {
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+}
+
+body.page-architect input[type="text"]:focus,
+body.page-architect input[type="number"]:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+/* Enhanced Button Styles for Architect Page */
+body.page-architect button {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+body.page-architect button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.page-architect button:active {
+    transform: translateY(0);
+}
+
+/* Routine Preview Enhancements */
+body.page-architect .routine-preview-item {
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+}
+
+body.page-architect .routine-preview-item:hover {
+    transform: translateX(4px);
+    border-left: 3px solid #22c55e;
+}
+
+/* Search Input Enhancement */
+#exercise-search {
+    transition: all 0.2s ease;
+}
+
+#exercise-search:focus {
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+}
+
+/* Animation for dropdown opening */
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.exercise-dropdown-menu:not(.hidden) {
+    animation: dropdownSlideIn 0.15s ease-out;
+}
+
+/* Muscle group color indicators */
+.muscle-group-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Enhanced routine preview cards */
+.routine-preview-card {
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.8) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    transition: all 0.2s ease;
+}
+
+.routine-preview-card:hover {
+    border-color: rgba(34, 197, 94, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(34, 197, 94, 0.15);
+}
+
+/* Loading states */
+.loading-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .exercise-dropdown-menu {
+        max-height: 60vh;
+    }
+    
+    .exercise-dropdown-content {
+        max-height: 50vh;
+    }
+    
+    .custom-exercise-dropdown {
+        position: static;
+    }
+    
+    .exercise-dropdown-menu {
+        position: fixed;
+        left: 1rem;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        max-height: 70vh;
+    }
+}/* Rou
+tine Builder Overlay Styles */
+#routine-builder-overlay {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#routine-builder-overlay:not(.hidden) {
+    opacity: 1;
+}
+
+.routine-builder-header {
+    backdrop-filter: blur(10px);
+}
+
+.routine-builder-footer {
+    backdrop-filter: blur(10px);
+}
+
+/* Builder Exercise Dropdown */
+.builder-exercise-dropdown-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(34, 197, 94, 0.3) transparent;
+}
+
+.builder-exercise-dropdown-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.builder-exercise-dropdown-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.builder-exercise-dropdown-content::-webkit-scrollbar-thumb {
+    background: rgba(34, 197, 94, 0.3);
+    border-radius: 3px;
+}
+
+.builder-exercise-dropdown-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(34, 197, 94, 0.5);
+}
+
+.builder-exercise-option {
+    transition: all 0.15s ease;
+}
+
+.builder-exercise-option:hover {
+    background: linear-gradient(90deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+    border-left: 3px solid #22c55e;
+}
+
+/* Template Buttons */
+.template-btn {
+    transition: all 0.2s ease;
+}
+
+.template-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+    border-color: #22c55e;
+}
+
+/* Builder Input Enhancements */
+#routine-builder-overlay input[type="text"],
+#routine-builder-overlay input[type="number"] {
+    transition: all 0.2s ease;
+}
+
+#routine-builder-overlay input[type="text"]:focus,
+#routine-builder-overlay input[type="number"]:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+/* Builder Preview Cards */
+#routine-builder-overlay .routine-preview-card {
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.6) 0%, rgba(17, 24, 39, 0.6) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    transition: all 0.2s ease;
+}
+
+#routine-builder-overlay .routine-preview-card:hover {
+    border-color: rgba(34, 197, 94, 0.4);
+    transform: translateX(4px);
+}
+
+/* Builder Button Enhancements */
+#routine-builder-overlay button {
+    transition: all 0.2s ease;
+}
+
+#routine-builder-overlay button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#routine-builder-overlay button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+#routine-builder-overlay button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Responsive Design for Builder */
+@media (max-width: 1024px) {
+    #routine-builder-overlay .grid.grid-cols-1.lg\\:grid-cols-3 {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+    }
+    
+    #routine-builder-overlay .lg\\:col-span-2 {
+        order: 1;
+    }
+    
+    #routine-builder-overlay .bg-gradient-to-br.from-gray-800.to-gray-900 {
+        order: 2;
+        max-height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .routine-builder-header {
+        padding: 1rem;
+    }
+    
+    .routine-builder-footer {
+        padding: 1rem;
+    }
+    
+    #routine-builder-overlay .grid.grid-cols-1.md\\:grid-cols-3 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    #routine-builder-overlay .grid.grid-cols-2.md\\:grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    
+    #routine-builder-overlay .flex.items-center.justify-between {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+}
+
+/* Animation for builder cards */
+@keyframes builderSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#routine-builder-overlay .routine-preview-card {
+    animation: builderSlideIn 0.3s ease-out;
+    animation-fill-mode: both;
+}
+
+#routine-builder-overlay .routine-preview-card:nth-child(1) { animation-delay: 0.1s; }
+#routine-builder-overlay .routine-preview-card:nth-child(2) { animation-delay: 0.2s; }
+#routine-builder-overlay .routine-preview-card:nth-child(3) { animation-delay: 0.3s; }
+#routine-builder-overlay .routine-preview-card:nth-child(4) { animation-delay: 0.4s; }
+#routine-builder-overlay .routine-preview-card:nth-child(5) { animation-delay: 0.5s; }
+
+/* Builder Stats Enhancement */
+#builder-routine-stats .bg-gray-900\/50 {
+    transition: all 0.2s ease;
+}
+
+#builder-routine-stats .bg-gray-900\/50:hover {
+    background: rgba(17, 24, 39, 0.7);
+    transform: translateY(-1px);
+}/*
+ Interactive Body Diagram Styles */
+.body-diagram-container {
+    position: relative;
+}
+
+.body-svg-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 450px;
+    position: relative;
+}
+
+.body-diagram {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.body-diagram.hidden {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.body-diagram.active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: all;
+    position: relative;
+}
+
+.interactive-muscle {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    stroke-width: 2;
+}
+
+.interactive-muscle:hover {
+    filter: brightness(1.3) drop-shadow(0 0 8px currentColor);
+    transform: scale(1.05);
+}
+
+.interactive-muscle.selected {
+    filter: brightness(1.4) drop-shadow(0 0 12px currentColor);
+    transform: scale(1.1);
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        filter: brightness(1.4) drop-shadow(0 0 12px currentColor);
+    }
+    50% {
+        filter: brightness(1.6) drop-shadow(0 0 16px currentColor);
+    }
+}
+
+.body-view-btn {
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.body-view-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.body-view-btn.active {
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.exercise-item {
+    transition: all 0.2s ease;
+}
+
+.exercise-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.exercise-item:active {
+    transform: translateY(0);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .body-svg-container {
+        min-height: 350px;
+    }
+    
+    .interactive-muscle {
+        stroke-width: 3;
+    }
+    
+    .interactive-muscle:hover {
+        transform: scale(1.08);
+    }
+    
+    .interactive-muscle.selected {
+        transform: scale(1.15);
+    }
+    
+    .body-diagram-container {
+        padding: 1rem;
+    }
+    
+    .exercise-selection-panel {
+        margin-top: 1rem;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .interactive-muscle:hover {
+        filter: none;
+        transform: scale(1);
+    }
+    
+    .interactive-muscle:active {
+        filter: brightness(1.3) drop-shadow(0 0 8px currentColor);
+        transform: scale(1.05);
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .interactive-muscle {
+        stroke-width: 3;
+    }
+    
+    .interactive-muscle:hover,
+    .interactive-muscle.selected {
+        stroke-width: 4;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .interactive-muscle,
+    .body-diagram,
+    .exercise-item {
+        transition: none;
+    }
+    
+    .interactive-muscle.selected {
+        animation: none;
+    }
+}/*
+ ===== APP LAYOUT FIXES ===== */
+
+/* Main app container */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Fixed header */
+.app-header {
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+    margin-bottom: 1rem;
+}
+
+/* Fixed navigation */
+.app-nav {
+    position: relative;
+    z-index: 9;
+    flex-shrink: 0;
+    margin-bottom: 1rem;
+}
+
+/* Scrollable main content */
+.app-main-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 1rem 2rem 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Settings container specific fixes */
+.settings-container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Account info grid fixes */
+#account-info {
+    position: relative;
+    z-index: 3;
+}
+
+/* Ensure proper spacing and no overlap */
+.settings-container > * {
+    margin-bottom: 1.5rem;
+}
+
+.settings-container > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Card background fixes */
+.card-bg {
+    position: relative;
+    z-index: 1;
+    background: rgba(31, 41, 55, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+/* Navigation button fixes */
+.nav-btn {
+    position: relative;
+    z-index: 10;
+    background: rgba(55, 65, 81, 0.8);
+    color: #9ca3af;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    background: rgba(75, 85, 99, 0.9);
+    color: #f3f4f6;
+}
+
+.nav-btn.active {
+    background: rgba(99, 102, 241, 0.9);
+    color: #ffffff;
+}
+
+/* Prevent text overlap in account overview */
+.settings-container h2 {
+    position: relative;
+    z-index: 5;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+/* Ensure proper text rendering */
+.settings-container .text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    margin-bottom: 1rem;
+}
+
+/* Fix for overlapping elements */
+.settings-container .grid {
+    position: relative;
+    z-index: 4;
+    gap: 1rem;
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 768px) {
+    .app-main-content {
+        padding: 0 0.5rem 1rem 0.5rem;
+    }
+    
+    .settings-container {
+        max-width: 100%;
+        padding: 0;
+    }
+    
+    .settings-container > * {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Ensure background canvas doesn't interfere */
+.background-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -10;
+    pointer-events: none;
+}
+
+/* Particle container fixes */
+#particles-dashboard,
+#particles-workout,
+#particles-gates,
+#particles-architect,
+#particles-achievements,
+#particles-settings {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -5;
+    pointer-events: none;
+}
+
+/* ===== ADDITIONAL OVERLAP FIXES ===== */
+
+/* Ensure proper header spacing */
+.app-header h1 {
+    margin: 0;
+    padding: 0;
+    line-height: 1.2;
+}
+
+/* Account overview specific fixes */
+.settings-container .card-bg h2 {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+/* Prevent icon overlap */
+.settings-container .card-bg h2 i {
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+/* Account info grid improvements */
+#account-info > div {
+    position: relative;
+    z-index: 5;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Text spacing fixes */
+.settings-container .text-xs {
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+}
+
+.settings-container .text-lg {
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Ensure proper card spacing */
+.settings-container > .card-bg {
+    margin-bottom: 1.5rem;
+    clear: both;
+    position: relative;
+}
+
+/* Fix for any floating elements */
+.settings-container::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Responsive text sizing */
+@media (max-width: 640px) {
+    .settings-container h1 {
+        font-size: 2rem;
+        line-height: 1.3;
+    }
+    
+    .settings-container h2 {
+        font-size: 1.125rem;
+        line-height: 1.5;
+    }
+    
+    #account-info {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
+
+/* Loading shimmer animation fix */
+.loading-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-shimmer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}/*
+ ===== SETTINGS PAGE SPECIFIC FIXES ===== */
+
+/* Force proper layout for settings page */
+body.page-settings .app-main-content {
+    position: relative;
+    z-index: 10;
+    background: transparent;
+}
+
+/* Account overview header fix */
+body.page-settings .settings-container .card-bg:first-of-type h2 {
+    position: relative;
+    z-index: 15;
+    background: rgba(31, 41, 55, 0.95);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Ensure account info is properly positioned */
+body.page-settings #account-info {
+    position: relative;
+    z-index: 12;
+    background: transparent;
+    margin-top: 1rem;
+}
+
+/* Fix for account overview text specifically */
+body.page-settings .settings-container .card-bg:nth-child(2) h2 {
+    position: relative;
+    z-index: 20;
+    background: rgba(31, 41, 55, 0.98);
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    margin: 0 0 1.5rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Prevent any background interference */
+body.page-settings .card-bg {
+    position: relative;
+    z-index: 8;
+    background: rgba(31, 41, 55, 0.95) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+/* Text rendering improvements */
+body.page-settings h1,
+body.page-settings h2,
+body.page-settings h3 {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure proper stacking context */
+body.page-settings .settings-container {
+    position: relative;
+    z-index: 5;
+    isolation: isolate;
+}
+
+/* Account overview specific isolation */
+body.page-settings .settings-container > .card-bg:nth-child(2) {
+    position: relative;
+    z-index: 15;
+    isolation: isolate;
+}
+
+body.page-settings .settings-container > .card-bg:nth-child(2) h2 {
+    position: relative;
+    z-index: 20;
+    isolation: isolate;
+}
+
+/* Force text to be on top */
+body.page-settings .text-white,
+body.page-settings .text-xl {
+    position: relative;
+    z-index: 25;
+}
+
+/* Additional safety for overlapping prevention */
+body.page-settings * {
+    position: relative;
+}
+
+body.page-settings .card-bg * {
+    z-index: inherit;
+}/* ==
+=== SETTINGS ICON POSITIONING FIXES ===== */
+
+/* Settings header icon container */
+.settings-container .card-bg:first-child .flex {
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Settings icon container */
+.settings-container .card-bg:first-child .w-12 {
+    width: 3rem !important;
+    height: 3rem !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 0.75rem !important;
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%) !important;
+    position: relative !important;
+    z-index: 10 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Settings icon */
+.settings-container .card-bg:first-child .fa-cog {
+    font-size: 1.25rem !important;
+    color: #d1d5db !important;
+    position: relative !important;
+    z-index: 11 !important;
+    line-height: 1 !important;
+    display: inline-block !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+}
+
+/* Settings header text container */
+.settings-container .card-bg:first-child .flex-1 {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Settings title */
+.settings-container .card-bg:first-child h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    margin: 0 0 0.25rem 0;
+}
+
+/* Settings subtitle */
+.settings-container .card-bg:first-child p {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Ensure proper spacing and prevent overflow */
+.settings-container .card-bg:first-child {
+    padding: 1.5rem;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+    .settings-container .card-bg:first-child .w-12 {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    
+    .settings-container .card-bg:first-child .fa-cog {
+        font-size: 1rem;
+    }
+    
+    .settings-container .card-bg:first-child h1 {
+        font-size: 1.5rem;
+    }
+    
+    .settings-container .card-bg:first-child p {
+        font-size: 0.8rem;
+    }
+}/* ==
+=== FONTAWESOME ICON FIXES ===== */
+
+/* Global icon positioning fixes */
+i[class*="fa-"],
+.fas,
+.far,
+.fab,
+.fal {
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    vertical-align: baseline;
+    position: relative;
+}
+
+/* Icon container fixes */
+.flex .fas,
+.flex .far,
+.flex .fab,
+.flex .fal {
+    flex-shrink: 0;
+}
+
+/* Prevent icon overflow */
+.card-bg i {
+    overflow: visible;
+    position: relative;
+    z-index: 5;
+}
+
+/* Settings specific icon fixes */
+.settings-container i {
+    position: relative;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Icon spacing in flex containers */
+.flex i + * {
+    margin-left: 0.5rem;
+}
+
+/* Ensure icons don't break layout */
+i {
+    max-width: none;
+    max-height: none;
+    width: auto;
+    height: auto;
+}/* =
+==== ADDITIONAL SETTINGS ICON FIXES ===== */
+
+/* Force proper positioning for settings header */
+body.page-settings .settings-container > .card-bg:first-child {
+    position: relative;
+    z-index: 10;
+    overflow: visible;
+    contain: layout;
+}
+
+/* Settings icon container positioning */
+body.page-settings .settings-container > .card-bg:first-child .flex {
+    position: relative;
+    z-index: 11;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* Icon wrapper specific positioning */
+body.page-settings .settings-container > .card-bg:first-child .w-12.h-12 {
+    position: relative;
+    z-index: 12;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 3rem !important;
+    height: 3rem !important;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Settings cog icon specific */
+body.page-settings .fa-cog {
+    position: relative;
+    z-index: 13;
+    font-size: 1.25rem !important;
+    color: #d1d5db !important;
+    line-height: 1;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Prevent any transform or positioning issues */
+body.page-settings .settings-container * {
+    transform: none;
+    will-change: auto;
+}
+
+/* Ensure text doesn't interfere with icon */
+body.page-settings .settings-container h1,
+body.page-settings .settings-container p {
+    position: relative;
+    z-index: 11;
+}/* ===== AC
+HIEVEMENTS DROPDOWN FIXES ===== */
+
+/* Achievement group header improvements */
+.achievement-group-header {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.achievement-group-header:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.achievement-group-header:active {
+    transform: translateY(0);
+}
+
+/* Focus styles for accessibility */
+.achievement-group-header:focus {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+}
+
+/* Expand icon animation */
+.expand-icon {
+    transition: transform 0.2s ease;
+    transform-origin: center;
+}
+
+.expand-icon.rotate-90 {
+    transform: rotate(90deg);
+}
+
+/* Achievement group content animation */
+.achievement-group-content {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.achievement-group-content.hidden {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.achievement-group-content:not(.hidden) {
+    max-height: 1000px;
+    opacity: 1;
+    margin-top: 0.5rem;
+}
+
+/* Achievement card improvements */
+.achievement-card {
+    transition: all 0.2s ease;
+    border-left-width: 2px;
+}
+
+.achievement-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Progress bar animations */
+.achievement-group-header .bg-indigo-600,
+.achievement-card .bg-indigo-600,
+.achievement-card .bg-yellow-600 {
+    transition: width 0.5s ease;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .achievement-group-content {
+        padding-left: 0.5rem;
+    }
+    
+    .achievement-card {
+        padding: 0.75rem;
+    }
+    
+    .achievement-group-header {
+        padding: 0.75rem;
+    }
+}
+
+/* Loading state improvements */
+.achievements-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #9ca3af;
+}
+
+.achievements-loading::after {
+    content: "";
+    width: 20px;
+    height: 20px;
+    border: 2px solid #374151;
+    border-top: 2px solid #6366f1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 0.5rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}/* 
+===== SETTINGS TOGGLE FIXES ===== */
+
+/* Remove any default checkbox styling and checkmarks */
+#auto-login-toggle {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+}
+
+/* Ensure no pseudo-elements add checkmarks */
+#auto-login-toggle::before,
+#auto-login-toggle::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Clean toggle switch styling */
+.settings-container label[for="auto-login-toggle"],
+.settings-container label:has(#auto-login-toggle) {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Toggle switch container */
+.settings-container #auto-login-toggle + div {
+    position: relative;
+    width: 2.75rem;
+    height: 1.5rem;
+    background-color: #374151;
+    border-radius: 9999px;
+    transition: background-color 0.2s ease;
+    border: none;
+    outline: none;
+}
+
+/* Toggle switch knob */
+.settings-container #auto-login-toggle + div::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Toggle switch active state */
+.settings-container #auto-login-toggle:checked + div {
+    background-color: #2563eb;
+}
+
+.settings-container #auto-login-toggle:checked + div::after {
+    transform: translateX(1.25rem);
+}
+
+/* Focus state */
+.settings-container #auto-login-toggle:focus + div {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Hover state */
+.settings-container label:hover #auto-login-toggle + div {
+    background-color: #4b5563;
+}
+
+.settings-container label:hover #auto-login-toggle:checked + div {
+    background-color: #1d4ed8;
+}
+
+/* Remove any icons or checkmarks that might appear */
+.settings-container .fa-check,
+.settings-container .fa-tick,
+.settings-container [class*="check"],
+.settings-container [class*="tick"] {
+    display: none !important;
+}
+
+/* Ensure clean layout for the toggle container */
+.settings-container .flex.items-center.justify-between {
+    position: relative;
+}
+
+.settings-container .flex.items-center.justify-between::before,
+.settings-container .flex.items-center.justify-between::after {
+    display: none !important;
+}
+
+/* Remove any potential duplicate elements */
+.settings-container label > *:not(input):not(div) {
+    display: none !important;
+}
+
+/* Ensure only the toggle switch is visible */
+.settings-container label {
+    position: relative;
+    overflow: hidden;
+}
+
+.settings-container label > input[type="checkbox"] ~ * ~ * {
+    display: none !important;
+}/* =====
+ CLEAN TOGGLE SWITCH IMPLEMENTATION ===== */
+
+/* Toggle container */
+.toggle-switch-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Hidden checkbox */
+.toggle-checkbox {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    pointer-events: none !important;
+}
+
+/* Remove any pseudo-elements from checkbox */
+.toggle-checkbox::before,
+.toggle-checkbox::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Toggle switch track */
+.toggle-switch {
+    position: relative;
+    width: 2.75rem;
+    height: 1.5rem;
+    background-color: #374151;
+    border-radius: 0.75rem;
+    transition: background-color 0.2s ease-in-out;
+    border: none;
+    outline: none;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Toggle switch knob */
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 0.125rem;
+    left: 0.125rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-color: #ffffff;
+    border-radius: 50%;
+    transition: transform 0.2s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Active state */
+.toggle-checkbox:checked + .toggle-switch {
+    background-color: #2563eb;
+}
+
+.toggle-checkbox:checked + .toggle-switch::after {
+    transform: translateX(1.25rem);
+}
+
+/* Focus state */
+.toggle-checkbox:focus + .toggle-switch {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Hover states */
+.toggle-switch-container:hover .toggle-switch {
+    background-color: #4b5563;
+}
+
+.toggle-switch-container:hover .toggle-checkbox:checked + .toggle-switch {
+    background-color: #1d4ed8;
+}
+
+/* Active/pressed state */
+.toggle-switch-container:active .toggle-switch::after {
+    width: 1.375rem;
+}
+
+/* Disabled state */
+.toggle-checkbox:disabled + .toggle-switch {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.toggle-checkbox:disabled + .toggle-switch::after {
+    background-color: #d1d5db;
+}
+
+/* Remove any potential icons or checkmarks */
+.toggle-switch-container * {
+    box-sizing: border-box;
+}
+
+.toggle-switch-container .fa-check,
+.toggle-switch-container .fa-tick,
+.toggle-switch-container [class*="check"],
+.toggle-switch-container [class*="tick"] {
+    display: none !important;
+}
+
+/* Ensure no extra elements appear */
+.toggle-switch-container > *:not(.toggle-checkbox):not(.toggle-switch) {
+    display: none !important;
+}/* ===
+== ADDITIONAL SETTINGS HEADER FIXES ===== */
+
+/* Settings header container */
+.settings-container > .card-bg:first-child {
+    position: relative !important;
+    overflow: visible !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Settings header flex container */
+.settings-container > .card-bg:first-child > .flex {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    width: 100% !important;
+    position: relative !important;
+    z-index: 5 !important;
+}
+
+/* Icon container specific positioning */
+.settings-container > .card-bg:first-child .w-12.h-12 {
+    position: static !important;
+    float: none !important;
+    clear: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Text container positioning */
+.settings-container > .card-bg:first-child .flex-1 {
+    position: static !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Settings title positioning */
+.settings-container > .card-bg:first-child h1 {
+    position: static !important;
+    margin: 0 0 0.25rem 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important;
+    font-size: 1.875rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+}
+
+/* Settings subtitle positioning */
+.settings-container > .card-bg:first-child p {
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.4 !important;
+    font-size: 0.875rem !important;
+    color: #9ca3af !important;
+}
+
+/* Prevent any transforms or positioning issues */
+.settings-container > .card-bg:first-child * {
+    box-sizing: border-box !important;
+}
+
+/* Mobile specific fixes */
+@media (max-width: 640px) {
+    .settings-container > .card-bg:first-child {
+        padding: 1rem !important;
+    }
+    
+    .settings-container > .card-bg:first-child .w-12.h-12 {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+    }
+    
+    .settings-container > .card-bg:first-child .fa-cog {
+        font-size: 1rem !important;
+    }
+    
+    .settings-container > .card-bg:first-child h1 {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* ===== FINAL SETTINGS ICON POSITIONING FIX ===== */
+
+/* Force proper positioning for settings page specifically */
+body.page-settings .settings-container > .card-bg:first-child {
+    position: relative !important;
+    z-index: 10 !important;
+    contain: layout !important;
+    isolation: isolate !important;
+}
+
+/* Settings icon container - force proper bounds */
+body.page-settings .settings-container .w-12.h-12.bg-gradient-to-br {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 3rem !important;
+    height: 3rem !important;
+    min-width: 3rem !important;
+    min-height: 3rem !important;
+    max-width: 3rem !important;
+    max-height: 3rem !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0.75rem !important;
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%) !important;
+    overflow: hidden !important;
+    z-index: 15 !important;
+}
+
+/* Settings cog icon - force center positioning */
+body.page-settings .settings-container .fa-cog {
+    position: relative !important;
+    display: inline-block !important;
+    font-size: 1.25rem !important;
+    line-height: 1 !important;
+    color: #d1d5db !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    transform: none !important;
+    left: 0 !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 20 !important;
+}
+
+/* Ensure flex container works properly */
+body.page-settings .settings-container > .card-bg:first-child > .flex {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 1rem !important;
+    width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+    z-index: 12 !important;
+}
+
+/* Text container positioning */
+body.page-settings .settings-container .flex-1 {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    position: relative !important;
+    z-index: 13 !important;
 }

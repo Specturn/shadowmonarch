@@ -4,7 +4,13 @@ export function initAchievements(app) {
             return `
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="card-bg p-6 rounded-lg">
-                        <h2 class="text-2xl font-bold mb-4">Achievements</h2>
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-2xl font-bold">Achievements</h2>
+                            <button id="toggle-all-achievements" class="text-sm px-3 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white rounded-lg transition-colors duration-200">
+                                <i class="fas fa-expand-arrows-alt mr-1"></i>
+                                <span>Expand All</span>
+                            </button>
+                        </div>
                         <div id="achievements-list" class="space-y-3">
                             <div class="text-center text-gray-400 py-4">Loading achievements...</div>
                         </div>
@@ -21,8 +27,120 @@ export function initAchievements(app) {
         },
 
         init() {
+            this.setupEventListeners();
             this.updateAchievements();
             this.updateProgressSummary();
+        },
+
+        setupEventListeners() {
+            // Remove any existing listeners first
+            this.cleanup();
+            
+            // Event delegation for achievement group toggles
+            this.clickHandler = (event) => {
+                try {
+                    const header = event.target.closest('.achievement-group-header');
+                    if (header) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        const content = header.parentElement.querySelector('.achievement-group-content');
+                        const expandIcon = header.querySelector('.expand-icon');
+                        
+                        if (content && expandIcon) {
+                            const isHidden = content.classList.contains('hidden');
+                            
+                            if (isHidden) {
+                                content.classList.remove('hidden');
+                                expandIcon.classList.add('rotate-90');
+                                header.setAttribute('aria-expanded', 'true');
+                            } else {
+                                content.classList.add('hidden');
+                                expandIcon.classList.remove('rotate-90');
+                                header.setAttribute('aria-expanded', 'false');
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error in achievements click handler:', error);
+                }
+            };
+
+            // Keyboard event handler for accessibility
+            this.keydownHandler = (event) => {
+                try {
+                    const header = event.target.closest('.achievement-group-header');
+                    if (header && (event.key === 'Enter' || event.key === ' ')) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        // Trigger the same logic as click
+                        header.click();
+                    }
+                } catch (error) {
+                    console.error('Error in achievements keydown handler:', error);
+                }
+            };
+
+            // Toggle all achievements handler
+            this.toggleAllHandler = (event) => {
+                try {
+                    if (event.target.closest('#toggle-all-achievements')) {
+                        event.preventDefault();
+                        
+                        const button = event.target.closest('#toggle-all-achievements');
+                        const buttonText = button.querySelector('span');
+                        const buttonIcon = button.querySelector('i');
+                        const allContents = document.querySelectorAll('.achievement-group-content');
+                        const allIcons = document.querySelectorAll('.expand-icon');
+                        const allHeaders = document.querySelectorAll('.achievement-group-header');
+                        
+                        // Check if any are currently expanded
+                        const anyExpanded = Array.from(allContents).some(content => !content.classList.contains('hidden'));
+                        
+                        if (anyExpanded) {
+                            // Collapse all
+                            allContents.forEach(content => content.classList.add('hidden'));
+                            allIcons.forEach(icon => icon.classList.remove('rotate-90'));
+                            allHeaders.forEach(header => header.setAttribute('aria-expanded', 'false'));
+                            buttonText.textContent = 'Expand All';
+                            buttonIcon.className = 'fas fa-expand-arrows-alt mr-1';
+                        } else {
+                            // Expand all
+                            allContents.forEach(content => content.classList.remove('hidden'));
+                            allIcons.forEach(icon => icon.classList.add('rotate-90'));
+                            allHeaders.forEach(header => header.setAttribute('aria-expanded', 'true'));
+                            buttonText.textContent = 'Collapse All';
+                            buttonIcon.className = 'fas fa-compress-arrows-alt mr-1';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error in toggle all handler:', error);
+                }
+            };
+
+            // Add event listeners
+            document.addEventListener('click', this.clickHandler);
+            document.addEventListener('keydown', this.keydownHandler);
+            document.addEventListener('click', this.toggleAllHandler);
+        },
+
+        cleanup() {
+            // Remove event listeners to prevent memory leaks
+            if (this.clickHandler) {
+                document.removeEventListener('click', this.clickHandler);
+                this.clickHandler = null;
+            }
+            
+            if (this.keydownHandler) {
+                document.removeEventListener('keydown', this.keydownHandler);
+                this.keydownHandler = null;
+            }
+            
+            if (this.toggleAllHandler) {
+                document.removeEventListener('click', this.toggleAllHandler);
+                this.toggleAllHandler = null;
+            }
         },
 
         updateAchievements() {
@@ -53,12 +171,16 @@ export function initAchievements(app) {
             const groupedAchievements = this.groupAchievements(visibleAchievements, userStats);
             
             const html = Object.entries(groupedAchievements).map(([category, group]) => {
-                const isExpanded = group.unlockedCount > 0; // Auto-expand categories with unlocked achievements
+                // All dropdowns start closed by default to reduce scrolling
+                const isExpanded = false;
                 
                 return `
                     <div class="achievement-group mb-4">
-                        <div class="achievement-group-header cursor-pointer p-3 bg-gray-800 rounded-lg border-l-4 ${group.borderColor} hover:bg-gray-700 transition-colors" 
-                             onclick="this.parentElement.querySelector('.achievement-group-content').classList.toggle('hidden'); this.querySelector('.expand-icon').classList.toggle('rotate-90');">
+                        <div class="achievement-group-header cursor-pointer p-3 bg-gray-800 rounded-lg border-l-4 ${group.borderColor} hover:bg-gray-700 transition-colors duration-200" 
+                             role="button" 
+                             tabindex="0" 
+                             aria-expanded="false"
+                             aria-controls="achievement-content-${category.replace(/\s+/g, '-').toLowerCase()}">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-3">
                                     <i class="fas ${group.icon} ${group.iconColor}"></i>
@@ -69,7 +191,7 @@ export function initAchievements(app) {
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <div class="text-xs text-indigo-400">+${group.totalXP} XP</div>
-                                    <i class="fas fa-chevron-right expand-icon transition-transform ${isExpanded ? 'rotate-90' : ''}"></i>
+                                    <i class="fas fa-chevron-right expand-icon transition-transform duration-200"></i>
                                 </div>
                             </div>
                             <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
@@ -77,7 +199,8 @@ export function initAchievements(app) {
                                      style="width: ${group.totalCount > 0 ? (group.unlockedCount / group.totalCount) * 100 : 0}%"></div>
                             </div>
                         </div>
-                        <div class="achievement-group-content ${isExpanded ? '' : 'hidden'} mt-2 space-y-2 pl-4">
+                        <div class="achievement-group-content hidden mt-2 space-y-2 pl-4" 
+                             id="achievement-content-${category.replace(/\s+/g, '-').toLowerCase()}">
                             ${group.achievements.map(achievement => {
                                 const isUnlocked = this.checkAchievement(achievement, userStats);
                                 const progress = this.getAchievementProgress(achievement, userStats);
@@ -509,6 +632,12 @@ export function initAchievements(app) {
                 current: Math.min(current, condition.target),
                 target: condition.target
             };
+        },
+
+        cleanup() {
+            // Achievements page doesn't have event listeners or timers to clean up
+            // This method is provided for consistency with other page modules
+            console.log('Achievements page cleanup completed');
         }
     };
 }

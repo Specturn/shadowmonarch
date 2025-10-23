@@ -1,0 +1,2352 @@
+export function initArchitect(app) {
+    return {
+        render() {
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card-bg p-6 rounded-lg">
+                        <div class="text-center">
+                            <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-plus text-3xl text-white"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold mb-2">Create New Routine</h2>
+                            <p class="text-gray-400 mb-6">Build your custom workout routine with our advanced routine builder</p>
+                            <button id="open-routine-builder-btn" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 flex items-center justify-center space-x-3 mx-auto shadow-lg hover:shadow-xl">
+                                <i class="fas fa-hammer"></i>
+                                <span>Open Routine Builder</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card-bg p-6 rounded-lg">
+                        <h2 class="text-2xl font-bold mb-4">Saved Routines</h2>
+                        <div id="saved-routines-list" class="space-y-2">
+                            <div class="text-gray-400 text-center py-4">No saved routines yet</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Routine Builder Overlay -->
+                <div id="routine-builder-overlay" class="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 hidden">
+                    <div class="h-full flex flex-col">
+                        <!-- Header -->
+                        <div class="routine-builder-header bg-gradient-to-r from-green-900/80 to-emerald-900/80 border-b border-green-500/30 p-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                                        <i class="fas fa-hammer text-xl text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h1 class="text-2xl font-bold text-white">Routine Builder</h1>
+                                        <p class="text-green-200">Create your perfect workout routine</p>
+                                    </div>
+                                </div>
+                                <button id="close-routine-builder-btn" class="w-10 h-10 bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 rounded-lg flex items-center justify-center transition-all duration-200">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Main Content -->
+                        <div class="flex-1 overflow-hidden">
+                            <div class="h-full grid grid-cols-1 lg:grid-cols-3 gap-0">
+                                <!-- Exercise Builder Panel -->
+                                <div class="lg:col-span-2 bg-gradient-to-br from-gray-900 to-gray-800 border-r border-gray-700 p-6 overflow-y-auto">
+                                    <div class="max-w-4xl mx-auto space-y-6">
+                                        <!-- Routine Name Section -->
+                                        <div class="routine-name-section">
+                                            <label class="block text-lg font-semibold text-white mb-3">
+                                                <i class="fas fa-tag text-green-400 mr-2"></i>
+                                                Routine Name
+                                            </label>
+                                            <input id="routine-builder-name" type="text" placeholder="Enter your routine name..." class="w-full p-4 bg-gray-800/50 border border-gray-600 rounded-xl text-white text-lg focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all duration-200">
+                                        </div>
+
+                                        <!-- Interactive Body Selection -->
+                                        <div class="body-selection-section">
+                                            <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+                                                <i class="fas fa-user text-green-400 mr-2"></i>
+                                                Select Target Muscle Group
+                                            </h3>
+                                            
+                                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                                <!-- Interactive Body Diagram -->
+                                                <div class="body-diagram-container">
+                                                    <div class="text-center mb-4">
+                                                        <div class="text-sm text-gray-400 mb-2">Click on muscle groups to see exercises</div>
+                                                        <div class="flex items-center justify-center space-x-4">
+                                                            <button id="body-view-front" class="body-view-btn active px-3 py-1 bg-green-600 text-white rounded-lg text-sm">Front</button>
+                                                            <button id="body-view-back" class="body-view-btn px-3 py-1 bg-gray-600 text-white rounded-lg text-sm">Back</button>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Body SVG Container -->
+                                                    <div class="body-svg-container relative bg-gray-800/30 rounded-xl p-6 border border-gray-700">
+                                                        <div id="body-diagram-front" class="body-diagram active">
+                                                            <!-- Front view body diagram will be inserted here -->
+                                                        </div>
+                                                        <div id="body-diagram-back" class="body-diagram hidden">
+                                                            <!-- Back view body diagram will be inserted here -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Exercise Selection Panel -->
+                                                <div class="exercise-selection-panel">
+                                                    <div class="mb-4">
+                                                        <h4 class="text-md font-semibold text-white mb-2 flex items-center">
+                                                            <span id="selected-muscle-group" class="text-green-400">Select a muscle group</span>
+                                                        </h4>
+                                                        <div class="text-sm text-gray-400" id="muscle-group-description">
+                                                            Click on a muscle group to see available exercises
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Exercise List -->
+                                                    <div id="muscle-exercises-list" class="space-y-2 mb-6 max-h-64 overflow-y-auto">
+                                                        <div class="text-center py-8 text-gray-500">
+                                                            <i class="fas fa-hand-pointer text-3xl mb-2"></i>
+                                                            <div>Click on a muscle group to see exercises</div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Exercise Configuration -->
+                                                    <div id="exercise-config-panel" class="hidden space-y-4">
+                                                        <div class="p-4 bg-gray-800/50 rounded-xl border border-gray-600">
+                                                            <div class="flex items-center justify-between mb-3">
+                                                                <span id="selected-exercise-name" class="font-semibold text-white">Exercise Name</span>
+                                                                <button id="clear-exercise-selection" class="text-gray-400 hover:text-white">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                            
+                                                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                                                <div>
+                                                                    <label class="block text-sm font-medium text-gray-300 mb-1">Sets</label>
+                                                                    <input id="builder-sets" type="number" placeholder="3" min="1" max="10" class="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500/50">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-sm font-medium text-gray-300 mb-1">Reps</label>
+                                                                    <input id="builder-reps" type="text" placeholder="8-12" class="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500/50">
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <button id="builder-add-exercise-btn" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2">
+                                                                <i class="fas fa-plus"></i>
+                                                                <span>Add to Routine</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Quick Exercise Templates -->
+                                        <div class="exercise-templates-section">
+                                            <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+                                                <i class="fas fa-bolt text-yellow-400 mr-2"></i>
+                                                Quick Add Templates
+                                            </h3>
+                                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                                <button class="template-btn p-3 bg-gray-800/30 border border-gray-600 rounded-lg hover:border-green-500 transition-all duration-200 text-center" data-exercise="Bench Press" data-sets="4" data-reps="8-10">
+                                                    <i class="fas fa-dumbbell text-red-400 mb-1"></i>
+                                                    <div class="text-sm text-white font-medium">Bench Press</div>
+                                                    <div class="text-xs text-gray-400">4 × 8-10</div>
+                                                </button>
+                                                <button class="template-btn p-3 bg-gray-800/30 border border-gray-600 rounded-lg hover:border-green-500 transition-all duration-200 text-center" data-exercise="Squat" data-sets="4" data-reps="6-8">
+                                                    <i class="fas fa-dumbbell text-green-400 mb-1"></i>
+                                                    <div class="text-sm text-white font-medium">Squat</div>
+                                                    <div class="text-xs text-gray-400">4 × 6-8</div>
+                                                </button>
+                                                <button class="template-btn p-3 bg-gray-800/30 border border-gray-600 rounded-lg hover:border-green-500 transition-all duration-200 text-center" data-exercise="Deadlift" data-sets="3" data-reps="5">
+                                                    <i class="fas fa-dumbbell text-blue-400 mb-1"></i>
+                                                    <div class="text-sm text-white font-medium">Deadlift</div>
+                                                    <div class="text-xs text-gray-400">3 × 5</div>
+                                                </button>
+                                                <button class="template-btn p-3 bg-gray-800/30 border border-gray-600 rounded-lg hover:border-green-500 transition-all duration-200 text-center" data-exercise="Overhead Press" data-sets="3" data-reps="8-10">
+                                                    <i class="fas fa-dumbbell text-yellow-400 mb-1"></i>
+                                                    <div class="text-sm text-white font-medium">OHP</div>
+                                                    <div class="text-xs text-gray-400">3 × 8-10</div>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Routine Preview Panel -->
+                                <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 overflow-y-auto">
+                                    <div class="sticky top-0 bg-gradient-to-br from-gray-800 to-gray-900 pb-4 mb-4 border-b border-gray-700">
+                                        <h3 class="text-xl font-bold text-white mb-2 flex items-center">
+                                            <i class="fas fa-list-alt text-green-400 mr-2"></i>
+                                            Routine Preview
+                                        </h3>
+                                        <div id="builder-routine-stats" class="grid grid-cols-3 gap-2 text-center">
+                                            <div class="bg-gray-900/50 p-2 rounded-lg">
+                                                <div class="text-lg font-bold text-green-400" id="builder-exercise-count">0</div>
+                                                <div class="text-xs text-gray-400">Exercises</div>
+                                            </div>
+                                            <div class="bg-gray-900/50 p-2 rounded-lg">
+                                                <div class="text-lg font-bold text-blue-400" id="builder-total-sets">0</div>
+                                                <div class="text-xs text-gray-400">Sets</div>
+                                            </div>
+                                            <div class="bg-gray-900/50 p-2 rounded-lg">
+                                                <div class="text-lg font-bold text-purple-400" id="builder-estimated-time">0</div>
+                                                <div class="text-xs text-gray-400">Minutes</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="builder-routine-preview" class="space-y-3">
+                                        <div class="text-center py-8">
+                                            <div class="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                                <i class="fas fa-dumbbell text-2xl text-gray-500"></i>
+                                            </div>
+                                            <div class="text-gray-400 font-medium">No exercises added yet</div>
+                                            <div class="text-sm text-gray-500 mt-1">Add exercises to see your routine preview</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Actions -->
+                        <div class="routine-builder-footer bg-gray-900 border-t border-gray-700 p-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <button id="builder-clear-routine-btn" class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2">
+                                        <i class="fas fa-trash"></i>
+                                        <span>Clear All</span>
+                                    </button>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <button id="builder-cancel-btn" class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200">
+                                        Cancel
+                                    </button>
+                                    <button id="builder-save-routine-btn" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl" disabled>
+                                        <i class="fas fa-save"></i>
+                                        <span>Save Routine</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        init() {
+            this.selectedExercise = null;
+            this.allExercises = [];
+
+            this.setupEventListeners();
+            this.populateExerciseDropdown();
+            this.updateRoutinePreview();
+            this.updateSavedRoutines();
+
+            // Add subtle animations on load
+            setTimeout(() => {
+                this.animateCardsIn();
+            }, 100);
+        },
+
+        animateCardsIn() {
+            const cards = document.querySelectorAll('.card-bg');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.4s ease';
+
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+        },
+
+        setupEventListeners() {
+            // Remove any existing listeners first
+            this.cleanup();
+
+            // Store app reference for closures
+            const appRef = app;
+            const self = this;
+
+            // Store references to bound functions for cleanup
+            this.openBuilderHandler = () => {
+                self.openRoutineBuilder();
+            };
+
+            this.closeBuilderHandler = () => {
+                self.closeRoutineBuilder();
+            };
+
+            this.builderNameInputHandler = (event) => {
+                const name = event.target.value.trim();
+                appRef.state.currentCustomWorkout.name = name;
+                self.updateBuilderSaveButton();
+            };
+
+            this.builderAddExerciseHandler = () => {
+                self.addExerciseToBuilderRoutine();
+            };
+
+            this.builderSaveHandler = () => {
+                self.saveBuilderRoutine();
+            };
+
+            this.builderClearHandler = () => {
+                self.clearBuilderRoutine();
+            };
+
+            this.templateClickHandler = (event) => {
+                if (event.target.closest('.template-btn')) {
+                    const btn = event.target.closest('.template-btn');
+                    const exercise = btn.dataset.exercise;
+                    const sets = btn.dataset.sets;
+                    const reps = btn.dataset.reps;
+                    self.addTemplateExercise(exercise, sets, reps);
+                }
+            };
+
+            this.delegatedClickHandler = (event) => {
+                if (event.target.classList.contains('remove-exercise-btn') ||
+                    event.target.closest('.remove-exercise-btn')) {
+                    const btn = event.target.closest('.remove-exercise-btn') || event.target;
+                    const index = parseInt(btn.dataset.index);
+                    self.removeExercise(index);
+                } else if (event.target.classList.contains('use-routine-btn')) {
+                    const routineId = event.target.dataset.routineId;
+                    self.useRoutine(routineId);
+                } else if (event.target.classList.contains('delete-routine-btn')) {
+                    const routineId = event.target.dataset.routineId;
+                    self.deleteRoutine(routineId);
+                }
+            };
+
+            // Add event listeners with proper references
+            const openBuilderBtn = document.getElementById('open-routine-builder-btn');
+            const closeBuilderBtn = document.getElementById('close-routine-builder-btn');
+            const builderNameInput = document.getElementById('routine-builder-name');
+            const builderAddBtn = document.getElementById('builder-add-exercise-btn');
+            const builderSaveBtn = document.getElementById('builder-save-routine-btn');
+            const builderClearBtn = document.getElementById('builder-clear-routine-btn');
+            const builderCancelBtn = document.getElementById('builder-cancel-btn');
+
+            if (openBuilderBtn) {
+                openBuilderBtn.addEventListener('click', this.openBuilderHandler);
+            }
+
+            if (closeBuilderBtn) {
+                closeBuilderBtn.addEventListener('click', this.closeBuilderHandler);
+            }
+
+            if (builderCancelBtn) {
+                builderCancelBtn.addEventListener('click', this.closeBuilderHandler);
+            }
+
+            if (builderNameInput) {
+                builderNameInput.addEventListener('input', this.builderNameInputHandler);
+            }
+
+            if (builderAddBtn) {
+                builderAddBtn.addEventListener('click', this.builderAddExerciseHandler);
+            }
+
+            if (builderSaveBtn) {
+                builderSaveBtn.addEventListener('click', this.builderSaveHandler);
+            }
+
+            if (builderClearBtn) {
+                builderClearBtn.addEventListener('click', this.builderClearHandler);
+            }
+
+            // Event delegation for dynamic buttons
+            document.addEventListener('click', this.delegatedClickHandler);
+            document.addEventListener('click', this.templateClickHandler);
+        },
+
+        openRoutineBuilder() {
+            const overlay = document.getElementById('routine-builder-overlay');
+            if (overlay) {
+                // Reset the builder state
+                app.state.currentCustomWorkout = { name: '', exercises: [] };
+
+                // Show overlay with animation
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                }, 10);
+
+                // Initialize builder
+                this.initializeRoutineBuilder();
+
+                // Focus on name input
+                setTimeout(() => {
+                    const nameInput = document.getElementById('routine-builder-name');
+                    if (nameInput) nameInput.focus();
+                }, 300);
+            }
+        },
+
+        closeRoutineBuilder() {
+            const overlay = document.getElementById('routine-builder-overlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 200);
+            }
+        },
+
+        initializeRoutineBuilder() {
+            // Initialize body diagram
+            this.initializeBodyDiagram();
+            
+            // Setup body diagram listeners
+            this.setupBodyDiagramListeners();
+            
+            // Update preview
+            this.updateBuilderPreview();
+            
+            // Update save button state
+            this.updateBuilderSaveButton();
+        },
+
+        initializeBodyDiagram() {
+            // Get user's gender from onboarding data
+            const userGender = app.state.onboardingData?.gender || 'male';
+            
+            // Create front view body diagram
+            this.createBodyDiagram('front', userGender);
+            
+            // Create back view body diagram
+            this.createBodyDiagram('back', userGender);
+            
+            // Initialize muscle group mappings
+            this.initializeMuscleGroupMappings();
+        },
+
+        createBodyDiagram(view, gender) {
+            const container = document.getElementById(`body-diagram-${view}`);
+            if (!container) return;
+
+            // Create SVG body diagram
+            const svg = this.createBodySVG(view, gender);
+            container.innerHTML = svg;
+        },
+
+        createBodySVG(view, gender) {
+            const isBack = view === 'back';
+            const bodyWidth = gender === 'female' ? 0.9 : 1.0; // Slightly narrower for female
+            
+            return `
+                <svg viewBox="0 0 300 500" class="body-svg w-full max-w-xs mx-auto cursor-pointer" style="max-height: 450px;">
+                    <defs>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge> 
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#374151;stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:#1F2937;stop-opacity:0.9" />
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Body Base -->
+                    ${this.getBodyBase(gender, bodyWidth)}
+                    
+                    <!-- Muscle Groups -->
+                    ${isBack ? this.getBackMuscleGroups(gender, bodyWidth) : this.getFrontMuscleGroups(gender, bodyWidth)}
+                </svg>
+            `;
+        },
+
+        getBodyBase(gender, bodyWidth) {
+            const shoulderWidth = 60 * bodyWidth;
+            const waistWidth = 45 * bodyWidth;
+            const hipWidth = gender === 'female' ? 55 * bodyWidth : 50 * bodyWidth;
+            const leftShoulder = 150 - shoulderWidth/2;
+            const rightShoulder = 150 + shoulderWidth/2;
+            const leftWaist = 150 - waistWidth/2;
+            const rightWaist = 150 + waistWidth/2;
+            const leftHip = 150 - hipWidth/2;
+            const rightHip = 150 + hipWidth/2;
+            const leftArm = leftShoulder - 15;
+            const rightArm = rightShoulder + 15;
+            const leftForearm = leftShoulder - 20;
+            const rightForearm = rightShoulder + 20;
+            
+            return `
+                <!-- Head -->
+                <circle cx="150" cy="60" r="25" fill="url(#bodyGradient)" stroke="#6B7280" stroke-width="1"/>
+                
+                <!-- Neck -->
+                <rect x="145" y="80" width="10" height="15" fill="url(#bodyGradient)" stroke="#6B7280" stroke-width="1"/>
+                
+                <!-- Torso -->
+                <path d="M${leftShoulder} 95 L${rightShoulder} 95 L${rightWaist} 200 L${rightHip} 280 L${leftHip} 280 L${leftWaist} 200 Z" 
+                      fill="url(#bodyGradient)" stroke="#6B7280" stroke-width="1"/>
+                
+                <!-- Arms -->
+                <ellipse cx="${leftArm}" cy="140" rx="12" ry="45" fill="url(#bodyGradient)" stroke="#6B7280" stroke-width="1"/>
+                <ellipse cx="${rightArm}" cy="140" rx="12" ry="45" fill="url(#bodyGradient)" stroke="#6B7280" stroke-width="1"/>
+                
+                <!-- Forearms -->
+                <ellipse cx="${leftForearm}" cy="200" rx="10" ry="35" fill="url(#bodyGradient)" stroke="#6B7280" stroke-width="1"/>
+                <ellipse cx="${rightForearm}" cy="200" rx="10" ry="35" fill="url(#bodyGradient)" stroke="#6B7280" stroke-width="1"/>
+                
+                <!-- Legs -->
+                <ellipse cx="135" cy="350" rx="18" ry="60" fill="url(#bodyGradient)" stroke="#6B7280" stroke-width="1"/>
+                <ellipse cx="165" cy="350" rx="18" ry="60" fill="url(#bodyGradient)" stroke="#6B7280" stroke-width="1"/>
+                
+                <!-- Calves -->
+                <ellipse cx="135" cy="430" rx="15" ry="40" fill="url(#bodyGradient)" stroke="#6B7280" stroke-width="1"/>
+                <ellipse cx="165" cy="430" rx="15" ry="40" fill="url(#bodyGradient)" stroke="#6B7280" stroke-width="1"/>
+            `;
+        },
+
+        getFrontMuscleGroups(gender, bodyWidth) {
+            const shoulderWidth = 60 * bodyWidth;
+            const leftShoulder = 150 - shoulderWidth/2;
+            const rightShoulder = 150 + shoulderWidth/2;
+            const leftArm = leftShoulder - 15;
+            const rightArm = rightShoulder + 15;
+            const leftForearm = leftShoulder - 20;
+            const rightForearm = rightShoulder + 20;
+            
+            return `
+                <!-- Chest -->
+                <ellipse cx="150" cy="130" rx="28" ry="22" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Chest" 
+                         data-description="Pectorals - Build a powerful chest"
+                         fill="rgba(239, 68, 68, 0.4)" 
+                         stroke="rgba(239, 68, 68, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Shoulders -->
+                <circle cx="${leftShoulder}" cy="110" r="18" 
+                        class="muscle-group interactive-muscle" 
+                        data-muscle="Shoulders" 
+                        data-description="Deltoids - Build rounded shoulders"
+                        fill="rgba(251, 191, 36, 0.4)" 
+                        stroke="rgba(251, 191, 36, 0.8)" 
+                        stroke-width="2"
+                        style="cursor: pointer; transition: all 0.3s ease;"/>
+                <circle cx="${rightShoulder}" cy="110" r="18" 
+                        class="muscle-group interactive-muscle" 
+                        data-muscle="Shoulders" 
+                        data-description="Deltoids - Build rounded shoulders"
+                        fill="rgba(251, 191, 36, 0.4)" 
+                        stroke="rgba(251, 191, 36, 0.8)" 
+                        stroke-width="2"
+                        style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Biceps -->
+                <ellipse cx="${leftArm}" cy="150" rx="10" ry="20" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Biceps" 
+                         data-description="Biceps - Build impressive arm peaks"
+                         fill="rgba(59, 130, 246, 0.4)" 
+                         stroke="rgba(59, 130, 246, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                <ellipse cx="${rightArm}" cy="150" rx="10" ry="20" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Biceps" 
+                         data-description="Biceps - Build impressive arm peaks"
+                         fill="rgba(59, 130, 246, 0.4)" 
+                         stroke="rgba(59, 130, 246, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Forearms -->
+                <ellipse cx="${leftForearm}" cy="200" rx="8" ry="25" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Forearms" 
+                         data-description="Forearms - Build grip strength"
+                         fill="rgba(168, 85, 247, 0.4)" 
+                         stroke="rgba(168, 85, 247, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                <ellipse cx="${rightForearm}" cy="200" rx="8" ry="25" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Forearms" 
+                         data-description="Forearms - Build grip strength"
+                         fill="rgba(168, 85, 247, 0.4)" 
+                         stroke="rgba(168, 85, 247, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Abs -->
+                <rect x="135" y="160" width="30" height="40" rx="5" 
+                      class="muscle-group interactive-muscle" 
+                      data-muscle="Abs" 
+                      data-description="Abdominals - Build a strong core"
+                      fill="rgba(34, 197, 94, 0.4)" 
+                      stroke="rgba(34, 197, 94, 0.8)" 
+                      stroke-width="2"
+                      style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Quadriceps -->
+                <ellipse cx="135" cy="330" rx="15" ry="35" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Quadriceps" 
+                         data-description="Quads - Build powerful leg muscles"
+                         fill="rgba(236, 72, 153, 0.4)" 
+                         stroke="rgba(236, 72, 153, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                <ellipse cx="165" cy="330" rx="15" ry="35" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Quadriceps" 
+                         data-description="Quads - Build powerful leg muscles"
+                         fill="rgba(236, 72, 153, 0.4)" 
+                         stroke="rgba(236, 72, 153, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Calves -->
+                <ellipse cx="135" cy="430" rx="12" ry="30" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Calves" 
+                         data-description="Calves - Build defined lower legs"
+                         fill="rgba(245, 101, 101, 0.4)" 
+                         stroke="rgba(245, 101, 101, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                <ellipse cx="165" cy="430" rx="12" ry="30" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Calves" 
+                         data-description="Calves - Build defined lower legs"
+                         fill="rgba(245, 101, 101, 0.4)" 
+                         stroke="rgba(245, 101, 101, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+            `;
+        },
+
+        getBackMuscleGroups(gender, bodyWidth) {
+            const shoulderWidth = 60 * bodyWidth;
+            const leftShoulder = 150 - shoulderWidth/2;
+            const rightShoulder = 150 + shoulderWidth/2;
+            const leftArm = leftShoulder - 15;
+            const rightArm = rightShoulder + 15;
+            
+            return `
+                <!-- Traps -->
+                <path d="M130 100 L170 100 L160 120 L140 120 Z" 
+                      class="muscle-group interactive-muscle" 
+                      data-muscle="Traps" 
+                      data-description="Trapezius - Build a powerful upper back"
+                      fill="rgba(251, 191, 36, 0.4)" 
+                      stroke="rgba(251, 191, 36, 0.8)" 
+                      stroke-width="2"
+                      style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Lats -->
+                <ellipse cx="150" cy="160" rx="35" ry="30" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Lats" 
+                         data-description="Latissimus Dorsi - Build a wide back"
+                         fill="rgba(59, 130, 246, 0.4)" 
+                         stroke="rgba(59, 130, 246, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Rear Delts -->
+                <circle cx="${leftShoulder}" cy="110" r="15" 
+                        class="muscle-group interactive-muscle" 
+                        data-muscle="Rear Delts" 
+                        data-description="Rear Deltoids - Build balanced shoulders"
+                        fill="rgba(168, 85, 247, 0.4)" 
+                        stroke="rgba(168, 85, 247, 0.8)" 
+                        stroke-width="2"
+                        style="cursor: pointer; transition: all 0.3s ease;"/>
+                <circle cx="${rightShoulder}" cy="110" r="15" 
+                        class="muscle-group interactive-muscle" 
+                        data-muscle="Rear Delts" 
+                        data-description="Rear Deltoids - Build balanced shoulders"
+                        fill="rgba(168, 85, 247, 0.4)" 
+                        stroke="rgba(168, 85, 247, 0.8)" 
+                        stroke-width="2"
+                        style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Triceps -->
+                <ellipse cx="${leftArm}" cy="150" rx="8" ry="18" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Triceps" 
+                         data-description="Triceps - Build strong arm muscles"
+                         fill="rgba(239, 68, 68, 0.4)" 
+                         stroke="rgba(239, 68, 68, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                <ellipse cx="${rightArm}" cy="150" rx="8" ry="18" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Triceps" 
+                         data-description="Triceps - Build strong arm muscles"
+                         fill="rgba(239, 68, 68, 0.4)" 
+                         stroke="rgba(239, 68, 68, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Lower Back -->
+                <rect x="135" y="200" width="30" height="25" rx="5" 
+                      class="muscle-group interactive-muscle" 
+                      data-muscle="Lower Back" 
+                      data-description="Erector Spinae - Build a strong lower back"
+                      fill="rgba(34, 197, 94, 0.4)" 
+                      stroke="rgba(34, 197, 94, 0.8)" 
+                      stroke-width="2"
+                      style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Glutes -->
+                <ellipse cx="150" cy="260" rx="25" ry="20" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Glutes" 
+                         data-description="Glutes - Build powerful hip muscles"
+                         fill="rgba(236, 72, 153, 0.4)" 
+                         stroke="rgba(236, 72, 153, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                
+                <!-- Hamstrings -->
+                <ellipse cx="135" cy="330" rx="12" ry="35" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Hamstrings" 
+                         data-description="Hamstrings - Build strong posterior legs"
+                         fill="rgba(245, 101, 101, 0.4)" 
+                         stroke="rgba(245, 101, 101, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+                <ellipse cx="165" cy="330" rx="12" ry="35" 
+                         class="muscle-group interactive-muscle" 
+                         data-muscle="Hamstrings" 
+                         data-description="Hamstrings - Build strong posterior legs"
+                         fill="rgba(245, 101, 101, 0.4)" 
+                         stroke="rgba(245, 101, 101, 0.8)" 
+                         stroke-width="2"
+                         style="cursor: pointer; transition: all 0.3s ease;"/>
+            `;
+        }ta-muscle="Arms" 
+                         fill="rgba(147, 51, 234, 0.3)" 
+                         stroke="rgba(147, 51, 234, 0.6)" 
+                         stroke-width="2"/>
+                <ellipse cx="195" cy="160" rx="8" ry="25" 
+                         class="muscle-group arms-right" 
+                         data-muscle="Arms" 
+                         fill="rgba(147, 51, 234, 0.3)" 
+                         stroke="rgba(147, 51, 234, 0.6)" 
+                         stroke-width="2"/>
+                
+                <!-- Core/Abs -->
+                <rect x="135" y="170" width="30" height="40" rx="5" 
+                      class="muscle-group core" 
+                      data-muscle="Core" 
+                      fill="rgba(34, 197, 94, 0.3)" 
+                      stroke="rgba(34, 197, 94, 0.6)" 
+                      stroke-width="2"/>
+                
+                <!-- Legs -->
+                <ellipse cx="135" cy="300" rx="12" ry="40" 
+                         class="muscle-group legs-left" 
+                         data-muscle="Legs" 
+                         fill="rgba(59, 130, 246, 0.3)" 
+                         stroke="rgba(59, 130, 246, 0.6)" 
+                         stroke-width="2"/>
+                <ellipse cx="165" cy="300" rx="12" ry="40" 
+                         class="muscle-group legs-right" 
+                         data-muscle="Legs" 
+                         fill="rgba(59, 130, 246, 0.3)" 
+                         stroke="rgba(59, 130, 246, 0.6)" 
+                         stroke-width="2"/>
+                
+                <!-- Glutes (front view - hip area) -->
+                <ellipse cx="150" cy="240" rx="20" ry="15" 
+                         class="muscle-group glutes" 
+                         data-muscle="Glutes" 
+                         fill="rgba(236, 72, 153, 0.3)" 
+                         stroke="rgba(236, 72, 153, 0.6)" 
+                         stroke-width="2"/>
+            `;
+        },
+
+        getBackMuscleGroups(gender) {
+            return `
+                <!-- Back -->
+                <ellipse cx="150" cy="140" rx="30" ry="35" 
+                         class="muscle-group back" 
+                         data-muscle="Back" 
+                         fill="rgba(59, 130, 246, 0.3)" 
+                         stroke="rgba(59, 130, 246, 0.6)" 
+                         stroke-width="2"/>
+                
+                <!-- Shoulders (back) -->
+                <circle cx="120" cy="120" r="15" 
+                        class="muscle-group shoulders-left-back" 
+                        data-muscle="Shoulders" 
+                        fill="rgba(251, 191, 36, 0.3)" 
+                        stroke="rgba(251, 191, 36, 0.6)" 
+                        stroke-width="2"/>
+                <circle cx="180" cy="120" r="15" 
+                        class="muscle-group shoulders-right-back" 
+                        data-muscle="Shoulders" 
+                        fill="rgba(251, 191, 36, 0.3)" 
+                        stroke="rgba(251, 191, 36, 0.6)" 
+                        stroke-width="2"/>
+                
+                <!-- Arms (back) -->
+                <ellipse cx="105" cy="160" rx="8" ry="25" 
+                         class="muscle-group arms-left-back" 
+                         data-muscle="Arms" 
+                         fill="rgba(147, 51, 234, 0.3)" 
+                         stroke="rgba(147, 51, 234, 0.6)" 
+                         stroke-width="2"/>
+                <ellipse cx="195" cy="160" rx="8" ry="25" 
+                         class="muscle-group arms-right-back" 
+                         data-muscle="Arms" 
+                         fill="rgba(147, 51, 234, 0.3)" 
+                         stroke="rgba(147, 51, 234, 0.6)" 
+                         stroke-width="2"/>
+                
+                <!-- Glutes (back view) -->
+                <ellipse cx="150" cy="240" rx="25" ry="20" 
+                         class="muscle-group glutes-back" 
+                         data-muscle="Glutes" 
+                         fill="rgba(236, 72, 153, 0.3)" 
+                         stroke="rgba(236, 72, 153, 0.6)" 
+                         stroke-width="2"/>
+                
+                <!-- Legs (back) -->
+                <ellipse cx="135" cy="320" rx="12" ry="40" 
+                         class="muscle-group legs-left-back" 
+                         data-muscle="Legs" 
+                         fill="rgba(59, 130, 246, 0.3)" 
+                         stroke="rgba(59, 130, 246, 0.6)" 
+                         stroke-width="2"/>
+                <ellipse cx="165" cy="320" rx="12" ry="40" 
+                         class="muscle-group legs-right-back" 
+                         data-muscle="Legs" 
+                         fill="rgba(59, 130, 246, 0.3)" 
+                         stroke="rgba(59, 130, 246, 0.6)" 
+                         stroke-width="2"/>
+            `;
+        },
+
+        initializeMuscleGroupMappings() {
+            // Comprehensive exercise database organized by muscle groups
+            this.muscleExercises = {
+                'Chest': [
+                    { name: 'Bench Press', sets: '3-4', reps: '6-10', difficulty: 'Intermediate' },
+                    { name: 'Push-ups', sets: '3-4', reps: '10-20', difficulty: 'Beginner' },
+                    { name: 'Incline Bench Press', sets: '3-4', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Dumbbell Flyes', sets: '3', reps: '10-15', difficulty: 'Beginner' },
+                    { name: 'Decline Bench Press', sets: '3', reps: '8-12', difficulty: 'Advanced' },
+                    { name: 'Chest Dips', sets: '3', reps: '8-15', difficulty: 'Intermediate' },
+                    { name: 'Cable Crossovers', sets: '3', reps: '12-15', difficulty: 'Intermediate' }
+                ],
+                'Shoulders': [
+                    { name: 'Overhead Press', sets: '3-4', reps: '6-10', difficulty: 'Intermediate' },
+                    { name: 'Lateral Raises', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Front Raises', sets: '3', reps: '10-12', difficulty: 'Beginner' },
+                    { name: 'Arnold Press', sets: '3', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Pike Push-ups', sets: '3', reps: '8-15', difficulty: 'Intermediate' },
+                    { name: 'Upright Rows', sets: '3', reps: '10-12', difficulty: 'Intermediate' }
+                ],
+                'Biceps': [
+                    { name: 'Barbell Curls', sets: '3-4', reps: '8-12', difficulty: 'Beginner' },
+                    { name: 'Dumbbell Curls', sets: '3', reps: '10-15', difficulty: 'Beginner' },
+                    { name: 'Hammer Curls', sets: '3', reps: '10-12', difficulty: 'Beginner' },
+                    { name: 'Chin-ups', sets: '3', reps: '5-10', difficulty: 'Intermediate' },
+                    { name: 'Cable Curls', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Preacher Curls', sets: '3', reps: '8-12', difficulty: 'Intermediate' }
+                ],
+                'Triceps': [
+                    { name: 'Close-Grip Bench Press', sets: '3-4', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Tricep Dips', sets: '3', reps: '8-15', difficulty: 'Intermediate' },
+                    { name: 'Overhead Tricep Extension', sets: '3', reps: '10-12', difficulty: 'Beginner' },
+                    { name: 'Tricep Pushdowns', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Diamond Push-ups', sets: '3', reps: '8-15', difficulty: 'Intermediate' },
+                    { name: 'Skull Crushers', sets: '3', reps: '10-12', difficulty: 'Intermediate' }
+                ],
+                'Forearms': [
+                    { name: 'Wrist Curls', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Reverse Wrist Curls', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Farmer\'s Walk', sets: '3', reps: '30-60s', difficulty: 'Beginner' },
+                    { name: 'Plate Pinches', sets: '3', reps: '20-30s', difficulty: 'Intermediate' },
+                    { name: 'Reverse Curls', sets: '3', reps: '12-15', difficulty: 'Intermediate' }
+                ],
+                'Abs': [
+                    { name: 'Crunches', sets: '3-4', reps: '15-25', difficulty: 'Beginner' },
+                    { name: 'Plank', sets: '3', reps: '30-60s', difficulty: 'Beginner' },
+                    { name: 'Russian Twists', sets: '3', reps: '20-30', difficulty: 'Beginner' },
+                    { name: 'Bicycle Crunches', sets: '3', reps: '20-30', difficulty: 'Beginner' },
+                    { name: 'Mountain Climbers', sets: '3', reps: '20-30', difficulty: 'Intermediate' },
+                    { name: 'Hanging Leg Raises', sets: '3', reps: '8-15', difficulty: 'Advanced' },
+                    { name: 'Dead Bug', sets: '3', reps: '10-15', difficulty: 'Beginner' }
+                ],
+                'Lats': [
+                    { name: 'Pull-ups', sets: '3-4', reps: '5-12', difficulty: 'Intermediate' },
+                    { name: 'Lat Pulldowns', sets: '3-4', reps: '8-12', difficulty: 'Beginner' },
+                    { name: 'Bent-over Rows', sets: '3-4', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'T-Bar Rows', sets: '3', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Cable Rows', sets: '3', reps: '10-15', difficulty: 'Beginner' },
+                    { name: 'Single-arm Dumbbell Rows', sets: '3', reps: '10-12', difficulty: 'Beginner' }
+                ],
+                'Traps': [
+                    { name: 'Shrugs', sets: '3-4', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Upright Rows', sets: '3', reps: '10-12', difficulty: 'Intermediate' },
+                    { name: 'Face Pulls', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'High Pulls', sets: '3', reps: '6-8', difficulty: 'Advanced' },
+                    { name: 'Rack Pulls', sets: '3', reps: '5-8', difficulty: 'Advanced' }
+                ],
+                'Rear Delts': [
+                    { name: 'Reverse Flyes', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Face Pulls', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Bent-over Lateral Raises', sets: '3', reps: '12-15', difficulty: 'Intermediate' },
+                    { name: 'Cable Reverse Flyes', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Prone Y-Raises', sets: '3', reps: '12-15', difficulty: 'Intermediate' }
+                ],
+                'Lower Back': [
+                    { name: 'Deadlifts', sets: '3-4', reps: '5-8', difficulty: 'Advanced' },
+                    { name: 'Romanian Deadlifts', sets: '3', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Good Mornings', sets: '3', reps: '10-12', difficulty: 'Intermediate' },
+                    { name: 'Hyperextensions', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Superman', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Reverse Hyperextensions', sets: '3', reps: '12-15', difficulty: 'Intermediate' }
+                ],
+                'Quadriceps': [
+                    { name: 'Squats', sets: '3-4', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Leg Press', sets: '3-4', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Lunges', sets: '3', reps: '10-12', difficulty: 'Beginner' },
+                    { name: 'Bulgarian Split Squats', sets: '3', reps: '10-12', difficulty: 'Intermediate' },
+                    { name: 'Leg Extensions', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Front Squats', sets: '3', reps: '8-10', difficulty: 'Advanced' },
+                    { name: 'Jump Squats', sets: '3', reps: '10-15', difficulty: 'Intermediate' }
+                ],
+                'Hamstrings': [
+                    { name: 'Romanian Deadlifts', sets: '3-4', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Leg Curls', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Stiff-leg Deadlifts', sets: '3', reps: '10-12', difficulty: 'Intermediate' },
+                    { name: 'Nordic Curls', sets: '3', reps: '5-8', difficulty: 'Advanced' },
+                    { name: 'Glute Ham Raises', sets: '3', reps: '8-12', difficulty: 'Advanced' },
+                    { name: 'Single-leg RDLs', sets: '3', reps: '8-10', difficulty: 'Intermediate' }
+                ],
+                'Glutes': [
+                    { name: 'Hip Thrusts', sets: '3-4', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Glute Bridges', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Bulgarian Split Squats', sets: '3', reps: '10-12', difficulty: 'Intermediate' },
+                    { name: 'Clamshells', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Single-leg Glute Bridges', sets: '3', reps: '10-15', difficulty: 'Intermediate' },
+                    { name: 'Lateral Lunges', sets: '3', reps: '10-12', difficulty: 'Intermediate' }
+                ],
+                'Calves': [
+                    { name: 'Calf Raises', sets: '3-4', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Seated Calf Raises', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Single-leg Calf Raises', sets: '3', reps: '12-15', difficulty: 'Intermediate' },
+                    { name: 'Jump Rope', sets: '3', reps: '60-120s', difficulty: 'Beginner' },
+                    { name: 'Donkey Calf Raises', sets: '3', reps: '15-20', difficulty: 'Intermediate' }
+                ]
+            };
+        },
+
+        setupBodyDiagramListeners() {
+            // Map muscle groups to exercises
+            this.muscleGroupExercises = {
+                'Chest': app.exercisesByMuscleGroup['Chest'] || [],
+                'Back': app.exercisesByMuscleGroup['Back'] || [],
+                'Shoulders': app.exercisesByMuscleGroup['Shoulders'] || [],
+                'Arms': app.exercisesByMuscleGroup['Arms'] || [],
+                'Legs': app.exercisesByMuscleGroup['Legs'] || [],
+                'Glutes': app.exercisesByMuscleGroup['Glutes'] || [],
+                'Core': ['Plank', 'Crunches', 'Russian Twists', 'Mountain Climbers', 'Dead Bug', 'Bicycle Crunches'],
+                'Full Body': app.exercisesByMuscleGroup['Full Body'] || []
+            };
+
+            // Muscle group descriptions
+            this.muscleGroupDescriptions = {
+                'Chest': 'Build a powerful chest with pressing movements',
+                'Back': 'Develop a strong back with pulling exercises',
+                'Shoulders': 'Shape your shoulders with pressing and raising movements',
+                'Arms': 'Build impressive arms with curls and extensions',
+                'Legs': 'Strengthen your legs with squats and lunges',
+                'Glutes': 'Build strong glutes with hip-focused movements',
+                'Core': 'Strengthen your core with stability exercises',
+                'Full Body': 'Total body movements for complete fitness'
+            };
+        },
+
+        setupBodyDiagramListeners() {
+            const self = this;
+            
+            // Body view toggle buttons
+            document.getElementById('body-view-front')?.addEventListener('click', () => {
+                self.switchBodyView('front');
+            });
+            
+            document.getElementById('body-view-back')?.addEventListener('click', () => {
+                self.switchBodyView('back');
+            });
+            
+            // Clear exercise selection
+            document.getElementById('clear-exercise-selection')?.addEventListener('click', () => {
+                self.clearExerciseSelection();
+            });
+            
+            // Muscle group interactions (both hover and click for desktop/mobile)
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('muscle-group')) {
+                    const muscleGroup = e.target.dataset.muscle;
+                    self.selectMuscleGroup(muscleGroup);
+                }
+                
+                if (e.target.classList.contains('exercise-option-btn')) {
+                    const exercise = e.target.dataset.exercise;
+                    self.selectExercise(exercise);
+                }
+            });
+            
+            // Hover effects for desktop
+            document.addEventListener('mouseover', (e) => {
+                if (e.target.classList.contains('muscle-group')) {
+                    self.highlightMuscleGroup(e.target);
+                }
+            });
+            
+            document.addEventListener('mouseout', (e) => {
+                if (e.target.classList.contains('muscle-group')) {
+                    self.unhighlightMuscleGroup(e.target);
+                }
+            });
+        },
+
+        switchBodyView(view) {
+            // Update button states
+            document.querySelectorAll('.body-view-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-green-600');
+                btn.classList.add('bg-gray-600');
+            });
+            
+            document.getElementById(`body-view-${view}`).classList.add('active', 'bg-green-600');
+            document.getElementById(`body-view-${view}`).classList.remove('bg-gray-600');
+            
+            // Switch diagrams
+            document.querySelectorAll('.body-diagram').forEach(diagram => {
+                diagram.classList.add('hidden');
+                diagram.classList.remove('active');
+            });
+            
+            document.getElementById(`body-diagram-${view}`).classList.remove('hidden');
+            document.getElementById(`body-diagram-${view}`).classList.add('active');
+            
+            // Clear current selection
+            this.clearExerciseSelection();
+        },
+
+        highlightMuscleGroup(element) {
+            element.style.fill = element.style.fill.replace('0.3', '0.5');
+            element.style.stroke = element.style.stroke.replace('0.6', '0.8');
+            element.style.transform = 'scale(1.05)';
+            element.style.transformOrigin = 'center';
+            element.style.transition = 'all 0.2s ease';
+        },
+
+        unhighlightMuscleGroup(element) {
+            element.style.fill = element.style.fill.replace('0.5', '0.3');
+            element.style.stroke = element.style.stroke.replace('0.8', '0.6');
+            element.style.transform = 'scale(1)';
+        },
+
+        selectMuscleGroup(muscleGroup) {
+            const exercises = this.muscleGroupExercises[muscleGroup] || [];
+            const description = this.muscleGroupDescriptions[muscleGroup] || '';
+            
+            // Update UI
+            document.getElementById('selected-muscle-group').textContent = muscleGroup;
+            document.getElementById('muscle-group-description').textContent = description;
+            
+            // Show exercises for this muscle group
+            this.displayMuscleExercises(exercises, muscleGroup);
+            
+            // Clear exercise selection
+            this.clearExerciseSelection();
+        },
+
+        displayMuscleExercises(exercises, muscleGroup) {
+            const container = document.getElementById('muscle-exercises-list');
+            if (!container) return;
+            
+            if (exercises.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-4 text-gray-500">
+                        <i class="fas fa-exclamation-circle text-2xl mb-2"></i>
+                        <div>No exercises found for ${muscleGroup}</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = exercises.map(exercise => `
+                <button class="exercise-option-btn w-full p-3 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-600 hover:border-green-500 rounded-lg text-left transition-all duration-200 flex items-center justify-between group" data-exercise="${exercise}">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-2 h-2 rounded-full ${this.getMuscleGroupColor(muscleGroup)}"></div>
+                        <span class="text-white font-medium">${exercise}</span>
+                    </div>
+                    <i class="fas fa-plus text-gray-400 group-hover:text-green-400 transition-colors duration-200"></i>
+                </button>
+            `).join('');
+            
+            container.innerHTML = html;
+        },
+
+        selectExercise(exercise) {
+            // Update selected exercise
+            this.selectedBuilderExercise = exercise;
+            
+            // Show exercise configuration panel
+            const configPanel = document.getElementById('exercise-config-panel');
+            const exerciseName = document.getElementById('selected-exercise-name');
+            
+            if (configPanel && exerciseName) {
+                configPanel.classList.remove('hidden');
+                exerciseName.textContent = exercise;
+                
+                // Focus on sets input
+                setTimeout(() => {
+                    const setsInput = document.getElementById('builder-sets');
+                    if (setsInput) setsInput.focus();
+                }, 100);
+            }
+        },
+
+        clearExerciseSelection() {
+            // Hide exercise configuration panel
+            const configPanel = document.getElementById('exercise-config-panel');
+            if (configPanel) {
+                configPanel.classList.add('hidden');
+            }
+            
+            // Clear selected exercise
+            this.selectedBuilderExercise = null;
+            
+            // Clear inputs
+            const setsInput = document.getElementById('builder-sets');
+            const repsInput = document.getElementById('builder-reps');
+            if (setsInput) setsInput.value = '';
+            if (repsInput) repsInput.value = '';
+        },
+
+        populateExerciseDropdown() {
+            const dropdownContent = document.querySelector('.exercise-dropdown-content');
+            if (!dropdownContent) return;
+
+            // Get categorized exercises from the app
+            const exercisesByMuscleGroup = app.exercisesByMuscleGroup;
+
+            // Store all exercises for search functionality
+            this.allExercises = [];
+
+            let html = '';
+
+            // Create sections for each muscle group
+            Object.entries(exercisesByMuscleGroup).forEach(([muscleGroup, exercises]) => {
+                // Add exercises to search array
+                exercises.forEach(exercise => {
+                    this.allExercises.push({
+                        name: exercise,
+                        group: muscleGroup
+                    });
+                });
+
+                // Get muscle group color
+                const groupColor = this.getMuscleGroupColor(muscleGroup);
+
+                html += `
+                    <div class="muscle-group-section">
+                        <div class="muscle-group-header p-3 bg-gray-900/50 border-b border-gray-700 sticky top-0 z-10">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 rounded-full ${groupColor}"></div>
+                                <span class="text-sm font-semibold text-gray-300 uppercase tracking-wide">${muscleGroup} Exercises</span>
+                                <span class="text-xs text-gray-500">(${exercises.length})</span>
+                            </div>
+                        </div>
+                        <div class="exercise-options">
+                            ${exercises.map(exercise => `
+                                <div class="exercise-option p-3 hover:bg-gray-700/50 cursor-pointer transition-colors duration-150 border-b border-gray-800/50 last:border-b-0" data-exercise="${exercise}" data-group="${muscleGroup}">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-2 h-2 rounded-full ${groupColor}"></div>
+                                            <span class="text-white font-medium">${exercise}</span>
+                                        </div>
+                                        <span class="text-xs text-gray-500">${muscleGroup}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            dropdownContent.innerHTML = html;
+            this.setupDropdownEventListeners();
+        },
+
+        getMuscleGroupColor(muscleGroup) {
+            const colors = {
+                'Chest': 'bg-red-500',
+                'Back': 'bg-blue-500',
+                'Shoulders': 'bg-yellow-500',
+                'Arms': 'bg-purple-500',
+                'Legs': 'bg-green-500',
+                'Glutes': 'bg-pink-500',
+                'Full Body': 'bg-orange-500'
+            };
+            return colors[muscleGroup] || 'bg-gray-500';
+        },
+
+        setupDropdownEventListeners() {
+            const dropdownBtn = document.getElementById('exercise-dropdown-btn');
+            const dropdownMenu = document.getElementById('exercise-dropdown-menu');
+            const searchInput = document.getElementById('exercise-search');
+            const dropdownText = document.querySelector('.exercise-dropdown-text');
+            const chevron = dropdownBtn?.querySelector('i');
+
+            // Toggle dropdown
+            if (dropdownBtn) {
+                dropdownBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const isOpen = !dropdownMenu.classList.contains('hidden');
+
+                    if (isOpen) {
+                        this.closeDropdown();
+                    } else {
+                        this.openDropdown();
+                    }
+                });
+            }
+
+            // Search functionality
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    this.filterExercises(e.target.value);
+                });
+            }
+
+            // Exercise selection
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.exercise-option')) {
+                    const option = e.target.closest('.exercise-option');
+                    const exercise = option.dataset.exercise;
+                    const group = option.dataset.group;
+
+                    this.selectExercise(exercise, group);
+                    this.closeDropdown();
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.custom-exercise-dropdown')) {
+                    this.closeDropdown();
+                }
+            });
+        },
+
+        openDropdown() {
+            const dropdownMenu = document.getElementById('exercise-dropdown-menu');
+            const chevron = document.querySelector('#exercise-dropdown-btn i');
+            const searchInput = document.getElementById('exercise-search');
+
+            if (dropdownMenu) {
+                dropdownMenu.classList.remove('hidden');
+                dropdownMenu.style.opacity = '0';
+                dropdownMenu.style.transform = 'translateY(-10px)';
+
+                setTimeout(() => {
+                    dropdownMenu.style.opacity = '1';
+                    dropdownMenu.style.transform = 'translateY(0)';
+                }, 10);
+            }
+
+            if (chevron) {
+                chevron.style.transform = 'rotate(180deg)';
+            }
+
+            // Focus search input
+            if (searchInput) {
+                setTimeout(() => searchInput.focus(), 100);
+            }
+        },
+
+        closeDropdown() {
+            const dropdownMenu = document.getElementById('exercise-dropdown-menu');
+            const chevron = document.querySelector('#exercise-dropdown-btn i');
+            const searchInput = document.getElementById('exercise-search');
+
+            if (dropdownMenu) {
+                dropdownMenu.style.opacity = '0';
+                dropdownMenu.style.transform = 'translateY(-10px)';
+
+                setTimeout(() => {
+                    dropdownMenu.classList.add('hidden');
+                }, 150);
+            }
+
+            if (chevron) {
+                chevron.style.transform = 'rotate(0deg)';
+            }
+
+            // Clear search
+            if (searchInput) {
+                searchInput.value = '';
+                this.filterExercises('');
+            }
+        },
+
+        selectExercise(exercise, group) {
+            const dropdownText = document.querySelector('.exercise-dropdown-text');
+            const dropdownBtn = document.getElementById('exercise-dropdown-btn');
+
+            if (dropdownText) {
+                dropdownText.textContent = exercise;
+                dropdownText.classList.remove('text-gray-400');
+                dropdownText.classList.add('text-white');
+            }
+
+            // Store selected exercise
+            this.selectedExercise = exercise;
+
+            // Add visual feedback
+            if (dropdownBtn) {
+                dropdownBtn.classList.add('border-green-500');
+                setTimeout(() => {
+                    dropdownBtn.classList.remove('border-green-500');
+                }, 2000);
+            }
+        },
+
+        filterExercises(searchTerm) {
+            const exerciseOptions = document.querySelectorAll('.exercise-option');
+            const muscleGroupSections = document.querySelectorAll('.muscle-group-section');
+
+            if (!searchTerm.trim()) {
+                // Show all exercises
+                exerciseOptions.forEach(option => {
+                    option.style.display = 'block';
+                });
+                muscleGroupSections.forEach(section => {
+                    section.style.display = 'block';
+                });
+                return;
+            }
+
+            const searchLower = searchTerm.toLowerCase();
+
+            muscleGroupSections.forEach(section => {
+                const options = section.querySelectorAll('.exercise-option');
+                let hasVisibleOptions = false;
+
+                options.forEach(option => {
+                    const exerciseName = option.dataset.exercise.toLowerCase();
+                    const groupName = option.dataset.group.toLowerCase();
+
+                    if (exerciseName.includes(searchLower) || groupName.includes(searchLower)) {
+                        option.style.display = 'block';
+                        hasVisibleOptions = true;
+                    } else {
+                        option.style.display = 'none';
+                    }
+                });
+
+                // Hide section if no visible options
+                section.style.display = hasVisibleOptions ? 'block' : 'none';
+            });
+        },
+
+        updateRoutinePreview() {
+            const previewContainer = document.getElementById('architect-routine-preview');
+            const saveBtn = document.getElementById('architect-save-routine-btn');
+
+            if (!previewContainer) return;
+
+            if (!app.state.currentCustomWorkout.exercises || app.state.currentCustomWorkout.exercises.length === 0) {
+                previewContainer.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-dumbbell text-2xl text-gray-500"></i>
+                        </div>
+                        <div class="text-gray-400 font-medium">No exercises added yet</div>
+                        <div class="text-sm text-gray-500 mt-1">Start building your routine by selecting exercises above</div>
+                    </div>
+                `;
+                if (saveBtn) saveBtn.classList.add('hidden');
+                return;
+            }
+
+            // Calculate total estimated time
+            const totalSets = app.state.currentCustomWorkout.exercises.reduce((sum, ex) => sum + ex.sets, 0);
+            const estimatedTime = Math.round((totalSets * 2.5) + (app.state.currentCustomWorkout.exercises.length * 2)); // 2.5 min per set + 2 min setup per exercise
+
+            const html = `
+                <div class="routine-preview-header mb-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-lg font-semibold text-white flex items-center">
+                            <i class="fas fa-list-alt text-green-400 mr-2"></i>
+                            Routine Preview
+                        </h3>
+                        <div class="text-sm text-gray-400">
+                            ${app.state.currentCustomWorkout.exercises.length} exercises • ~${estimatedTime} min
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 mb-4">
+                        <div class="bg-gray-800/50 p-3 rounded-lg text-center border border-gray-700/50">
+                            <div class="text-lg font-bold text-green-400">${app.state.currentCustomWorkout.exercises.length}</div>
+                            <div class="text-xs text-gray-400">Exercises</div>
+                        </div>
+                        <div class="bg-gray-800/50 p-3 rounded-lg text-center border border-gray-700/50">
+                            <div class="text-lg font-bold text-blue-400">${totalSets}</div>
+                            <div class="text-xs text-gray-400">Total Sets</div>
+                        </div>
+                        <div class="bg-gray-800/50 p-3 rounded-lg text-center border border-gray-700/50">
+                            <div class="text-lg font-bold text-purple-400">${estimatedTime}</div>
+                            <div class="text-xs text-gray-400">Est. Minutes</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="routine-exercises space-y-2">
+                    ${app.state.currentCustomWorkout.exercises.map((exercise, index) => {
+                // Get muscle group for the exercise
+                const muscleGroup = this.getExerciseMuscleGroup(exercise.name);
+                const groupColor = this.getMuscleGroupColor(muscleGroup);
+
+                return `
+                            <div class="routine-preview-card routine-preview-item p-4 rounded-lg flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg text-white font-bold text-sm">
+                                        ${index + 1}
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="font-semibold text-white">${exercise.name}</span>
+                                            <div class="w-2 h-2 rounded-full ${groupColor}"></div>
+                                        </div>
+                                        <div class="flex items-center space-x-4 mt-1">
+                                            <span class="text-sm text-gray-400">
+                                                <i class="fas fa-layer-group mr-1"></i>${exercise.sets} sets
+                                            </span>
+                                            <span class="text-sm text-gray-400">
+                                                <i class="fas fa-repeat mr-1"></i>${exercise.reps} reps
+                                            </span>
+                                            <span class="text-xs text-gray-500">${muscleGroup}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="remove-exercise-btn opacity-0 group-hover:opacity-100 w-8 h-8 bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 rounded-lg flex items-center justify-center transition-all duration-200" data-index="${index}" title="Remove exercise">
+                                    <i class="fas fa-trash text-sm"></i>
+                                </button>
+                            </div>
+                        `;
+            }).join('')}
+                </div>
+            `;
+
+            previewContainer.innerHTML = html;
+            if (saveBtn) saveBtn.classList.remove('hidden');
+        },
+
+        getExerciseMuscleGroup(exerciseName) {
+            // Find which muscle group this exercise belongs to
+            for (const [group, exercises] of Object.entries(app.exercisesByMuscleGroup)) {
+                if (exercises.includes(exerciseName)) {
+                    return group;
+                }
+            }
+            return 'Unknown';
+        },
+
+        addExerciseToRoutine() {
+            const setsInput = document.getElementById('architect-sets');
+            const repsInput = document.getElementById('architect-reps');
+
+            const exercise = this.selectedExercise;
+            const sets = setsInput?.value;
+            const reps = repsInput?.value;
+
+            if (!exercise || !sets || !reps) {
+                app.showErrorNotification("Please fill out all exercise fields.");
+                return;
+            }
+
+            if (!app.state.currentCustomWorkout.exercises) {
+                app.state.currentCustomWorkout.exercises = [];
+            }
+
+            // Check for duplicate exercises
+            const isDuplicate = app.state.currentCustomWorkout.exercises.some(ex => ex.name === exercise);
+            if (isDuplicate) {
+                app.showWarningNotification("This exercise is already in your routine.");
+                return;
+            }
+
+            app.state.currentCustomWorkout.exercises.push({
+                name: exercise,
+                sets: parseInt(sets),
+                reps: reps
+            });
+
+            // Clear inputs with animation
+            this.clearExerciseForm();
+
+            // Update preview without full page re-render
+            this.updateRoutinePreview();
+
+            // Show success feedback
+            app.showSuccessNotification(`Added ${exercise} to routine!`);
+        },
+
+        clearExerciseForm() {
+            const dropdownText = document.querySelector('.exercise-dropdown-text');
+            const setsInput = document.getElementById('architect-sets');
+            const repsInput = document.getElementById('architect-reps');
+
+            // Reset dropdown
+            if (dropdownText) {
+                dropdownText.textContent = 'Select Exercise';
+                dropdownText.classList.remove('text-white');
+                dropdownText.classList.add('text-gray-400');
+            }
+            this.selectedExercise = null;
+
+            // Clear inputs
+            if (setsInput) setsInput.value = '';
+            if (repsInput) repsInput.value = '';
+
+            // Add subtle animation
+            const inputs = [setsInput, repsInput];
+            inputs.forEach(input => {
+                if (input) {
+                    input.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        input.style.transform = 'scale(1)';
+                    }, 150);
+                }
+            });
+        },
+
+        saveCurrentRoutine() {
+            if (!app.state.currentCustomWorkout.name || !app.state.currentCustomWorkout.exercises || app.state.currentCustomWorkout.exercises.length === 0) {
+                app.modalAlert("Please add a name and at least one exercise to your routine.");
+                return;
+            }
+
+            if (!app.state.savedRoutines) {
+                app.state.savedRoutines = [];
+            }
+
+            // Add unique ID and timestamp
+            const routine = {
+                ...app.state.currentCustomWorkout,
+                id: `routine_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+                createdAt: Date.now()
+            };
+
+            app.state.savedRoutines.push(routine);
+            app.saveData();
+
+            app.modalAlert(`Routine "${app.state.currentCustomWorkout.name}" saved!`, 'Routine Saved');
+
+            // Reset current workout
+            app.state.currentCustomWorkout = { name: '', exercises: [] };
+
+            // Clear form and update displays
+            const nameInput = document.getElementById('architect-routine-name');
+            const exerciseSection = document.getElementById('architect-exercise-section');
+            if (nameInput) nameInput.value = '';
+            if (exerciseSection) exerciseSection.classList.add('hidden');
+
+            this.updateRoutinePreview();
+            this.updateSavedRoutines();
+        },
+
+        removeExercise(index) {
+            if (!app.state.currentCustomWorkout.exercises || index < 0 || index >= app.state.currentCustomWorkout.exercises.length) {
+                return;
+            }
+
+            app.state.currentCustomWorkout.exercises.splice(index, 1);
+            this.updateRoutinePreview();
+        },
+
+        updateSavedRoutines() {
+            const container = document.getElementById('saved-routines-list');
+            if (!container) return;
+
+            if (!app.state.savedRoutines || app.state.savedRoutines.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-bookmark text-2xl text-gray-500"></i>
+                        </div>
+                        <div class="text-gray-400 font-medium">No saved routines yet</div>
+                        <div class="text-sm text-gray-500 mt-1">Create and save your first routine to see it here</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = app.state.savedRoutines.map(routine => {
+                const totalSets = routine.exercises.reduce((sum, ex) => sum + ex.sets, 0);
+                const estimatedTime = Math.round((totalSets * 2.5) + (routine.exercises.length * 2));
+                const createdDate = new Date(routine.createdAt).toLocaleDateString();
+
+                return `
+                    <div class="routine-preview-card p-4 rounded-xl group">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-lg text-white mb-1">${routine.name}</h4>
+                                <div class="flex items-center space-x-4 text-sm text-gray-400">
+                                    <span><i class="fas fa-dumbbell mr-1"></i>${routine.exercises.length} exercises</span>
+                                    <span><i class="fas fa-clock mr-1"></i>~${estimatedTime} min</span>
+                                    <span><i class="fas fa-calendar mr-1"></i>${createdDate}</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <button class="use-routine-btn bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-1" data-routine-id="${routine.id}">
+                                    <i class="fas fa-play text-xs"></i>
+                                    <span>Use</span>
+                                </button>
+                                <button class="delete-routine-btn bg-red-600 hover:bg-red-500 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-1" data-routine-id="${routine.id}">
+                                    <i class="fas fa-trash text-xs"></i>
+                                    <span>Delete</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-2 mb-3">
+                            <div class="bg-gray-900/50 p-2 rounded text-center">
+                                <div class="text-sm font-bold text-green-400">${routine.exercises.length}</div>
+                                <div class="text-xs text-gray-500">Exercises</div>
+                            </div>
+                            <div class="bg-gray-900/50 p-2 rounded text-center">
+                                <div class="text-sm font-bold text-blue-400">${totalSets}</div>
+                                <div class="text-xs text-gray-500">Sets</div>
+                            </div>
+                            <div class="bg-gray-900/50 p-2 rounded text-center">
+                                <div class="text-sm font-bold text-purple-400">${estimatedTime}</div>
+                                <div class="text-xs text-gray-500">Minutes</div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-1 max-h-32 overflow-y-auto">
+                            ${routine.exercises.map((exercise, index) => {
+                    const muscleGroup = this.getExerciseMuscleGroup(exercise.name);
+                    const groupColor = this.getMuscleGroupColor(muscleGroup);
+
+                    return `
+                                    <div class="flex items-center justify-between text-sm p-2 bg-gray-900/30 rounded">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="w-5 h-5 bg-gray-700 rounded flex items-center justify-center text-xs text-gray-300">${index + 1}</span>
+                                            <div class="w-2 h-2 rounded-full ${groupColor}"></div>
+                                            <span class="text-gray-300">${exercise.name}</span>
+                                        </div>
+                                        <span class="text-gray-500">${exercise.sets} × ${exercise.reps}</span>
+                                    </div>
+                                `;
+                }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+        },
+
+        useRoutine(routineId) {
+            const routine = app.state.savedRoutines.find(r => r.id === routineId);
+            if (!routine) {
+                app.modalAlert('Routine not found!');
+                return;
+            }
+
+            // Copy routine to current workout (without ID and timestamp)
+            app.state.currentCustomWorkout = {
+                name: routine.name,
+                exercises: [...routine.exercises]
+            };
+
+            // Update form
+            const nameInput = document.getElementById('architect-routine-name');
+            const exerciseSection = document.getElementById('architect-exercise-section');
+
+            if (nameInput) nameInput.value = routine.name;
+            if (exerciseSection) exerciseSection.classList.remove('hidden');
+
+            this.updateRoutinePreview();
+
+            app.modalAlert(`Loaded routine "${routine.name}" for editing.`);
+        },
+
+        deleteRoutine(routineId) {
+            app.modalConfirm('Are you sure you want to delete this routine?').then(confirmed => {
+                if (confirmed) {
+                    const index = app.state.savedRoutines.findIndex(r => r.id === routineId);
+                    if (index !== -1) {
+                        const routineName = app.state.savedRoutines[index].name;
+                        app.state.savedRoutines.splice(index, 1);
+                        app.saveData();
+                        this.updateSavedRoutines();
+                        app.modalAlert(`Routine "${routineName}" deleted.`);
+                    }
+                }
+            });
+        },
+
+        addExerciseToBuilderRoutine() {
+            const setsInput = document.getElementById('builder-sets');
+            const repsInput = document.getElementById('builder-reps');
+
+            const exercise = this.selectedBuilderExercise;
+            const sets = setsInput?.value;
+            const reps = repsInput?.value;
+
+            if (!exercise || !sets || !reps) {
+                app.showErrorNotification("Please fill out all exercise fields.");
+                return;
+            }
+
+            if (!app.state.currentCustomWorkout.exercises) {
+                app.state.currentCustomWorkout.exercises = [];
+            }
+
+            // Check for duplicate exercises
+            const isDuplicate = app.state.currentCustomWorkout.exercises.some(ex => ex.name === exercise);
+            if (isDuplicate) {
+                app.showWarningNotification("This exercise is already in your routine.");
+                return;
+            }
+
+            app.state.currentCustomWorkout.exercises.push({
+                name: exercise,
+                sets: parseInt(sets),
+                reps: reps
+            });
+
+            // Clear inputs with animation
+            this.clearBuilderExerciseForm();
+
+            // Update preview
+            this.updateBuilderPreview();
+
+            // Update save button
+            this.updateBuilderSaveButton();
+
+            // Show success feedback
+            app.showSuccessNotification(`Added ${exercise} to routine!`);
+        },
+
+        addTemplateExercise(exercise, sets, reps) {
+            if (!app.state.currentCustomWorkout.exercises) {
+                app.state.currentCustomWorkout.exercises = [];
+            }
+
+            // Check for duplicate exercises
+            const isDuplicate = app.state.currentCustomWorkout.exercises.some(ex => ex.name === exercise);
+            if (isDuplicate) {
+                app.showWarningNotification("This exercise is already in your routine.");
+                return;
+            }
+
+            app.state.currentCustomWorkout.exercises.push({
+                name: exercise,
+                sets: parseInt(sets),
+                reps: reps
+            });
+
+            // Update preview
+            this.updateBuilderPreview();
+
+            // Update save button
+            this.updateBuilderSaveButton();
+
+            // Show success feedback
+            app.showSuccessNotification(`Added ${exercise} to routine!`);
+        },
+
+        clearBuilderExerciseForm() {
+            const dropdownText = document.querySelector('.builder-exercise-dropdown-text');
+            const setsInput = document.getElementById('builder-sets');
+            const repsInput = document.getElementById('builder-reps');
+
+            // Reset dropdown
+            if (dropdownText) {
+                dropdownText.textContent = 'Select Exercise';
+                dropdownText.classList.remove('text-white');
+                dropdownText.classList.add('text-gray-400');
+            }
+            this.selectedBuilderExercise = null;
+
+            // Clear inputs
+            if (setsInput) setsInput.value = '';
+            if (repsInput) repsInput.value = '';
+        },
+
+        updateBuilderPreview() {
+            const previewContainer = document.getElementById('builder-routine-preview');
+            const exerciseCountEl = document.getElementById('builder-exercise-count');
+            const totalSetsEl = document.getElementById('builder-total-sets');
+            const estimatedTimeEl = document.getElementById('builder-estimated-time');
+
+            if (!previewContainer) return;
+
+            const exercises = app.state.currentCustomWorkout.exercises || [];
+            const totalSets = exercises.reduce((sum, ex) => sum + ex.sets, 0);
+            const estimatedTime = Math.round((totalSets * 2.5) + (exercises.length * 2));
+
+            // Update stats
+            if (exerciseCountEl) exerciseCountEl.textContent = exercises.length;
+            if (totalSetsEl) totalSetsEl.textContent = totalSets;
+            if (estimatedTimeEl) estimatedTimeEl.textContent = estimatedTime;
+
+            if (exercises.length === 0) {
+                previewContainer.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-dumbbell text-2xl text-gray-500"></i>
+                        </div>
+                        <div class="text-gray-400 font-medium">No exercises added yet</div>
+                        <div class="text-sm text-gray-500 mt-1">Add exercises to see your routine preview</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = exercises.map((exercise, index) => {
+                const muscleGroup = this.getExerciseMuscleGroup(exercise.name);
+                const groupColor = this.getMuscleGroupColor(muscleGroup);
+
+                return `
+                    <div class="routine-preview-card p-3 rounded-lg flex items-center justify-between group mb-2">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center justify-center w-7 h-7 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg text-white font-bold text-sm">
+                                ${index + 1}
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-medium text-white text-sm">${exercise.name}</span>
+                                    <div class="w-2 h-2 rounded-full ${groupColor}"></div>
+                                </div>
+                                <div class="text-xs text-gray-400">
+                                    ${exercise.sets} sets × ${exercise.reps} reps
+                                </div>
+                            </div>
+                        </div>
+                        <button class="remove-exercise-btn opacity-0 group-hover:opacity-100 w-6 h-6 bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 rounded flex items-center justify-center transition-all duration-200" data-index="${index}" title="Remove exercise">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            previewContainer.innerHTML = html;
+        },
+
+        updateBuilderSaveButton() {
+            const saveBtn = document.getElementById('builder-save-routine-btn');
+            const routineName = app.state.currentCustomWorkout.name;
+            const exercises = app.state.currentCustomWorkout.exercises || [];
+
+            if (saveBtn) {
+                const canSave = routineName && routineName.trim() && exercises.length > 0;
+                saveBtn.disabled = !canSave;
+
+                if (canSave) {
+                    saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        },
+
+        saveBuilderRoutine() {
+            if (!app.state.currentCustomWorkout.name || !app.state.currentCustomWorkout.exercises || app.state.currentCustomWorkout.exercises.length === 0) {
+                app.showErrorNotification("Please add a name and at least one exercise to your routine.");
+                return;
+            }
+
+            if (!app.state.savedRoutines) {
+                app.state.savedRoutines = [];
+            }
+
+            // Add unique ID and timestamp
+            const routine = {
+                ...app.state.currentCustomWorkout,
+                id: `routine_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+                createdAt: Date.now()
+            };
+
+            app.state.savedRoutines.push(routine);
+            app.safeSave();
+
+            app.showSuccessNotification(`Routine "${app.state.currentCustomWorkout.name}" saved successfully!`);
+
+            // Close builder and update main view
+            this.closeRoutineBuilder();
+            this.updateSavedRoutines();
+
+            // Reset current workout
+            app.state.currentCustomWorkout = { name: '', exercises: [] };
+        },
+
+        clearBuilderRoutine() {
+            app.modalConfirm({
+                title: 'Clear Routine',
+                message: 'Are you sure you want to clear all exercises from this routine?'
+            }).then((confirmed) => {
+                if (confirmed) {
+                    app.state.currentCustomWorkout = { name: '', exercises: [] };
+
+                    // Clear name input
+                    const nameInput = document.getElementById('routine-builder-name');
+                    if (nameInput) nameInput.value = '';
+
+                    // Clear exercise form
+                    this.clearBuilderExerciseForm();
+
+                    // Update preview and save button
+                    this.updateBuilderPreview();
+                    this.updateBuilderSaveButton();
+
+                    app.showInfoNotification('Routine cleared');
+                }
+            });
+        },
+
+        initializeMuscleGroupMappings() {
+            // Comprehensive exercise database organized by muscle groups
+            this.muscleExercises = {
+                'Chest': [
+                    { name: 'Bench Press', sets: '3-4', reps: '6-10', difficulty: 'Intermediate' },
+                    { name: 'Push-ups', sets: '3-4', reps: '10-20', difficulty: 'Beginner' },
+                    { name: 'Incline Bench Press', sets: '3-4', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Dumbbell Flyes', sets: '3', reps: '10-15', difficulty: 'Beginner' },
+                    { name: 'Decline Bench Press', sets: '3', reps: '8-12', difficulty: 'Advanced' },
+                    { name: 'Chest Dips', sets: '3', reps: '8-15', difficulty: 'Intermediate' },
+                    { name: 'Cable Crossovers', sets: '3', reps: '12-15', difficulty: 'Intermediate' }
+                ],
+                'Shoulders': [
+                    { name: 'Overhead Press', sets: '3-4', reps: '6-10', difficulty: 'Intermediate' },
+                    { name: 'Lateral Raises', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Front Raises', sets: '3', reps: '10-12', difficulty: 'Beginner' },
+                    { name: 'Arnold Press', sets: '3', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Pike Push-ups', sets: '3', reps: '8-15', difficulty: 'Intermediate' },
+                    { name: 'Upright Rows', sets: '3', reps: '10-12', difficulty: 'Intermediate' }
+                ],
+                'Biceps': [
+                    { name: 'Barbell Curls', sets: '3-4', reps: '8-12', difficulty: 'Beginner' },
+                    { name: 'Dumbbell Curls', sets: '3', reps: '10-15', difficulty: 'Beginner' },
+                    { name: 'Hammer Curls', sets: '3', reps: '10-12', difficulty: 'Beginner' },
+                    { name: 'Chin-ups', sets: '3', reps: '5-10', difficulty: 'Intermediate' },
+                    { name: 'Cable Curls', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Preacher Curls', sets: '3', reps: '8-12', difficulty: 'Intermediate' }
+                ],
+                'Triceps': [
+                    { name: 'Close-Grip Bench Press', sets: '3-4', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Tricep Dips', sets: '3', reps: '8-15', difficulty: 'Intermediate' },
+                    { name: 'Overhead Tricep Extension', sets: '3', reps: '10-12', difficulty: 'Beginner' },
+                    { name: 'Tricep Pushdowns', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Diamond Push-ups', sets: '3', reps: '8-15', difficulty: 'Intermediate' },
+                    { name: 'Skull Crushers', sets: '3', reps: '10-12', difficulty: 'Intermediate' }
+                ],
+                'Forearms': [
+                    { name: 'Wrist Curls', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Reverse Wrist Curls', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Farmer\'s Walk', sets: '3', reps: '30-60s', difficulty: 'Beginner' },
+                    { name: 'Plate Pinches', sets: '3', reps: '20-30s', difficulty: 'Intermediate' },
+                    { name: 'Reverse Curls', sets: '3', reps: '12-15', difficulty: 'Intermediate' }
+                ],
+                'Abs': [
+                    { name: 'Crunches', sets: '3-4', reps: '15-25', difficulty: 'Beginner' },
+                    { name: 'Plank', sets: '3', reps: '30-60s', difficulty: 'Beginner' },
+                    { name: 'Russian Twists', sets: '3', reps: '20-30', difficulty: 'Beginner' },
+                    { name: 'Bicycle Crunches', sets: '3', reps: '20-30', difficulty: 'Beginner' },
+                    { name: 'Mountain Climbers', sets: '3', reps: '20-30', difficulty: 'Intermediate' },
+                    { name: 'Hanging Leg Raises', sets: '3', reps: '8-15', difficulty: 'Advanced' },
+                    { name: 'Dead Bug', sets: '3', reps: '10-15', difficulty: 'Beginner' }
+                ],
+                'Lats': [
+                    { name: 'Pull-ups', sets: '3-4', reps: '5-12', difficulty: 'Intermediate' },
+                    { name: 'Lat Pulldowns', sets: '3-4', reps: '8-12', difficulty: 'Beginner' },
+                    { name: 'Bent-over Rows', sets: '3-4', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'T-Bar Rows', sets: '3', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Cable Rows', sets: '3', reps: '10-15', difficulty: 'Beginner' },
+                    { name: 'Single-arm Dumbbell Rows', sets: '3', reps: '10-12', difficulty: 'Beginner' }
+                ],
+                'Traps': [
+                    { name: 'Shrugs', sets: '3-4', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Upright Rows', sets: '3', reps: '10-12', difficulty: 'Intermediate' },
+                    { name: 'Face Pulls', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'High Pulls', sets: '3', reps: '6-8', difficulty: 'Advanced' },
+                    { name: 'Rack Pulls', sets: '3', reps: '5-8', difficulty: 'Advanced' }
+                ],
+                'Rear Delts': [
+                    { name: 'Reverse Flyes', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Face Pulls', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Bent-over Lateral Raises', sets: '3', reps: '12-15', difficulty: 'Intermediate' },
+                    { name: 'Cable Reverse Flyes', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Prone Y-Raises', sets: '3', reps: '12-15', difficulty: 'Intermediate' }
+                ],
+                'Lower Back': [
+                    { name: 'Deadlifts', sets: '3-4', reps: '5-8', difficulty: 'Advanced' },
+                    { name: 'Romanian Deadlifts', sets: '3', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Good Mornings', sets: '3', reps: '10-12', difficulty: 'Intermediate' },
+                    { name: 'Hyperextensions', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Superman', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Reverse Hyperextensions', sets: '3', reps: '12-15', difficulty: 'Intermediate' }
+                ],
+                'Quadriceps': [
+                    { name: 'Squats', sets: '3-4', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Leg Press', sets: '3-4', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Lunges', sets: '3', reps: '10-12', difficulty: 'Beginner' },
+                    { name: 'Bulgarian Split Squats', sets: '3', reps: '10-12', difficulty: 'Intermediate' },
+                    { name: 'Leg Extensions', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Front Squats', sets: '3', reps: '8-10', difficulty: 'Advanced' },
+                    { name: 'Jump Squats', sets: '3', reps: '10-15', difficulty: 'Intermediate' }
+                ],
+                'Hamstrings': [
+                    { name: 'Romanian Deadlifts', sets: '3-4', reps: '8-12', difficulty: 'Intermediate' },
+                    { name: 'Leg Curls', sets: '3', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Stiff-leg Deadlifts', sets: '3', reps: '10-12', difficulty: 'Intermediate' },
+                    { name: 'Nordic Curls', sets: '3', reps: '5-8', difficulty: 'Advanced' },
+                    { name: 'Glute Ham Raises', sets: '3', reps: '8-12', difficulty: 'Advanced' },
+                    { name: 'Single-leg RDLs', sets: '3', reps: '8-10', difficulty: 'Intermediate' }
+                ],
+                'Glutes': [
+                    { name: 'Hip Thrusts', sets: '3-4', reps: '12-15', difficulty: 'Beginner' },
+                    { name: 'Glute Bridges', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Bulgarian Split Squats', sets: '3', reps: '10-12', difficulty: 'Intermediate' },
+                    { name: 'Clamshells', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Single-leg Glute Bridges', sets: '3', reps: '10-15', difficulty: 'Intermediate' },
+                    { name: 'Lateral Lunges', sets: '3', reps: '10-12', difficulty: 'Intermediate' }
+                ],
+                'Calves': [
+                    { name: 'Calf Raises', sets: '3-4', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Seated Calf Raises', sets: '3', reps: '15-20', difficulty: 'Beginner' },
+                    { name: 'Single-leg Calf Raises', sets: '3', reps: '12-15', difficulty: 'Intermediate' },
+                    { name: 'Jump Rope', sets: '3', reps: '60-120s', difficulty: 'Beginner' },
+                    { name: 'Donkey Calf Raises', sets: '3', reps: '15-20', difficulty: 'Intermediate' }
+                ]
+            };
+        },
+
+        setupBodyDiagramListeners() {
+            // Body view toggle listeners
+            const frontViewBtn = document.getElementById('body-view-front');
+            const backViewBtn = document.getElementById('body-view-back');
+            
+            if (frontViewBtn && backViewBtn) {
+                frontViewBtn.addEventListener('click', () => this.switchBodyView('front'));
+                backViewBtn.addEventListener('click', () => this.switchBodyView('back'));
+            }
+
+            // Set up muscle group interactions
+            this.setupMuscleGroupInteractions();
+        },
+
+        switchBodyView(view) {
+            const frontDiagram = document.getElementById('body-diagram-front');
+            const backDiagram = document.getElementById('body-diagram-back');
+            const frontBtn = document.getElementById('body-view-front');
+            const backBtn = document.getElementById('body-view-back');
+
+            if (view === 'front') {
+                frontDiagram?.classList.remove('hidden');
+                frontDiagram?.classList.add('active');
+                backDiagram?.classList.add('hidden');
+                backDiagram?.classList.remove('active');
+                
+                frontBtn?.classList.add('active', 'bg-green-600');
+                frontBtn?.classList.remove('bg-gray-600');
+                backBtn?.classList.remove('active', 'bg-green-600');
+                backBtn?.classList.add('bg-gray-600');
+            } else {
+                backDiagram?.classList.remove('hidden');
+                backDiagram?.classList.add('active');
+                frontDiagram?.classList.add('hidden');
+                frontDiagram?.classList.remove('active');
+                
+                backBtn?.classList.add('active', 'bg-green-600');
+                backBtn?.classList.remove('bg-gray-600');
+                frontBtn?.classList.remove('active', 'bg-green-600');
+                frontBtn?.classList.add('bg-gray-600');
+            }
+
+            // Re-setup muscle group interactions for the new view
+            setTimeout(() => this.setupMuscleGroupInteractions(), 100);
+        },
+
+        setupMuscleGroupInteractions() {
+            const muscleGroups = document.querySelectorAll('.interactive-muscle');
+            
+            muscleGroups.forEach(muscle => {
+                // Remove existing listeners to prevent duplicates
+                muscle.replaceWith(muscle.cloneNode(true));
+            });
+
+            // Re-select after cloning
+            const freshMuscleGroups = document.querySelectorAll('.interactive-muscle');
+            
+            freshMuscleGroups.forEach(muscle => {
+                const muscleType = muscle.dataset.muscle;
+                const description = muscle.dataset.description;
+
+                // Desktop interactions (hover)
+                if (!this.isMobileDevice()) {
+                    muscle.addEventListener('mouseenter', (e) => {
+                        this.highlightMuscleGroup(e.target, muscleType, description);
+                        this.showMuscleExercises(muscleType);
+                    });
+
+                    muscle.addEventListener('mouseleave', (e) => {
+                        this.unhighlightMuscleGroup(e.target);
+                    });
+                }
+
+                // Mobile and desktop click interactions
+                muscle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.selectMuscleGroup(e.target, muscleType, description);
+                    this.showMuscleExercises(muscleType);
+                });
+
+                // Touch interactions for mobile
+                if (this.isMobileDevice()) {
+                    muscle.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        this.highlightMuscleGroup(e.target, muscleType, description);
+                    });
+
+                    muscle.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        this.selectMuscleGroup(e.target, muscleType, description);
+                        this.showMuscleExercises(muscleType);
+                    });
+                }
+            });
+        },
+
+        isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                   window.innerWidth <= 768;
+        },
+
+        highlightMuscleGroup(element, muscleType, description) {
+            // Reset all muscle groups
+            document.querySelectorAll('.interactive-muscle').forEach(muscle => {
+                muscle.style.filter = 'none';
+                muscle.style.transform = 'scale(1)';
+            });
+
+            // Highlight selected muscle group
+            element.style.filter = 'url(#glow) brightness(1.3)';
+            element.style.transform = 'scale(1.05)';
+
+            // Update UI
+            this.updateMuscleGroupDisplay(muscleType, description);
+        },
+
+        unhighlightMuscleGroup(element) {
+            if (!this.selectedMuscleGroup) {
+                element.style.filter = 'none';
+                element.style.transform = 'scale(1)';
+            }
+        },
+
+        selectMuscleGroup(element, muscleType, description) {
+            // Clear previous selection
+            document.querySelectorAll('.interactive-muscle').forEach(muscle => {
+                muscle.classList.remove('selected');
+                if (muscle !== element) {
+                    muscle.style.filter = 'none';
+                    muscle.style.transform = 'scale(1)';
+                }
+            });
+
+            // Mark as selected
+            element.classList.add('selected');
+            element.style.filter = 'url(#glow) brightness(1.4)';
+            element.style.transform = 'scale(1.1)';
+
+            this.selectedMuscleGroup = muscleType;
+            this.updateMuscleGroupDisplay(muscleType, description);
+        },
+
+        updateMuscleGroupDisplay(muscleType, description) {
+            const muscleGroupSpan = document.getElementById('selected-muscle-group');
+            const descriptionDiv = document.getElementById('muscle-group-description');
+
+            if (muscleGroupSpan) {
+                muscleGroupSpan.textContent = muscleType;
+            }
+
+            if (descriptionDiv) {
+                descriptionDiv.textContent = description;
+            }
+        },
+
+        showMuscleExercises(muscleType) {
+            const exercisesList = document.getElementById('muscle-exercises-list');
+            const exercises = this.muscleExercises[muscleType] || [];
+
+            if (!exercisesList) return;
+
+            if (exercises.length === 0) {
+                exercisesList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                        <div>No exercises found for ${muscleType}</div>
+                    </div>
+                `;
+                return;
+            }
+
+            exercisesList.innerHTML = exercises.map(exercise => `
+                <div class="exercise-item p-3 bg-gray-800/30 border border-gray-600 rounded-lg hover:border-green-500 cursor-pointer transition-all duration-200 group" 
+                     data-exercise="${exercise.name}" 
+                     data-sets="${exercise.sets}" 
+                     data-reps="${exercise.reps}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="font-medium text-white group-hover:text-green-400 transition-colors">
+                                ${exercise.name}
+                            </div>
+                            <div class="text-sm text-gray-400 mt-1">
+                                ${exercise.sets} sets × ${exercise.reps} reps
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs px-2 py-1 rounded-full ${this.getDifficultyColor(exercise.difficulty)}">
+                                ${exercise.difficulty}
+                            </span>
+                            <i class="fas fa-plus text-green-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add click listeners to exercise items
+            exercisesList.querySelectorAll('.exercise-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const exerciseName = item.dataset.exercise;
+                    const sets = item.dataset.sets;
+                    const reps = item.dataset.reps;
+                    this.selectExercise(exerciseName, sets, reps);
+                });
+            });
+        },
+
+        getDifficultyColor(difficulty) {
+            switch (difficulty) {
+                case 'Beginner': return 'bg-green-500/20 text-green-400';
+                case 'Intermediate': return 'bg-yellow-500/20 text-yellow-400';
+                case 'Advanced': return 'bg-red-500/20 text-red-400';
+                default: return 'bg-gray-500/20 text-gray-400';
+            }
+        },
+
+        selectExercise(exerciseName, sets, reps) {
+            // Update the exercise configuration panel
+            const exerciseNameSpan = document.getElementById('selected-exercise-name');
+            const setsInput = document.getElementById('builder-sets');
+            const repsInput = document.getElementById('builder-reps');
+            const configPanel = document.getElementById('exercise-config-panel');
+
+            if (exerciseNameSpan) exerciseNameSpan.textContent = exerciseName;
+            if (setsInput) setsInput.value = sets.split('-')[0]; // Take first number if range
+            if (repsInput) repsInput.value = reps;
+            
+            if (configPanel) {
+                configPanel.classList.remove('hidden');
+            }
+
+            // Store selected exercise
+            this.selectedExercise = {
+                name: exerciseName,
+                sets: sets,
+                reps: reps
+            };
+
+            // Setup clear selection listener
+            const clearBtn = document.getElementById('clear-exercise-selection');
+            if (clearBtn) {
+                clearBtn.onclick = () => this.clearExerciseSelection();
+            }
+        },
+
+        clearExerciseSelection() {
+            const configPanel = document.getElementById('exercise-config-panel');
+            if (configPanel) {
+                configPanel.classList.add('hidden');
+            }
+            
+            this.selectedExercise = null;
+            
+            // Clear muscle group selection
+            document.querySelectorAll('.interactive-muscle').forEach(muscle => {
+                muscle.classList.remove('selected');
+                muscle.style.filter = 'none';
+                muscle.style.transform = 'scale(1)';
+            });
+            
+            this.selectedMuscleGroup = null;
+            
+            // Reset display
+            const muscleGroupSpan = document.getElementById('selected-muscle-group');
+            const descriptionDiv = document.getElementById('muscle-group-description');
+            const exercisesList = document.getElementById('muscle-exercises-list');
+            
+            if (muscleGroupSpan) muscleGroupSpan.textContent = 'Select a muscle group';
+            if (descriptionDiv) descriptionDiv.textContent = 'Click on a muscle group to see available exercises';
+            if (exercisesList) {
+                exercisesList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-hand-pointer text-3xl mb-2"></i>
+                        <div>Click on a muscle group to see exercises</div>
+                    </div>
+                `;
+            }
+        },
+
+        cleanup() {
+            // Remove event listeners to prevent memory leaks
+            const routineNameInput = document.getElementById('architect-routine-name');
+            const addExerciseBtn = document.getElementById('architect-add-exercise-btn');
+            const saveRoutineBtn = document.getElementById('architect-save-routine-btn');
+
+            if (routineNameInput && this.routineNameInputHandler) {
+                routineNameInput.removeEventListener('input', this.routineNameInputHandler);
+            }
+
+            if (addExerciseBtn && this.addExerciseHandler) {
+                addExerciseBtn.removeEventListener('click', this.addExerciseHandler);
+            }
+
+            if (saveRoutineBtn && this.saveRoutineHandler) {
+                saveRoutineBtn.removeEventListener('click', this.saveRoutineHandler);
+            }
+
+            if (this.delegatedClickHandler) {
+                document.removeEventListener('click', this.delegatedClickHandler);
+            }
+
+            // Clear handler references
+            this.routineNameInputHandler = null;
+            this.addExerciseHandler = null;
+            this.saveRoutineHandler = null;
+            this.delegatedClickHandler = null;
+        }
+    };
+}

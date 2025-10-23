@@ -81,12 +81,13 @@ export function initGates(app) {
 
         setupEventListeners() {
             // Remove any existing listeners first
-            if (this.clickHandler) {
-                document.removeEventListener('click', this.clickHandler);
-            }
+            this.cleanup();
+            
+            // Store app reference for closures
+            const appRef = app;
+            const self = this;
             
             // Gate completion buttons - use event delegation
-            const self = this;
             this.clickHandler = (event) => {
                 if (event.target.classList.contains('complete-gate-btn')) {
                     event.preventDefault();
@@ -98,7 +99,7 @@ export function initGates(app) {
                         self.completeGate(gateId);
                     } else {
                         console.error('No gate ID found on button');
-                        app.modalAlert('Error: Gate ID not found!');
+                        appRef.modalAlert('Error: Gate ID not found!');
                     }
                 } else if (event.target.id === 'manual-generate-gate-btn') {
                     event.preventDefault();
@@ -108,6 +109,20 @@ export function initGates(app) {
             };
             
             document.addEventListener('click', this.clickHandler);
+        },
+
+        cleanup() {
+            // Clear time update interval
+            if (this.timeUpdateInterval) {
+                clearInterval(this.timeUpdateInterval);
+                this.timeUpdateInterval = null;
+            }
+
+            // Remove event listeners to prevent memory leaks
+            if (this.clickHandler) {
+                document.removeEventListener('click', this.clickHandler);
+                this.clickHandler = null;
+            }
         },
 
         updateGatesList() {
@@ -692,15 +707,7 @@ export function initGates(app) {
             }, 60000); // Update every minute
         },
 
-        cleanup() {
-            // Clean up event listeners and intervals
-            if (this.clickHandler) {
-                document.removeEventListener('click', this.clickHandler);
-            }
-            if (this.timeUpdateInterval) {
-                clearInterval(this.timeUpdateInterval);
-            }
-        },
+
 
         getGateDatabase() {
             return {

@@ -74,7 +74,7 @@ export function initDashboard(app) {
                         <div class="card-bg p-6 rounded-lg">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-xl font-bold">💪 Strength Progression</h3>
-                                <select id="progression-timeframe" class="bg-gray-800 border border-gray-600 rounded px-3 py-1 text-sm">
+                                <select id="progression-timeframe" class="polished-dropdown select-sm">
                                     <option value="4">Last 4 Weeks</option>
                                     <option value="8">Last 8 Weeks</option>
                                     <option value="12">Last 12 Weeks</option>
@@ -120,23 +120,6 @@ export function initDashboard(app) {
                         
                         <!-- Activity Calendar (Full Width in Content Area) -->
                         <div id="activity-calendar-container" class="card-bg p-6 rounded-lg">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-xl font-bold">Activity Calendar</h3>
-                                <div class="flex items-center gap-4 text-xs">
-                                    <div class="flex items-center gap-1">
-                                        <div class="w-3 h-3 bg-green-500 rounded"></div>
-                                        <span class="text-gray-400">Workout</span>
-                                    </div>
-                                    <div class="flex items-center gap-1">
-                                        <div class="w-3 h-3 bg-purple-500 rounded"></div>
-                                        <span class="text-gray-400">Gate</span>
-                                    </div>
-                                    <div class="flex items-center gap-1">
-                                        <div class="w-3 h-3 bg-blue-500 rounded"></div>
-                                        <span class="text-gray-400">Both</span>
-                                    </div>
-                                </div>
-                            </div>
                             <div id="activity-calendar" class="activity-calendar">
                                 <!-- Calendar will be rendered here -->
                             </div>
@@ -194,6 +177,10 @@ export function initDashboard(app) {
             // Remove any existing listeners first
             this.cleanup();
 
+            // Store app reference for closures
+            const appRef = app;
+            const self = this;
+
             // Store references to bound functions for cleanup
             this.avatarClickHandler = () => {
                 const avatarInput = document.getElementById('avatar-upload-input');
@@ -206,30 +193,37 @@ export function initDashboard(app) {
                 
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    app.state.customAvatar = e.target.result;
-                    app.saveData();
-                    this.renderAvatar();
+                    appRef.state.customAvatar = e.target.result;
+                    appRef.saveData();
+                    self.renderAvatar();
                 };
                 reader.readAsDataURL(file);
             };
 
             this.editNameHandler = () => {
-                app.modalPrompt({
+                appRef.modalPrompt({
                     title: 'Edit Name',
                     message: 'Enter your new name:',
-                    placeholder: app.state.playerName
+                    placeholder: appRef.state.playerName
                 }).then((val) => {
                     if (val && val.trim() !== '') {
-                        app.state.playerName = val.trim();
-                        app.saveData();
-                        document.getElementById('player-name-display').textContent = app.state.playerName;
+                        appRef.state.playerName = val.trim();
+                        appRef.saveData();
+                        const nameDisplay = document.getElementById('player-name-display');
+                        if (nameDisplay) {
+                            nameDisplay.textContent = appRef.state.playerName;
+                        }
                     }
                 });
             };
 
             this.showcaseHandler = () => {
                 // This would open showcase selector - simplified for now
-                app.modalAlert('Showcase selector coming soon!');
+                appRef.modalAlert('Showcase selector coming soon!');
+            };
+
+            this.progressionTimeframeHandler = () => {
+                self.updateStrengthProgression();
             };
 
             // Add event listeners with proper references
@@ -237,6 +231,7 @@ export function initDashboard(app) {
             const avatarInput = document.getElementById('avatar-upload-input');
             const editNameBtn = document.getElementById('edit-name-btn');
             const showcaseBtn = document.getElementById('select-showcase-btn');
+            const progressionSelect = document.getElementById('progression-timeframe');
             
             if (avatarContainer) {
                 avatarContainer.addEventListener('click', this.avatarClickHandler);
@@ -252,6 +247,10 @@ export function initDashboard(app) {
 
             if (showcaseBtn) {
                 showcaseBtn.addEventListener('click', this.showcaseHandler);
+            }
+
+            if (progressionSelect) {
+                progressionSelect.addEventListener('change', this.progressionTimeframeHandler);
             }
         },
 
@@ -354,6 +353,7 @@ export function initDashboard(app) {
             const avatarInput = document.getElementById('avatar-upload-input');
             const editNameBtn = document.getElementById('edit-name-btn');
             const showcaseBtn = document.getElementById('select-showcase-btn');
+            const progressionSelect = document.getElementById('progression-timeframe');
 
             if (avatarContainer && this.avatarClickHandler) {
                 avatarContainer.removeEventListener('click', this.avatarClickHandler);
@@ -371,11 +371,16 @@ export function initDashboard(app) {
                 showcaseBtn.removeEventListener('click', this.showcaseHandler);
             }
 
+            if (progressionSelect && this.progressionTimeframeHandler) {
+                progressionSelect.removeEventListener('change', this.progressionTimeframeHandler);
+            }
+
             // Clear handler references
             this.avatarClickHandler = null;
             this.avatarChangeHandler = null;
             this.editNameHandler = null;
             this.showcaseHandler = null;
+            this.progressionTimeframeHandler = null;
         },
 
         updateProgressiveAnalytics() {
@@ -642,108 +647,146 @@ export function initDashboard(app) {
                         ${record.lastUpdated ? ` • ${new Date(record.lastUpdated).toLocaleDateString()}` : ''}
                     </div>
                 </div>
-            `).join('')}
+            `).join('');
+            
+            container.innerHTML = html;
         },
+
         updateActivityCalendar() {
             const container = document.getElementById('activity-calendar');
             if (!container) return;
         
             const activityLog = app.state.activityLog || [];
+            const workoutHistory = app.state.workoutHistory || {};
         
-            if (activityLog.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center text-gray-400 py-8">
-                        <i class="fas fa-calendar-alt text-4xl mb-3"></i>
-                        <div>No activity yet.</div>
-                        <div class="text-sm text-gray-500 mt-1">Your workout and gate activity will appear here.</div>
+            // Get recent activities (last 10)
+            const recentActivities = activityLog
+                .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+                .slice(0, 10);
+            
+            // Get workout stats
+            const totalWorkouts = Object.keys(workoutHistory).length;
+            const thisWeekWorkouts = this.getThisWeekWorkouts(activityLog);
+            const currentStreak = app.state.streak || 0;
+            
+            let activitiesHTML = '';
+            if (recentActivities.length === 0) {
+                activitiesHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fas fa-dumbbell text-4xl mb-4"></i>
+                        <p class="text-lg">No workouts yet!</p>
+                        <p class="text-sm">Complete your first workout to start tracking your progress.</p>
                     </div>
                 `;
-                return;
+            } else {
+                activitiesHTML = recentActivities.map(activity => {
+                    const date = new Date(activity.timestamp);
+                    const timeAgo = this.getTimeAgo(date);
+                    
+                    let icon, title, description, color;
+                    
+                    switch (activity.type) {
+                        case 'workout_completed':
+                            icon = 'fas fa-dumbbell';
+                            title = `Completed ${activity.workoutName}`;
+                            description = `Duration: ${activity.duration} minutes`;
+                            color = 'text-green-400';
+                            break;
+                        case 'gate_completed':
+                            icon = 'fas fa-trophy';
+                            title = 'Gate Conquered';
+                            description = activity.gateName || 'Unknown Gate';
+                            color = 'text-purple-400';
+                            break;
+                        case 'achievement_unlocked':
+                            icon = 'fas fa-medal';
+                            title = 'Achievement Unlocked';
+                            description = activity.achievementName || 'New Achievement';
+                            color = 'text-yellow-400';
+                            break;
+                        case 'level_up':
+                            icon = 'fas fa-arrow-up';
+                            title = `Level Up! Reached Level ${activity.newLevel}`;
+                            description = 'Your power grows stronger';
+                            color = 'text-indigo-400';
+                            break;
+                        default:
+                            icon = 'fas fa-star';
+                            title = 'Activity';
+                            description = 'Progress made';
+                            color = 'text-gray-400';
+                    }
+                    
+                    return `
+                        <div class="activity-item flex items-start space-x-4 p-4 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
+                                    <i class="${icon} ${color}"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-white">${title}</p>
+                                <p class="text-xs text-gray-400">${description}</p>
+                                <p class="text-xs text-gray-500 mt-1">${timeAgo}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             }
         
-            const { months, days } = this.generateActivityCalendar(activityLog);
-        
-            // Add month labels
-            const monthLabels = months.map(month => `<div class="text-center text-gray-500 p-1 font-semibold" style="grid-column: span ${month.span}">${month.name}</div>`).join('');
-        
             container.innerHTML = `
-                <div class="grid grid-cols-53 gap-1 text-xs" style="grid-template-rows: auto 1fr;">
-                    <div class="col-span-1"></div>
-                    ${monthLabels}
-                    <div class="grid grid-cols-1 gap-1 text-center text-gray-500 p-1 font-semibold">
-                        <div>Mon</div>
-                        <div>Wed</div>
-                        <div>Fri</div>
+                <div class="activity-log-container">
+                    <div class="activity-header flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">🔥 Recent Activity</h3>
+                        <div class="flex space-x-4 text-sm">
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-green-400">${thisWeekWorkouts}</div>
+                                <div class="text-xs text-gray-400">This Week</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-indigo-400">${totalWorkouts}</div>
+                                <div class="text-xs text-gray-400">Total</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-orange-400">${currentStreak}</div>
+                                <div class="text-xs text-gray-400">Streak</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-52 gap-1 text-xs">
-                        ${days.map(day => `
-                            <div class="aspect-square rounded ${day.bgClass}" title="${day.tooltip}"></div>
-                        `).join('')}
+                    <div class="activity-list space-y-3 max-h-96 overflow-y-auto">
+                        ${activitiesHTML}
                     </div>
                 </div>
             `;
         },
         
-        generateActivityCalendar(activityLog) {
+        getThisWeekWorkouts(activityLog) {
             const today = new Date();
-            const endDate = new Date(today);
-            endDate.setDate(today.getDate() + (6 - today.getDay())); // Align to end of the week (Saturday)
-        
-            const days = [];
-            const months = [];
-            let lastMonth = -1;
-        
-            for (let i = 0; i < 365; i++) {
-                const currentDate = new Date(endDate);
-                currentDate.setDate(endDate.getDate() - i);
-        
-                const dayActivities = activityLog.filter(log => {
-                    const logDate = new Date(log.timestamp);
-                    return logDate.toDateString() === currentDate.toDateString();
-                });
-        
-                const hasWorkout = dayActivities.some(log => log.type === 'workout_completed');
-                const hasGate = dayActivities.some(log => log.type === 'gate_completed');
-        
-                let bgClass = 'bg-gray-800';
-                let tooltip = currentDate.toDateString();
-                let contributionLevel = 0;
-        
-                if (hasWorkout && hasGate) {
-                    contributionLevel = 4;
-                    bgClass = 'bg-green-800';
-                    tooltip += ' - Workout & Gate completed';
-                } else if (hasWorkout) {
-                    contributionLevel = 3;
-                    bgClass = 'bg-green-700';
-                    tooltip += ' - Workout completed';
-                } else if (hasGate) {
-                    contributionLevel = 2;
-                    bgClass = 'bg-green-600';
-                    tooltip += ' - Gate completed';
-                } else {
-                    contributionLevel = 1;
-                    bgClass = 'bg-green-500';
-                }
-        
-                days.unshift({
-                    date: currentDate,
-                    bgClass,
-                    tooltip,
-                    contributionLevel,
-                });
-        
-                const currentMonth = currentDate.getMonth();
-                if (currentMonth !== lastMonth) {
-                    months.unshift({ name: currentDate.toLocaleString('default', { month: 'short' }), span: 0 });
-                    lastMonth = currentMonth;
-                }
-                if (months.length > 0) {
-                    months[0].span++;
-                }
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
+            
+            return activityLog.filter(log => {
+                const logDate = new Date(log.timestamp);
+                return logDate >= weekStart && log.type === 'workout_completed';
+            }).length;
+        },
+
+        getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 60) {
+                return diffMins <= 1 ? 'Just now' : `${diffMins}m ago`;
+            } else if (diffHours < 24) {
+                return `${diffHours}h ago`;
+            } else if (diffDays < 7) {
+                return `${diffDays}d ago`;
+            } else {
+                return date.toLocaleDateString();
             }
-        
-            return { months, days };
         }
         
     };
